@@ -2,7 +2,7 @@ import SwiftUI
 
 struct WindowTitleBar: View {
     @EnvironmentObject private var vm: ImageToolsViewModel
-    @StateObject private var purchaseManager = PurchaseManager.shared
+    @State private var purchaseManager = PurchaseManager.shared
     @State private var isHovered: Bool = false
     
     var body: some View {
@@ -20,8 +20,7 @@ struct WindowTitleBar: View {
             Menu {
                 if !purchaseManager.isProUnlocked {
                     Button {
-                        vm.paywallContext = .manual
-                        vm.isPaywallPresented = true
+                        PaywallCoordinator.shared.presentManually()
                     } label: {
                         Label("Buy Lifetime", systemImage: "sparkle") 
                     }

@@ -41,13 +41,12 @@ extension ImageToolsViewModel {
     }
 
     func applyPipelineAsync() {
-        // Show paywall first when user is not unlocked, unless explicitly bypassed for this request.
-        if !PurchaseManager.shared.isProUnlocked && !shouldBypassPaywallOnce {
-            paywallContext = .beforeExport
-            isPaywallPresented = true
-            return
+        PaywallCoordinator.shared.requestAccess { [weak self] in
+            self?.executeExport()
         }
-        shouldBypassPaywallOnce = false
+    }
+    
+    private func executeExport() {
         let pipeline = buildPipeline()
         let targets = images
         guard !targets.isEmpty else { return }

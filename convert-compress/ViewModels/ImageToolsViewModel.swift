@@ -91,18 +91,6 @@ final class ImageToolsViewModel: ObservableObject {
     @Published private(set) var totalPipelineApplications: Int = 0
     private var usageCancellable: AnyCancellable?
     
-    // MARK: - Paywall State
-    
-    enum PaywallContext {
-        case manual // Opened from menu
-        case beforeExport // Opened before processing/export
-    }
-    
-    @Published var isProUnlocked: Bool = false
-    @Published var isPaywallPresented: Bool = false
-    var paywallContext: PaywallContext = .manual
-    var shouldBypassPaywallOnce: Bool = false
-    
     // MARK: - Subscriptions
     
     var cancellables = Set<AnyCancellable>()
@@ -125,18 +113,6 @@ final class ImageToolsViewModel: ObservableObject {
                 self.totalPipelineApplications = events.filter { $0.kind == .pipelineApplied }.count
                 self.persistUsageEvents(events)
             }
-    }
-
-
-    // MARK: - Paywall actions
-    func paywallContinueFree() {
-        isPaywallPresented = false
-        shouldBypassPaywallOnce = true
-        
-        // Only start processing if paywall was opened from export/save action
-        if paywallContext == .beforeExport {
-            applyPipelineAsync()
-        }
     }
 
     // MARK: - Clear all images
