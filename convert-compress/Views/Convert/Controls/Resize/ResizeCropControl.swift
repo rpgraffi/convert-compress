@@ -12,6 +12,9 @@ struct ResizeCropView: View {
                 text: $vm.resizeWidth,
                 cornerRadius: .infinity
             )
+            .onChange(of: vm.resizeWidth) { _, newValue in
+                parseDimensionsIfNeeded(from: newValue)
+            }
             
             // Height field
             InputPillField(
@@ -19,9 +22,23 @@ struct ResizeCropView: View {
                 text: $vm.resizeHeight,
                 cornerRadius: .infinity
             )
+            .onChange(of: vm.resizeHeight) { _, newValue in
+                parseDimensionsIfNeeded(from: newValue)
+            }
         }
         .frame(height: Theme.Metrics.controlHeight)
         .cornerRadius(.infinity)
+    }
+    
+    /// Parses dimension strings like "680x340", "680 x 340", "680X340", "680 340", "680/340", etc.
+    /// If a valid pattern is found, automatically populates both width and height fields.
+    private func parseDimensionsIfNeeded(from text: String) {
+        guard let dimensions = parseDimensions(from: text) else {
+            return
+        }
+        
+        vm.resizeWidth = dimensions.width
+        vm.resizeHeight = dimensions.height
     }
 }
 

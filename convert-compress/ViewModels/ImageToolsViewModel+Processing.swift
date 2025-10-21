@@ -112,19 +112,6 @@ extension ImageToolsViewModel {
             self.finishExport(with: updatedImages)
         }
     }
-
-    // Recovery
-    func recoverOriginal(_ asset: ImageAsset) {
-        guard let backup = asset.backupURL else { return }
-        do {
-            if FileManager.default.fileExists(atPath: asset.originalURL.path) { try FileManager.default.removeItem(at: asset.originalURL) }
-            try FileManager.default.copyItem(at: backup, to: asset.originalURL)
-            var updated = asset
-            updated.workingURL = asset.originalURL
-            updated.isEdited = false
-            if let idx = images.firstIndex(of: asset) { images[idx] = updated }
-        } catch { print("Recovery failed: \(error)") }
-    }
 }
 
 extension ImageToolsViewModel {

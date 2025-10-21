@@ -29,3 +29,9 @@ alwaysApply: true
 - Follow Swift API Design Guidelines for naming
 - Don't overengineer; prefer simplicity
 - Research current APIs and patterns when uncertain
+
+
+## Folders
+- Use `convert-compress/Core/Models` for models
+- Use `convert-compress/Core/Constants` for constants
+- 
