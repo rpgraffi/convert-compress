@@ -2891,6 +2891,9 @@
         }
       }
     },
+    "Convert & Compress" : {
+
+    },
     "Convert & Compress needs access to save files in %@. Please choose Allow when prompted." : {
       "comment" : "The text that appears below the main message in the alert. The argument is a directory name.",
       "extractionState" : "manual",

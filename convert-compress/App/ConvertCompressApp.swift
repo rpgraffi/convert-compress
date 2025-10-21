@@ -29,30 +29,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             SandboxAccessManager.shared.register(url: standardized)
             return IngestionCoordinator.expandToSupportedImageURLs(from: standardized)
         }
-        
-        Task { @MainActor in
-            guard let vm = AppDelegate.sharedViewModel else { return }
-            vm.addURLs(expandedURLs)
-            NSApp.activate(ignoringOtherApps: true)
-        }
+
+        self.application(NSApp, open: expandedURLs)
     }
 }
 
 @main
-struct ImageToolsApp: App {
-    @StateObject private var vm = ImageToolsViewModel()
+struct ConvertCompressApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    private let vm: ImageToolsViewModel
+    
+    init() {
+        self.vm = ImageToolsViewModel()
+        AppDelegate.sharedViewModel = vm
+    }
     
     var body: some Scene {
-        WindowGroup {
+        Window("Convert & Compress", id: "main") {
             MainView()
                 .background(.clear)
-                .onAppear { AppDelegate.sharedViewModel = vm }
-                .handlesExternalEvents(preferring: ["main"], allowing: ["*"])
         }
+        .environmentObject(vm)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
-        .environmentObject(vm)
-        .handlesExternalEvents(matching: ["main"])
     }
 }
