@@ -4,7 +4,7 @@ import CoreGraphics
 enum ResizeInput {
     case percent(Double)
     case pixels(width: Int?, height: Int?)
-    case longSide(Int)
+    case longEdge(Int)
 }
 
 struct ResizeMath {
@@ -45,9 +45,9 @@ struct ResizeMath {
                 return CGSize(width: max(1, w.rounded()), height: max(1, h.rounded()))
             }
             
-        case .longSide(let targetLongSide):
+        case .longEdge(let targetlongEdge):
             let isWidthLonger = original.width >= original.height
-            let targetSize = CGFloat(targetLongSide)
+            let targetSize = CGFloat(targetlongEdge)
             let cappedTarget = noUpscale ? min(targetSize, max(original.width, original.height)) : targetSize
             
             if isWidthLonger {

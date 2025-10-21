@@ -13,7 +13,7 @@ struct UnrestrictedResizeControl: View {
                         ResizeSliderControl(
                             widthText: $vm.resizeWidth,
                             heightText: $vm.resizeHeight,
-                            longSideText: $vm.resizeLongSide,
+                            longEdgeText: $vm.resizelongEdge,
                             baseSize: basePixelSizeForCurrentSelection(),
                             containerSize: size,
                             squareLocked: false

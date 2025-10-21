@@ -37,7 +37,7 @@ final class ImageToolsViewModel: ObservableObject {
     @Published var resizeMode: ResizeMode = .resize
     @Published var resizeWidth: String = ""
     @Published var resizeHeight: String = ""
-    @Published var resizeLongSide: String = ""
+    @Published var resizelongEdge: String = ""
     
     // MARK: - Format Settings
     

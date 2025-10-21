@@ -4,7 +4,7 @@ struct PipelineBuilder {
     func build(resizeMode: ResizeMode,
                resizeWidth: String,
                resizeHeight: String,
-               resizeLongSide: String,
+               resizelongEdge: String,
                selectedFormat: ImageFormat?,
                compressionPercent: Double,
                flipV: Bool,
@@ -19,15 +19,15 @@ struct PipelineBuilder {
 
         let widthInt = Int(resizeWidth)
         let heightInt = Int(resizeHeight)
-        let longSideInt = Int(resizeLongSide)
+        let longEdgeInt = Int(resizelongEdge)
         
         // Handle resize or crop based on mode
         if resizeMode == .crop, let w = widthInt, let h = heightInt {
             // Both dimensions filled in crop mode: CropOperation handles resize + crop internally
             pipeline.add(CropOperation(targetWidth: w, targetHeight: h))
-        } else if let longSide = longSideInt {
+        } else if let longEdge = longEdgeInt {
             // Long side mode: resize based on the longest dimension
-            pipeline.add(ResizeOperation(mode: .longSide(longSide)))
+            pipeline.add(ResizeOperation(mode: .longEdge(longEdge)))
         } else if widthInt != nil || heightInt != nil {
             // One or both dimensions filled in resize mode, or only one dimension in crop mode: resize maintaining aspect ratio
             pipeline.add(ResizeOperation(mode: .pixels(width: widthInt, height: heightInt)))

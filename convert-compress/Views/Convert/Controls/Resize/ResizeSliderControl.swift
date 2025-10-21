@@ -6,12 +6,12 @@ import AppKit
 struct ResizeSliderControl: View {
     @Binding var widthText: String
     @Binding var heightText: String
-    @Binding var longSideText: String
+    @Binding var longEdgeText: String
     let baseSize: CGSize?
     let containerSize: CGSize
     let squareLocked: Bool
     
-    private enum ActiveDimension { case width, height, longSide }
+    private enum ActiveDimension { case width, height, longEdge }
     
     @State private var activeDimension: ActiveDimension = .width
     @State private var hapticTracker = HapticStopTracker()
@@ -23,7 +23,7 @@ struct ResizeSliderControl: View {
         switch activeDimension {
         case .width: return widthText
         case .height: return heightText
-        case .longSide: return longSideText
+        case .longEdge: return longEdgeText
         }
     }
     
@@ -32,13 +32,13 @@ struct ResizeSliderControl: View {
         case .width:
             widthText = newValue ?? ""
             heightText = ""
-            longSideText = ""
+            longEdgeText = ""
         case .height:
             heightText = newValue ?? ""
             widthText = ""
-            longSideText = ""
-        case .longSide:
-            longSideText = newValue ?? ""
+            longEdgeText = ""
+        case .longEdge:
+            longEdgeText = newValue ?? ""
             widthText = ""
             heightText = ""
         }
@@ -90,18 +90,18 @@ struct ResizeSliderControl: View {
     }
     
     private func initializeActiveDimension() {
-        if !longSideText.isEmpty, (widthText.isEmpty && heightText.isEmpty || (Int(widthText) == nil && Int(heightText) == nil && Int(longSideText) != nil)) {
-            activeDimension = .longSide
+        if !longEdgeText.isEmpty, (widthText.isEmpty && heightText.isEmpty || (Int(widthText) == nil && Int(heightText) == nil && Int(longEdgeText) != nil)) {
+            activeDimension = .longEdge
             widthText = ""
             heightText = ""
         } else if !heightText.isEmpty, (widthText.isEmpty || (Int(widthText) == nil && Int(heightText) != nil)) {
             activeDimension = .height
             widthText = ""
-            longSideText = ""
+            longEdgeText = ""
         } else {
             activeDimension = .width
             heightText = ""
-            longSideText = ""
+            longEdgeText = ""
         }
     }
     
@@ -159,7 +159,7 @@ struct ResizeSliderControl: View {
             maxValue = Int(base.width)
         case .height:
             maxValue = Int(base.height)
-        case .longSide:
+        case .longEdge:
             maxValue = Int(max(base.width, base.height))
         }
         return allStops.filter { $0 <= maxValue }
@@ -209,8 +209,8 @@ struct ResizeSliderControl: View {
                 case .width:
                     activeDimension = .height
                 case .height:
-                    activeDimension = .longSide
-                case .longSide:
+                    activeDimension = .longEdge
+                case .longEdge:
                     activeDimension = .width
                 }
                 assignActive(value)
@@ -220,7 +220,7 @@ struct ResizeSliderControl: View {
                 switch activeDimension {
                 case .width: return String(localized: "Width")
                 case .height: return String(localized: "Height")
-                case .longSide: return String(localized: "Long Side")
+                case .longEdge: return String(localized: "Long Edge")
                 }
             }()
             Text(labelText)

@@ -35,5 +35,64 @@
 		</array>
 		<key>LSMultipleInstancesProhibited</key>
 		<true/>
+		<key>NSServices</key>
+		<array>
+			<dict>
+				<key>NSMenuItem</key>
+				<dict>
+					<key>default</key>
+					<string>Convert &amp; Compress</string>
+					<key>en</key>
+					<string>Convert &amp; Compress</string>
+					<key>ar</key>
+					<string>تحويل وضغط</string>
+					<key>da</key>
+					<string>Konverter &amp; Komprimer</string>
+					<key>de</key>
+					<string>Convert &amp; Compress</string>
+					<key>es</key>
+					<string>Convertir y Comprimir</string>
+					<key>fi</key>
+					<string>Muunna &amp; Pakkaa</string>
+					<key>fr</key>
+					<string>Convertir &amp; Compresser</string>
+					<key>it</key>
+					<string>Converti e Comprimi</string>
+					<key>ja</key>
+					<string>変換と圧縮</string>
+					<key>ko</key>
+					<string>변환 및 압축</string>
+					<key>nb</key>
+					<string>Konverter &amp; Komprimer</string>
+					<key>nl</key>
+					<string>Converteren &amp; Comprimeren</string>
+					<key>pl</key>
+					<string>Konwertuj i Kompresuj</string>
+					<key>pt-BR</key>
+					<string>Converter e Comprimir</string>
+					<key>pt-PT</key>
+					<string>Converter e Comprimir</string>
+					<key>ru</key>
+					<string>Конвертация и сжатие</string>
+					<key>sv</key>
+					<string>Konvertera &amp; Komprimera</string>
+					<key>tr</key>
+					<string>Dönüştür ve Sıkıştır</string>
+					<key>zh-Hans</key>
+					<string>转换与压缩</string>
+				</dict>
+				<key>NSMessage</key>
+				<string>handleFinderService</string>
+				<key>NSPortName</key>
+				<string>convert-compress</string>
+				<key>NSRequiredContext</key>
+				<dict/>
+				<key>NSSendFileTypes</key>
+				<array>
+					<string>public.image</string>
+					<string>public.folder</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>
