@@ -11,12 +11,20 @@ struct PreviewEstimator {
                   resizeMode: ResizeMode,
                   resizeWidth: String,
                   resizeHeight: String,
+                  resizeLongSide: String,
                   compressionPercent: Double,
                   selectedFormat: ImageFormat?) -> PreviewInfo {
         let baseSize: CGSize? = asset.originalPixelSize
         let targetSize: CGSize? = {
             guard let base = baseSize else { return CGSize(width: 0, height: 0) }
-            let input: ResizeInput = .pixels(width: Int(resizeWidth), height: Int(resizeHeight))
+            
+            let input: ResizeInput
+            if let longSide = Int(resizeLongSide) {
+                input = .longSide(longSide)
+            } else {
+                input = .pixels(width: Int(resizeWidth), height: Int(resizeHeight))
+            }
+            
             // Preview should not upscale
             var size = ResizeMath.targetSize(for: base, input: input, noUpscale: true)
             

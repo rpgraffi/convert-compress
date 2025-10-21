@@ -11,6 +11,7 @@ extension ImageToolsViewModel {
         let resizeMode = self.resizeMode
         let resizeWidth = self.resizeWidth
         let resizeHeight = self.resizeHeight
+        let resizeLongSide = self.resizeLongSide
         let selectedFormat = self.selectedFormat
         let compressionPercent = self.compressionPercent
         let removeMetadata = self.removeMetadata
@@ -25,6 +26,7 @@ extension ImageToolsViewModel {
                 resizeMode: resizeMode,
                 resizeWidth: resizeWidth,
                 resizeHeight: resizeHeight,
+                resizeLongSide: resizeLongSide,
                 selectedFormat: selectedFormat,
                 compressionPercent: compressionPercent,
                 flipV: flipV,
