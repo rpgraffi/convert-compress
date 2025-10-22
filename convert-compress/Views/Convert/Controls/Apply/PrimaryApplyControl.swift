@@ -79,6 +79,7 @@ struct PrimaryApplyControl: View {
                             Rectangle()
                                 .fill(Color.accentColor)
                                 .frame(width: displayedProgress * proxy.size.width)
+                                .animation(Theme.Animations.spring(), value: displayedProgress)
                         }
                     } else if !isDisabled {
                         Color.accentColor
