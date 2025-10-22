@@ -42,15 +42,15 @@ struct TopBar: View {
                         Label("Rate App", systemImage: "star")
                     }
                     
-                    Link(destination: URL(string: "https://www.image-tool.app")!) {
+                    Link(destination: URL(string: "https://convert-compress.com")!) {
                         Label("Website", systemImage: "globe")
                     }
                     
-                    ShareLink(item: URL(string: "https://www.image-tool.app")!) {
+                    ShareLink(item: URL(string: "https://convert-compress.com")!) {
                         Label("Share App", systemImage: "square.and.arrow.up")
                     }
                     
-                    Link(destination: URL(string: "https://github.com/rpgraffi/image-tools")!) {
+                    Link(destination: URL(string: "https://github.com/rpgraffi/convert-compress")!) {
                         Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
                 } label: {
