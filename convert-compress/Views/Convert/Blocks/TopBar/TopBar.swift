@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct TopBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
     @State private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var usageTracker = UsageTracker.shared
     @State private var isHovered: Bool = false
     
     var body: some View {
@@ -11,7 +11,7 @@ struct TopBar: View {
             
             // Titlebar content on trailing side
             HStack(spacing: 8) {
-                Text(isHovered ? "Converted: \(vm.totalImageConversions)" : "\(vm.totalImageConversions)")
+                Text(isHovered ? "Converted: \(usageTracker.totalImageConversions)" : "\(usageTracker.totalImageConversions)")
                     .font(.system(.caption, design: .monospaced))
                     // .foregroundStyle(.secondary)
                     .animation(.easeInOut(duration: 0.18), value: isHovered)

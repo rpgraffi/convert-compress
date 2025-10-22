@@ -86,12 +86,6 @@ final class ImageToolsViewModel: ObservableObject {
         return String("\(displayed)/\(ingestTotal)")
     }
     
-    // MARK: - Usage Tracking
-    
-    @Published private(set) var totalImageConversions: Int = 0
-    @Published private(set) var totalPipelineApplications: Int = 0
-    private var usageCancellable: AnyCancellable?
-    
     // MARK: - Subscriptions
     
     var cancellables = Set<AnyCancellable>()
@@ -100,20 +94,8 @@ final class ImageToolsViewModel: ObservableObject {
     
     init() {
         setupComparisonObservation()
-        setupUsageTracking()
         loadPersistedState()
         setupPersistenceObservation()
-    }
-    
-    private func setupUsageTracking() {
-        usageCancellable = UsageTracker.shared.$events
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
-                guard let self = self else { return }
-                self.totalImageConversions = events.filter { $0.kind == .imageConversion }.count
-                self.totalPipelineApplications = events.filter { $0.kind == .pipelineApplied }.count
-                self.persistUsageEvents(events)
-            }
     }
 
     // MARK: - Clear all images

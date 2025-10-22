@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct WindowTitleBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
     @State private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var usageTracker = UsageTracker.shared
     @State private var isHovered: Bool = false
     
     var body: some View {
         HStack(spacing: 8) {
-            Text(isHovered ? "Converted: \(vm.totalImageConversions)" : "\(vm.totalImageConversions)")
+            Text(isHovered ? "Converted: \(usageTracker.totalImageConversions)" : "\(usageTracker.totalImageConversions)")
                 .font(.system(.caption, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 130, alignment: .trailing)

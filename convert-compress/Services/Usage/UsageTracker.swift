@@ -1,47 +1,45 @@
 import Foundation
-import Combine
-
 
 final class UsageTracker: ObservableObject {
     static let shared = UsageTracker()
-
+    
     @Published private(set) var events: [UsageEventModel] = []
-
-    private init() {}
-
-    // MARK: Recording
-    func recordImageConversion(at date: Date = Date()) {
-        record(.init(kind: .imageConversion, date: date))
+    
+    private static let key = "image_tools.usage_events.v1"
+    
+    private init() {
+        load()
     }
-
-    func recordPipelineApplied(at date: Date = Date()) {
-        record(.init(kind: .pipelineApplied, date: date))
+    
+    func recordImageConversion() {
+        events.append(.init(kind: .imageConversion, date: Date()))
+        save()
     }
-
-    private func record(_ event: UsageEventModel) {
-        var updated = events
-        updated.append(event)
-        events = updated
+    
+    func recordPipelineApplied() {
+        events.append(.init(kind: .pipelineApplied, date: Date()))
+        save()
     }
-
-    // MARK: Aggregations
-    var totalImageConversions: Int { events.lazy.filter { $0.kind == .imageConversion }.count }
-    var totalPipelineApplications: Int { events.lazy.filter { $0.kind == .pipelineApplied }.count }
-
-    func count(kind: UsageEventModel.Kind, in interval: DateInterval) -> Int {
-        events.lazy.filter { $0.kind == kind && interval.contains($0.date) }.count
+    
+    var totalImageConversions: Int {
+        events.filter { $0.kind == .imageConversion }.count
     }
-
-    func count(kind: UsageEventModel.Kind, onSameDayAs date: Date, calendar: Calendar = .current) -> Int {
-        let dayStart = calendar.startOfDay(for: date)
-        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return 0 }
-        let interval = DateInterval(start: dayStart, end: dayEnd)
-        return count(kind: kind, in: interval)
+    
+    var totalPipelineApplications: Int {
+        events.filter { $0.kind == .pipelineApplied }.count
     }
-
-    // Persistence hook: view model will call these
-    func replaceAll(_ newEvents: [UsageEventModel]) {
-        events = newEvents
+    
+    private func load() {
+        guard let data = UserDefaults.standard.data(forKey: Self.key),
+              let decoded = try? JSONDecoder().decode([UsageEventModel].self, from: data) else {
+            return
+        }
+        events = decoded
+    }
+    
+    private func save() {
+        guard let data = try? JSONEncoder().encode(events) else { return }
+        UserDefaults.standard.set(data, forKey: Self.key)
     }
 }
 
