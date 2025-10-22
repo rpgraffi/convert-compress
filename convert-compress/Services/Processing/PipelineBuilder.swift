@@ -1,28 +1,19 @@
 import Foundation
 
 struct PipelineBuilder {
-    func build(resizeMode: ResizeMode,
-               resizeWidth: String,
-               resizeHeight: String,
-               resizelongEdge: String,
-               selectedFormat: ImageFormat?,
-               compressionPercent: Double,
-               flipV: Bool,
-               removeBackground: Bool,
-               removeMetadata: Bool,
-               exportDirectory: URL?) -> ProcessingPipeline {
+    func build(configuration: ProcessingConfiguration) -> ProcessingPipeline {
         var pipeline = ProcessingPipeline()
-        pipeline.removeMetadata = removeMetadata
-        pipeline.exportDirectory = exportDirectory
-        pipeline.finalFormat = selectedFormat
-        pipeline.compressionPercent = compressionPercent
+        pipeline.removeMetadata = configuration.removeMetadata
+        pipeline.exportDirectory = configuration.exportDirectory
+        pipeline.finalFormat = configuration.selectedFormat
+        pipeline.compressionPercent = configuration.compressionPercent
 
-        let widthInt = Int(resizeWidth)
-        let heightInt = Int(resizeHeight)
-        let longEdgeInt = Int(resizelongEdge)
+        let widthInt = Int(configuration.resizeWidth)
+        let heightInt = Int(configuration.resizeHeight)
+        let longEdgeInt = Int(configuration.resizelongEdge)
         
         // Handle resize or crop based on mode
-        if resizeMode == .crop, let w = widthInt, let h = heightInt {
+        if configuration.resizeMode == .crop, let w = widthInt, let h = heightInt {
             // Both dimensions filled in crop mode: CropOperation handles resize + crop internally
             pipeline.add(CropOperation(targetWidth: w, targetHeight: h))
         } else if let longEdge = longEdgeInt {
@@ -34,7 +25,7 @@ struct PipelineBuilder {
         }
 
         // Enforce format-specific size constraints before conversion
-        if let fmt = selectedFormat {
+        if let fmt = configuration.selectedFormat {
             let caps = ImageIOCapabilities.shared
             if caps.sizeRestrictions(forUTType: fmt.utType) != nil {
                 pipeline.add(ConstrainSizeOperation(targetFormat: fmt))
@@ -44,10 +35,10 @@ struct PipelineBuilder {
         // Compression handled at final export via pipeline.compressionPercent
 
         // Flip
-        if flipV { pipeline.add(FlipVerticalOperation()) }
+        if configuration.flipV { pipeline.add(FlipVerticalOperation()) }
 
         // Remove background
-        if removeBackground { pipeline.add(RemoveBackgroundOperation()) }
+        if configuration.removeBackground { pipeline.add(RemoveBackgroundOperation()) }
 
         return pipeline
     }

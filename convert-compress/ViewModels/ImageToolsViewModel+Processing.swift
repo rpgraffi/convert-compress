@@ -4,18 +4,7 @@ import AppKit
 
 extension ImageToolsViewModel {
     func buildPipeline() -> ProcessingPipeline {
-        let pipeline = PipelineBuilder().build(
-            resizeMode: resizeMode,
-            resizeWidth: resizeWidth,
-            resizeHeight: resizeHeight,
-            resizelongEdge: resizelongEdge,
-            selectedFormat: selectedFormat,
-            compressionPercent: compressionPercent,
-            flipV: flipV,
-            removeBackground: removeBackground,
-            removeMetadata: removeMetadata,
-            exportDirectory: exportDirectory
-        )
+        let pipeline = PipelineBuilder().build(configuration: currentConfiguration)
         if let fmt = selectedFormat { bumpRecentFormats(fmt) }
         return pipeline
     }

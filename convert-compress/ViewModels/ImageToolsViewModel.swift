@@ -98,6 +98,23 @@ final class ImageToolsViewModel: ObservableObject {
         setupPersistenceObservation()
     }
 
+    // MARK: - Processing Configuration
+    
+    var currentConfiguration: ProcessingConfiguration {
+        ProcessingConfiguration(
+            resizeMode: resizeMode,
+            resizeWidth: resizeWidth,
+            resizeHeight: resizeHeight,
+            resizelongEdge: resizelongEdge,
+            selectedFormat: selectedFormat,
+            compressionPercent: compressionPercent,
+            flipV: flipV,
+            removeMetadata: removeMetadata,
+            removeBackground: removeBackground,
+            exportDirectory: exportDirectory
+        )
+    }
+    
     // MARK: - Clear all images
     func clearAll() {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
