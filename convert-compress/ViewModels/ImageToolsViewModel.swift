@@ -37,7 +37,7 @@ final class ImageToolsViewModel: ObservableObject {
     @Published var resizeMode: ResizeMode = .resize
     @Published var resizeWidth: String = ""
     @Published var resizeHeight: String = ""
-    @Published var resizelongEdge: String = ""
+    @Published var resizeLongEdge: String = ""
     
     // MARK: - Format Settings
     
@@ -52,6 +52,10 @@ final class ImageToolsViewModel: ObservableObject {
     @Published var flipV: Bool = false
     @Published var removeBackground: Bool = false
     @Published var removeMetadata: Bool = false
+    
+    // MARK: - Presets
+    
+    @Published var presets: [Preset] = []
     
     // MARK: - Estimation State
     
@@ -96,6 +100,8 @@ final class ImageToolsViewModel: ObservableObject {
         setupComparisonObservation()
         loadPersistedState()
         setupPersistenceObservation()
+        loadPresets()
+        setupPresetsSyncing()
     }
 
     // MARK: - Processing Configuration
@@ -105,13 +111,12 @@ final class ImageToolsViewModel: ObservableObject {
             resizeMode: resizeMode,
             resizeWidth: resizeWidth,
             resizeHeight: resizeHeight,
-            resizelongEdge: resizelongEdge,
+            resizeLongEdge: resizeLongEdge,
             selectedFormat: selectedFormat,
             compressionPercent: compressionPercent,
             flipV: flipV,
             removeMetadata: removeMetadata,
-            removeBackground: removeBackground,
-            exportDirectory: exportDirectory
+            removeBackground: removeBackground
         )
     }
     

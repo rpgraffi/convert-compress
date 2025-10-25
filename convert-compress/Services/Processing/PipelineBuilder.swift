@@ -1,16 +1,16 @@
 import Foundation
 
 struct PipelineBuilder {
-    func build(configuration: ProcessingConfiguration) -> ProcessingPipeline {
+    func build(configuration: ProcessingConfiguration, exportDirectory: URL?) -> ProcessingPipeline {
         var pipeline = ProcessingPipeline()
         pipeline.removeMetadata = configuration.removeMetadata
-        pipeline.exportDirectory = configuration.exportDirectory
+        pipeline.exportDirectory = exportDirectory
         pipeline.finalFormat = configuration.selectedFormat
         pipeline.compressionPercent = configuration.compressionPercent
 
         let widthInt = Int(configuration.resizeWidth)
         let heightInt = Int(configuration.resizeHeight)
-        let longEdgeInt = Int(configuration.resizelongEdge)
+        let longEdgeInt = Int(configuration.resizeLongEdge)
         
         // Handle resize or crop based on mode
         if configuration.resizeMode == .crop, let w = widthInt, let h = heightInt {

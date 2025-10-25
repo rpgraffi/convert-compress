@@ -8,7 +8,6 @@ struct TopBar: View {
     var body: some View {
         HStack {
             Spacer()
-            
             // Titlebar content on trailing side
             HStack(spacing: 8) {
                 Text(isHovered ? "Converted: \(usageTracker.totalImageConversions)" : "\(usageTracker.totalImageConversions)")

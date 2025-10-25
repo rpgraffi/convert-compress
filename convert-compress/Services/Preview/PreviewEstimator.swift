@@ -11,7 +11,7 @@ struct PreviewEstimator {
                   resizeMode: ResizeMode,
                   resizeWidth: String,
                   resizeHeight: String,
-                  resizelongEdge: String,
+                  resizeLongEdge: String,
                   compressionPercent: Double,
                   selectedFormat: ImageFormat?) -> PreviewInfo {
         let baseSize: CGSize? = asset.originalPixelSize
@@ -19,7 +19,7 @@ struct PreviewEstimator {
             guard let base = baseSize else { return CGSize(width: 0, height: 0) }
             
             let input: ResizeInput
-            if let longEdge = Int(resizelongEdge) {
+            if let longEdge = Int(resizeLongEdge) {
                 input = .longEdge(longEdge)
             } else {
                 input = .pixels(width: Int(resizeWidth), height: Int(resizeHeight))

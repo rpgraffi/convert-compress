@@ -5,11 +5,9 @@ struct ControlsBar: View {
     
     var body: some View {
         HStack(spacing: 16) {
+            PresetButton()
             FormatControl()
-                .transition(.opacity.combined(with: .scale))
-            
             ResizeControl()
-                .transition(.opacity.combined(with: .scale))
             
             if shouldShowCompression {
                 QualityControl()

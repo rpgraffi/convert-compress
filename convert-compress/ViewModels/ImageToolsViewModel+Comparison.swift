@@ -86,7 +86,7 @@ extension ImageToolsViewModel {
             }
             .store(in: &cancellables)
         
-        $resizelongEdge
+        $resizeLongEdge
             .dropFirst()
             .sink { [weak self] _ in
                 self?.scheduleComparisonPreviewRefresh()

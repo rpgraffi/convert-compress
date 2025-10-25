@@ -133,6 +133,12 @@ private extension FormatControl {
     func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            // Don't intercept keystrokes if a text field is focused
+            if let firstResponder = NSApp.keyWindow?.firstResponder,
+               firstResponder is NSTextView || firstResponder is NSTextField {
+                return event
+            }
+            
             guard let chars = event.charactersIgnoringModifiers?.lowercased(), event.modifierFlags.intersection([.command, .option, .control]).isEmpty else {
                 return event
             }

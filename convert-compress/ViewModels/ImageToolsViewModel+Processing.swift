@@ -4,7 +4,10 @@ import AppKit
 
 extension ImageToolsViewModel {
     func buildPipeline() -> ProcessingPipeline {
-        let pipeline = PipelineBuilder().build(configuration: currentConfiguration)
+        let pipeline = PipelineBuilder().build(
+            configuration: currentConfiguration,
+            exportDirectory: exportDirectory
+        )
         if let fmt = selectedFormat { bumpRecentFormats(fmt) }
         return pipeline
     }

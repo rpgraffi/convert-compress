@@ -48,8 +48,8 @@ struct TrueSizeEstimator {
         configuration: ProcessingConfiguration
     ) -> (UUID, Int)? {
         do {
-            // Build a pipeline identical to the real processing path
-            let pipeline = PipelineBuilder().build(configuration: configuration)
+            // Build a pipeline identical to the real processing path (exportDirectory not needed for estimation)
+            let pipeline = PipelineBuilder().build(configuration: configuration, exportDirectory: nil)
 
             // Apply the same operations in-memory
             var ci = try loadCIImageApplyingOrientation(from: asset.originalURL)
