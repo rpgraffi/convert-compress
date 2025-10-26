@@ -17,7 +17,7 @@ struct PresetListItem: View {
             configuration: preset.configuration,
             name: isEditing ? $editedName : .constant(preset.displayName),
             isEditing: isEditing,
-            backgroundColor: isHovered ? Color.primary.opacity(0.10) : Color.clear,
+            backgroundColor: isHovered ? Color.primary.opacity(0.07) : Color.clear,
             trailingButtons: {
                 AnyView(
                     Group {
@@ -39,7 +39,7 @@ struct PresetListItem: View {
             isPresented = false
         }
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.15)) {
+            withAnimation(.easeInOut(duration: 0.10)) {
                 isHovered = hovering
             }
         }
@@ -101,10 +101,8 @@ struct PresetListItem: View {
             HoverIconButton(
                 systemName: "xmark",
                 action: {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isEditing = false
-                        editedName = ""
-                    }
+                    isEditing = false
+                    editedName = ""
                 },
                 iconWeight: .medium,
                 cornerRadius: 6

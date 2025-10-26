@@ -17,19 +17,7 @@ extension ImageToolsViewModel {
     // MARK: - Save Preset
     
     func savePreset(name: String?) {
-        let config = ProcessingConfiguration(
-            resizeMode: resizeMode,
-            resizeWidth: resizeWidth,
-            resizeHeight: resizeHeight,
-            resizeLongEdge: resizeLongEdge,
-            selectedFormat: selectedFormat,
-            compressionPercent: compressionPercent,
-            flipV: flipV,
-            removeMetadata: removeMetadata,
-            removeBackground: removeBackground
-        )
-        
-        let preset = Preset(name: name, configuration: config)
+        let preset = Preset(name: name, configuration: currentConfiguration)
         presets.append(preset)
         PresetsStore.shared.save(presets)
     }

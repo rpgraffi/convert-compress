@@ -106,15 +106,18 @@ final class ImageToolsViewModel: ObservableObject {
     // MARK: - Processing Configuration
     
     var currentConfiguration: ProcessingConfiguration {
-        ProcessingConfiguration(
+        // Get format capabilities to normalize unsupported settings
+        let caps = selectedFormat.map { ImageIOCapabilities.shared.capabilities(for: $0) }
+        
+        return ProcessingConfiguration(
             resizeMode: resizeMode,
             resizeWidth: resizeWidth,
             resizeHeight: resizeHeight,
             resizeLongEdge: resizeLongEdge,
             selectedFormat: selectedFormat,
-            compressionPercent: compressionPercent,
+            compressionPercent: caps?.supportsQuality == false ? 0 : compressionPercent,
             flipV: flipV,
-            removeMetadata: removeMetadata,
+            removeMetadata: caps?.supportsMetadata == false ? false : removeMetadata,
             removeBackground: removeBackground
         )
     }

@@ -65,16 +65,19 @@ struct PresetItemView: View {
             // Mirror/Flip
             if configuration.flipV {
                 Image(systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill")
+                .font(.system(size: 10))
             }
             
             // Remove Background
             if configuration.removeBackground {
                 Image(systemName: "person.and.background.dotted")
+                .font(.system(size: 10))
             }
             
             // Remove Metadata
             if configuration.removeMetadata {
                 Image(systemName: "tag.slash.fill")
+                .font(.system(size: 10))
             }
         }
         .monospacedDigit()
