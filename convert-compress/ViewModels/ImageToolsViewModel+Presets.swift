@@ -14,12 +14,6 @@ extension ImageToolsViewModel {
         }
     }
     
-    func setupPresetsSyncing() {
-        PresetsStore.shared.onPresetsChanged = { [weak self] in
-            self?.loadPresets()
-        }
-    }
-    
     // MARK: - Save Preset
     
     func savePreset(name: String?) {

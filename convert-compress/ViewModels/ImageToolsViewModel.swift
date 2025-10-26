@@ -101,7 +101,6 @@ final class ImageToolsViewModel: ObservableObject {
         loadPersistedState()
         setupPersistenceObservation()
         loadPresets()
-        setupPresetsSyncing()
     }
 
     // MARK: - Processing Configuration

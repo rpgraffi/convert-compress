@@ -8,25 +8,12 @@ final class PresetsStore {
     private var storeKey: String {
         "\(Bundle.main.bundleIdentifier!).presets"
     }
-    private var storeObserver: NSObjectProtocol?
-    
-    var onPresetsChanged: (() -> Void)?
     
     private let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         return encoder
     }()
-    
-    private init() {
-        startObservingUbiquitousStore()
-    }
-    
-    deinit {
-        if let observer = storeObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
     
     // MARK: - Public API
     
@@ -57,29 +44,6 @@ final class PresetsStore {
     
     func clearAll() {
         ubiquitousStore.removeObject(forKey: storeKey)
-        ubiquitousStore.synchronize()
-        onPresetsChanged?()
-    }
-    
-    // MARK: - Private
-    
-    private func startObservingUbiquitousStore() {
-        storeObserver = NotificationCenter.default.addObserver(
-            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-            object: ubiquitousStore,
-            queue: nil
-        ) { [weak self] notification in
-            guard let changedKeys = notification.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] else {
-                return
-            }
-            
-            Task { @MainActor [weak self] in
-                guard let self, changedKeys.contains(self.storeKey) else { return }
-                self.ubiquitousStore.synchronize()
-                self.onPresetsChanged?()
-            }
-        }
-        
         ubiquitousStore.synchronize()
     }
 }
