@@ -37,6 +37,7 @@ final class ImageToolsViewModel: ObservableObject {
     @Published var resizeMode: ResizeMode = .resize
     @Published var resizeWidth: String = ""
     @Published var resizeHeight: String = ""
+    @Published var resizeLongEdge: String = ""
     
     // MARK: - Format Settings
     
@@ -51,6 +52,10 @@ final class ImageToolsViewModel: ObservableObject {
     @Published var flipV: Bool = false
     @Published var removeBackground: Bool = false
     @Published var removeMetadata: Bool = false
+    
+    // MARK: - Presets
+    
+    @Published var presets: [Preset] = []
     
     // MARK: - Estimation State
     
@@ -85,24 +90,6 @@ final class ImageToolsViewModel: ObservableObject {
         return String("\(displayed)/\(ingestTotal)")
     }
     
-    // MARK: - Usage Tracking
-    
-    @Published private(set) var totalImageConversions: Int = 0
-    @Published private(set) var totalPipelineApplications: Int = 0
-    private var usageCancellable: AnyCancellable?
-    
-    // MARK: - Paywall State
-    
-    enum PaywallContext {
-        case manual // Opened from menu
-        case beforeExport // Opened before processing/export
-    }
-    
-    @Published var isProUnlocked: Bool = false
-    @Published var isPaywallPresented: Bool = false
-    var paywallContext: PaywallContext = .manual
-    var shouldBypassPaywallOnce: Bool = false
-    
     // MARK: - Subscriptions
     
     var cancellables = Set<AnyCancellable>()
@@ -111,34 +98,30 @@ final class ImageToolsViewModel: ObservableObject {
     
     init() {
         setupComparisonObservation()
-        setupUsageTracking()
         loadPersistedState()
         setupPersistenceObservation()
+        loadPresets()
+    }
+
+    // MARK: - Processing Configuration
+    
+    var currentConfiguration: ProcessingConfiguration {
+        // Get format capabilities to normalize unsupported settings
+        let caps = selectedFormat.map { ImageIOCapabilities.shared.capabilities(for: $0) }
+        
+        return ProcessingConfiguration(
+            resizeMode: resizeMode,
+            resizeWidth: resizeWidth,
+            resizeHeight: resizeHeight,
+            resizeLongEdge: resizeLongEdge,
+            selectedFormat: selectedFormat,
+            compressionPercent: caps?.supportsQuality == false ? 0 : compressionPercent,
+            flipV: flipV,
+            removeMetadata: caps?.supportsMetadata == false ? false : removeMetadata,
+            removeBackground: removeBackground
+        )
     }
     
-    private func setupUsageTracking() {
-        usageCancellable = UsageTracker.shared.$events
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
-                guard let self = self else { return }
-                self.totalImageConversions = events.filter { $0.kind == .imageConversion }.count
-                self.totalPipelineApplications = events.filter { $0.kind == .pipelineApplied }.count
-                self.persistUsageEvents(events)
-            }
-    }
-
-
-    // MARK: - Paywall actions
-    func paywallContinueFree() {
-        isPaywallPresented = false
-        shouldBypassPaywallOnce = true
-        
-        // Only start processing if paywall was opened from export/save action
-        if paywallContext == .beforeExport {
-            applyPipelineAsync()
-        }
-    }
-
     // MARK: - Clear all images
     func clearAll() {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {

@@ -14,6 +14,7 @@ enum WindowConfigurator {
         let toolbar = NSToolbar(identifier: "MainToolbar")
         toolbar.displayMode = .iconOnly
         window.toolbar = toolbar
+
         window.center()
     }
 } 

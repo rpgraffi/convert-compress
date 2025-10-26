@@ -27,7 +27,7 @@ func loadCIImageApplyingOrientation(from url: URL) throws -> CIImage {
 }
 
 struct ResizeOperation: ImageOperation {
-    enum Mode { case percent(Double); case pixels(width: Int?, height: Int?) }
+    enum Mode { case percent(Double); case pixels(width: Int?, height: Int?); case longEdge(Int) }
     let mode: Mode
 
     // Reusable pixel transform for in-memory pipelines
@@ -38,6 +38,7 @@ struct ResizeOperation: ImageOperation {
                 switch mode {
                 case .percent(let p): return .percent(p)
                 case .pixels(let width, let height): return .pixels(width: width, height: height)
+                case .longEdge(let size): return .longEdge(size)
                 }
             }()
             // Processing should not upscale either.

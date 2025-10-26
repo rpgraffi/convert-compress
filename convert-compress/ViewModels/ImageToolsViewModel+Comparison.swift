@@ -85,6 +85,13 @@ extension ImageToolsViewModel {
                 self?.scheduleComparisonPreviewRefresh()
             }
             .store(in: &cancellables)
+        
+        $resizeLongEdge
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.scheduleComparisonPreviewRefresh()
+            }
+            .store(in: &cancellables)
     }
     // MARK: - Comparison Flow
     

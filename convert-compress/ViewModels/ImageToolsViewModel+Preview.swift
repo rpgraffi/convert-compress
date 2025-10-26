@@ -7,6 +7,7 @@ extension ImageToolsViewModel {
             resizeMode: resizeMode,
             resizeWidth: resizeWidth,
             resizeHeight: resizeHeight,
+            resizeLongEdge: resizeLongEdge,
             compressionPercent: compressionPercent,
             selectedFormat: selectedFormat
         )

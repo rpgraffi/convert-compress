@@ -2,16 +2,17 @@ import Foundation
 import StoreKit
 
 @MainActor
-final class PurchaseManager: ObservableObject {
+@Observable
+final class PurchaseManager {
     static let shared = PurchaseManager()
     
-    // MARK: - Published Properties
+    // MARK: - Properties
     
-    @Published private(set) var isPurchasing = false
-    @Published private(set) var isProUnlocked = false
-    @Published var purchaseError: String?
-    @Published var lifetimeDisplayPrice: String?
-    @Published var lifetimeRegularDisplayPrice: String?
+    private(set) var isPurchasing = false
+    private(set) var isProUnlocked = false
+    var purchaseError: String?
+    var lifetimeDisplayPrice: String?
+    var lifetimeRegularDisplayPrice: String?
     
     // MARK: - Private Properties
     
@@ -28,10 +29,6 @@ final class PurchaseManager: ObservableObject {
     // MARK: - Initialization
     
     private init() {}
-    
-    deinit {
-        transactionUpdateTask?.cancel()
-    }
     
     // MARK: - Configuration
     
@@ -61,6 +58,7 @@ final class PurchaseManager: ObservableObject {
             lifetimeRegularDisplayPrice = lifetimeRegularProduct?.displayPrice
             
         } catch {
+            print("Failed to load products: \(error)")
         }
     }
     
@@ -90,12 +88,10 @@ final class PurchaseManager: ObservableObject {
                 continue
             }
             
-            
             if proEntitlementProductIds.contains(transaction.productID) {
                 isProUnlocked = true
+                await transaction.finish()
             }
-            
-            await transaction.finish()
         }
     }
     
@@ -143,6 +139,7 @@ final class PurchaseManager: ObservableObject {
                 break
             }
         } catch {
+            print("Purchase failed: \(error)")
             purchaseError = "Purchase failed. Please try again."
         }
     }
@@ -161,6 +158,7 @@ final class PurchaseManager: ObservableObject {
             try await AppStore.sync()
             await checkEntitlements()
         } catch {
+            print("Restore failed: \(error)")
             purchaseError = "Restore failed. Please try again."
         }
     }

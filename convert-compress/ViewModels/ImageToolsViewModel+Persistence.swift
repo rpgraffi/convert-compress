@@ -42,14 +42,6 @@ extension ImageToolsViewModel {
                 self?.persistRecentFormats()
             }
             .store(in: &cancellables)
-        
-        // Observe isProUnlocked changes
-        $isProUnlocked
-            .dropFirst()
-            .sink { [weak self] _ in
-                self?.persistPaywallState()
-            }
-            .store(in: &cancellables)
     }
     
     private enum PersistenceKeys {
@@ -57,8 +49,6 @@ extension ImageToolsViewModel {
         static let selectedFormat = "image_tools.selected_format.v1"
         static let exportDirectory = "image_tools.export_directory.v1"
         static let resizeMode = "image_tools.resize_mode.v1"
-        static let usageEvents = "image_tools.usage_events.v1"
-        static let isProUnlocked = "image_tools.is_pro_unlocked.v1"
     }
 
     func loadPersistedState() {
@@ -88,12 +78,6 @@ extension ImageToolsViewModel {
                 resizeMode = .resize
             }
         }
-
-        // Load usage tracking events
-        loadUsageEvents()
-
-        // Load paywall state
-        isProUnlocked = defaults.bool(forKey: PersistenceKeys.isProUnlocked)
 
         // Re-run side effects that used to live in property observers
         if let directory = exportDirectory {
@@ -126,28 +110,6 @@ extension ImageToolsViewModel {
         let defaults = UserDefaults.standard
         let value = (resizeMode == .resize) ? "crop" : "resize"
         defaults.set(value, forKey: PersistenceKeys.resizeMode)
-    }
-
-    // MARK: - Usage tracking persistence
-    func loadUsageEvents() {
-        let defaults = UserDefaults.standard
-        guard let data = defaults.data(forKey: PersistenceKeys.usageEvents) else { return }
-        if let decoded = try? JSONDecoder().decode([UsageEventModel].self, from: data) {
-            UsageTracker.shared.replaceAll(decoded)
-        }
-    }
-
-    func persistUsageEvents(_ events: [UsageEventModel]) {
-        let defaults = UserDefaults.standard
-        if let data = try? JSONEncoder().encode(events) {
-            defaults.set(data, forKey: PersistenceKeys.usageEvents)
-        }
-    }
-
-    // MARK: - Paywall state
-    func persistPaywallState() {
-        let defaults = UserDefaults.standard
-        defaults.set(isProUnlocked, forKey: PersistenceKeys.isProUnlocked)
     }
 }
 
