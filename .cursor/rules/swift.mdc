@@ -4,6 +4,9 @@ alwaysApply: true
 
 # Swift 6.2 / macOS 14.6+
 
+## Information
+- bundle identifier: raffistudio.image-tools
+
 ## Architecture & State
 - Prefer `struct` over `class` for data models (value semantics prevent shared mutable state)
 - Design stateless, pure functions where possible

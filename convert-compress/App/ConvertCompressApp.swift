@@ -25,9 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         let expandedURLs = urls.flatMap { url -> [URL] in
-            let standardized = url.standardizedFileURL
-            SandboxAccessManager.shared.register(url: standardized)
-            return IngestionCoordinator.expandToSupportedImageURLs(from: standardized)
+            IngestionCoordinator.expandToSupportedImageURLs(from: url.standardizedFileURL)
         }
 
         self.application(NSApp, open: expandedURLs)

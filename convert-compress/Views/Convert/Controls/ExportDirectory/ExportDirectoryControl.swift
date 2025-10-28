@@ -73,7 +73,6 @@ struct ExportDirectoryControl: View {
         panel.prompt = String(localized: "Choose")
         if panel.runModal() == .OK {
             if let chosen = panel.urls.first?.standardizedFileURL {
-                SandboxAccessManager.shared.register(url: chosen)
                 directory = chosen
             }
         }

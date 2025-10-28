@@ -39,7 +39,7 @@ struct PrimaryApplyControl: View {
             }
             return "photo.stack.fill"
         }()
-        let isCounting = ingestText != nil || (isInProgress && (counterText != nil))
+        let isCounting = ingestText != nil || isInProgress
         let textTransition: ContentTransition = isCounting ? .numericText() : .opacity
         let displayedProgress: Double = {
             if let _ = ingestText {
@@ -73,16 +73,13 @@ struct PrimaryApplyControl: View {
                     // Background
                     Color.secondary.opacity(0.2)
                     
-                    // Full accent color when active, or progress fill when in progress
-                    if isInProgress || ingestText != nil {
+                    if !isDisabled {
                         GeometryReader { proxy in
                             Rectangle()
                                 .fill(Color.accentColor)
                                 .frame(width: displayedProgress * proxy.size.width)
                                 .animation(Theme.Animations.spring(), value: displayedProgress)
                         }
-                    } else if !isDisabled {
-                        Color.accentColor
                     }
                 }
             }
