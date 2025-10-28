@@ -3023,9 +3023,6 @@
         }
       }
     },
-    "Convert & Compress" : {
-
-    },
     "Convert & Compress needs access to save files in %@. Please choose Allow when prompted." : {
       "comment" : "The text that appears below the main message in the alert. The argument is a directory name.",
       "extractionState" : "manual",
@@ -5522,61 +5519,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这是您的预设"
-          }
-        }
-      }
-    },
-    "How your experience with Convert & Compress so far?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "How your experience with Convert & Compress so far?"
-          }
-        }
-      }
-    },
-    "I like it" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "I like it"
-          }
-        }
-      }
-    },
-    "If you have a moment, leaving a short review helps me and keeps development moving forward. <3" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "If you have a moment, leaving a short review helps me and keeps development moving forward. <3"
-          }
-        }
-      }
-    },
-    "Images processed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Images processed"
-          }
-        }
-      }
-    },
-    "It's okay" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "It's okay"
           }
         }
       }
@@ -9276,7 +9218,6 @@
       }
     },
     "RATING_PROMPT_2_BUTTON_NEVER" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9395,7 +9336,6 @@
       }
     },
     "RATING_PROMPT_2_BUTTON_RATE" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9514,7 +9454,6 @@
       }
     },
     "RATING_PROMPT_2_DESCRIPTION" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9633,7 +9572,6 @@
       }
     },
     "RATING_PROMPT_2_TITLE" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9650,7 +9588,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Freut mich zu hören!"
+            "value" : "Freut mich!"
           }
         },
         "en" : {

@@ -12,7 +12,6 @@ struct RatingView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
             } else {
                 FirstRatingPrompt(coordinator: coordinator, imageCount: imageCount)
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
         }
         .animation(Theme.Animations.smooth(), value: coordinator.showSecondPrompt)
@@ -29,11 +28,11 @@ private struct FirstRatingPrompt: View {
         VStack(spacing: 24) {
             VStack(spacing: 12) {
                 Text("\(imageCount)")
-                    .font(.system(size: 56, weight: .bold))
+                    .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(.primary)
                 
                 Text(String(localized: "RATING_PROMPT_1_TITLE", defaultValue: "Images processed"))
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
                 Text(String(localized: "RATING_PROMPT_1_DESCRIPTION", defaultValue: "How is your experience with \(AppConstants.localizedAppName) so far?"))
@@ -49,7 +48,7 @@ private struct FirstRatingPrompt: View {
                     Text(String(localized: "RATING_PROMPT_1_BUTTON_LIKE", defaultValue: "I like it"))
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(8)
+                        .padding(4)
                 }
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.capsule)
@@ -58,7 +57,7 @@ private struct FirstRatingPrompt: View {
                     Text(String(localized: "RATING_PROMPT_1_BUTTON_OKAY", defaultValue: "It's okay"))
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(8)
+                        .padding(4)
                 }
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.capsule)
@@ -79,7 +78,7 @@ private struct SecondRatingPrompt: View {
         VStack(spacing: 24) {
             VStack(spacing: 12) {
                 Text(String(localized: "RATING_PROMPT_2_TITLE", defaultValue: "Glad to hear that!"))
-                    .font(.system(size: 32, weight: .bold))
+                    .font(.system(size: 20, weight: .semibold))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.primary)
                 
@@ -96,7 +95,7 @@ private struct SecondRatingPrompt: View {
                     Text(String(localized: "RATING_PROMPT_2_BUTTON_RATE", defaultValue: "Rate App"))
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(8)
+                        .padding(4)
                 }
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.borderedProminent)
@@ -105,7 +104,7 @@ private struct SecondRatingPrompt: View {
                     Text(String(localized: "RATING_PROMPT_2_BUTTON_NEVER", defaultValue: "Never show again"))
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(8)
+                        .padding(4)
                 }
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.bordered)

@@ -360,8 +360,8 @@ struct ComparisonView: View {
         removeKeyMonitor()
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             
-            // Check if a text field is currently focused - if so, let arrow keys pass through
-            if isTextFieldFocused() && (event.keyCode == 123 || event.keyCode == 124) {
+            // Check if a text field is currently focused - if so, let all keys pass through
+            if isTextFieldFocused() {
                 return event
             }
             
