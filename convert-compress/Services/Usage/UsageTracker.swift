@@ -11,18 +11,17 @@ final class UsageTracker: ObservableObject {
         load()
     }
     
-    func recordImageConversion() {
-        let event = UsageEventModel(kind: .imageConversion, date: Date())
-        DispatchQueue.main.async { [weak self] in
-            self?.events.append(event)
-            self?.save()
+    func recordPipelineApplied(imageCount: Int) {
+        guard imageCount > 0 else { return }
+        
+        let pipelineEvent = UsageEventModel(kind: .pipelineApplied, date: Date())
+        let conversionEvents = (0..<imageCount).map { _ in
+            UsageEventModel(kind: .imageConversion, date: Date())
         }
-    }
-    
-    func recordPipelineApplied() {
-        let event = UsageEventModel(kind: .pipelineApplied, date: Date())
+        
         DispatchQueue.main.async { [weak self] in
-            self?.events.append(event)
+            self?.events.append(pipelineEvent)
+            self?.events.append(contentsOf: conversionEvents)
             self?.save()
         }
     }

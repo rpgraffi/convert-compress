@@ -90,7 +90,7 @@ final class ZoomPanState: ObservableObject {
         let newScale = targetScale.clamped(to: minScale...maxScale)
         
         if animated {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            withAnimation(Theme.Animations.fastSpring()) {
                 scale = newScale
                 offset = .zero
             }
@@ -146,7 +146,7 @@ final class ZoomPanState: ObservableObject {
     
     func reset(animated: Bool = true) {
         if animated {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            withAnimation(Theme.Animations.fastSpring()) {
                 scale = baseScale
                 offset = .zero
             }
@@ -159,7 +159,7 @@ final class ZoomPanState: ObservableObject {
     func fitToContainer(animated: Bool = false) {
         calculateBaseScale()
         if animated {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            withAnimation(Theme.Animations.fastSpring()) {
                 scale = baseScale
                 offset = .zero
             }

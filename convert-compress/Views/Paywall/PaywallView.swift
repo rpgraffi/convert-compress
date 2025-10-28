@@ -112,7 +112,7 @@ struct PaywallView: View {
                 Link(String(localized:"Privacy"), destination: URL(string: "https://imagetool.app/privacy")!)
                 Link(String(localized:"Terms"), destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                 Link(String(localized:"Source Code"), destination: URL(string: "https://github.com/rpgraffi/image-tools")!)
-                Link(String(localized: "Help"), destination: URL(string: "mailto:me@raffi.studio")!)
+                Link(String(localized:"Help"), destination: URL(string: "mailto:me@raffi.studio")!)
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)

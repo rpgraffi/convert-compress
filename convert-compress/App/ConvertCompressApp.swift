@@ -46,7 +46,7 @@ struct ConvertCompressApp: App {
     }
     
     var body: some Scene {
-        Window("Convert & Compress", id: "main") {
+        Window(AppConstants.localizedAppName, id: "main") {
             MainView()
                 .background(.clear)
         }

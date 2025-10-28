@@ -125,7 +125,11 @@ extension ImageToolsViewModel {
         isExporting = false
         exportCompleted = 0
         exportTotal = 0
-        UsageTracker.shared.recordPipelineApplied()
+        
+        // Track usage and check for rating prompt
+        let processedCount = imagesToCommit.filter { $0.isEdited }.count
+        UsageTracker.shared.recordPipelineApplied(imageCount: processedCount)
+        RatingCoordinator.shared.checkAndShowIfNeeded()
 
         let urlsToReveal = imagesToCommit.compactMap { $0.isEdited ? $0.workingURL : nil }
         if !urlsToReveal.isEmpty {
