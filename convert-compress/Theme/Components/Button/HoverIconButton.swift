@@ -27,7 +27,7 @@ struct HoverIconButton: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.15)) {
+            withAnimation(.easeOut(duration: 0.07)) {
                 isHovering = hovering
             }
         }

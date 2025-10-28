@@ -39,9 +39,7 @@ struct PresetListItem: View {
             isPresented = false
         }
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.10)) {
-                isHovered = hovering
-            }
+            isHovered = hovering
         }
         .onDrag {
             isBeingDragged = true
@@ -83,7 +81,7 @@ struct PresetListItem: View {
             HoverIconButton(
                 systemName: "trash.fill",
                 action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 1.7)) {
+                    withAnimation(Theme.Animations.smooth()) {
                         vm.deletePreset(preset)
                     }
                 },

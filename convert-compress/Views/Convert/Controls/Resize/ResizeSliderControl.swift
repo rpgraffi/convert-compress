@@ -62,6 +62,8 @@ struct ResizeSliderControl: View {
             .font(Theme.Fonts.button)
             .onTapGesture {
                 isEditing = true
+                fieldFocused = true
+                TextFieldUtilities.selectAllText()
             }
             .scrollGesture(
                 totalSteps: stops.count + 1,
@@ -86,6 +88,21 @@ struct ResizeSliderControl: View {
         }
         .onChange(of: activeDimension) {
             hapticTracker.reset()
+        }
+        .onChange(of: widthText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
+        }
+        .onChange(of: heightText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
+        }
+        .onChange(of: longEdgeText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
         }
     }
     

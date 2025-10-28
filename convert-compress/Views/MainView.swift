@@ -4,7 +4,8 @@ import UniformTypeIdentifiers
 
 struct MainView: View {
     @EnvironmentObject private var vm: ImageToolsViewModel
-    @Bindable private var coordinator = PaywallCoordinator.shared
+    @Bindable private var paywallCoordinator = PaywallCoordinator.shared
+    @Bindable private var ratingCoordinator = RatingCoordinator.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -25,8 +26,11 @@ struct MainView: View {
         .onCommand(#selector(NSText.paste(_:))) {
             vm.addFromPasteboard()
         }
-        .sheet(isPresented: $coordinator.isPresented) {
+        .sheet(isPresented: $paywallCoordinator.isPresented) {
             PaywallView()
+        }
+        .sheet(isPresented: $ratingCoordinator.isPresented) {
+            RatingView()
         }
     }
 }
