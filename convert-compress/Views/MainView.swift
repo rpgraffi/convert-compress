@@ -15,7 +15,7 @@ struct MainView: View {
             BottomBar()
         }
         .frame(minWidth: 680)
-        .background(.regularMaterial)
+        .background(.thickMaterial)
         .ignoresSafeArea(.all, edges: .top)
         .onAppear {
             WindowConfigurator.configureMainWindow()
