@@ -7,12 +7,8 @@ extension ImageToolsViewModel {
         // Observe exportDirectory changes
         $exportDirectory
             .dropFirst()
-            .sink { [weak self] directory in
-                guard let self else { return }
-                self.persistExportDirectory()
-                if let directory = directory {
-                    SandboxAccessManager.shared.register(url: directory)
-                }
+            .sink { [weak self] _ in
+                self?.persistExportDirectory()
             }
             .store(in: &cancellables)
         
@@ -77,11 +73,6 @@ extension ImageToolsViewModel {
             default:
                 resizeMode = .resize
             }
-        }
-
-        // Re-run side effects that used to live in property observers
-        if let directory = exportDirectory {
-            SandboxAccessManager.shared.register(url: directory)
         }
 
         onSelectedFormatChanged(selectedFormat)
