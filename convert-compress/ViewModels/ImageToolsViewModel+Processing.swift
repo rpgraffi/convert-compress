@@ -5,14 +5,7 @@ import AppKit
 extension ImageToolsViewModel {
     func buildPipeline() -> ProcessingPipeline {
         let pipeline = PipelineBuilder().build(
-            resizeMode: resizeMode,
-            resizeWidth: resizeWidth,
-            resizeHeight: resizeHeight,
-            selectedFormat: selectedFormat,
-            compressionPercent: compressionPercent,
-            flipV: flipV,
-            removeBackground: removeBackground,
-            removeMetadata: removeMetadata,
+            configuration: currentConfiguration,
             exportDirectory: exportDirectory
         )
         if let fmt = selectedFormat { bumpRecentFormats(fmt) }
@@ -41,13 +34,12 @@ extension ImageToolsViewModel {
     }
 
     func applyPipelineAsync() {
-        // Show paywall first when user is not unlocked, unless explicitly bypassed for this request.
-        if !PurchaseManager.shared.isProUnlocked && !shouldBypassPaywallOnce {
-            paywallContext = .beforeExport
-            isPaywallPresented = true
-            return
+        PaywallCoordinator.shared.requestAccess { [weak self] in
+            self?.executeExport()
         }
-        shouldBypassPaywallOnce = false
+    }
+    
+    private func executeExport() {
         let pipeline = buildPipeline()
         let targets = images
         guard !targets.isEmpty else { return }
@@ -113,19 +105,6 @@ extension ImageToolsViewModel {
             self.finishExport(with: updatedImages)
         }
     }
-
-    // Recovery
-    func recoverOriginal(_ asset: ImageAsset) {
-        guard let backup = asset.backupURL else { return }
-        do {
-            if FileManager.default.fileExists(atPath: asset.originalURL.path) { try FileManager.default.removeItem(at: asset.originalURL) }
-            try FileManager.default.copyItem(at: backup, to: asset.originalURL)
-            var updated = asset
-            updated.workingURL = asset.originalURL
-            updated.isEdited = false
-            if let idx = images.firstIndex(of: asset) { images[idx] = updated }
-        } catch { print("Recovery failed: \(error)") }
-    }
 }
 
 extension ImageToolsViewModel {
@@ -146,7 +125,11 @@ extension ImageToolsViewModel {
         isExporting = false
         exportCompleted = 0
         exportTotal = 0
-        UsageTracker.shared.recordPipelineApplied()
+        
+        // Track usage and check for rating prompt
+        let processedCount = imagesToCommit.filter { $0.isEdited }.count
+        UsageTracker.shared.recordPipelineApplied(imageCount: processedCount)
+        RatingCoordinator.shared.checkAndShowIfNeeded()
 
         let urlsToReveal = imagesToCommit.compactMap { $0.isEdited ? $0.workingURL : nil }
         if !urlsToReveal.isEmpty {

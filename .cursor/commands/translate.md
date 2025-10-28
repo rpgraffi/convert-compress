@@ -1,0 +1,1 @@
+Translate the first values to all translations the last value has. Try to respect the nuances of each language.

@@ -95,7 +95,7 @@ struct HoverControls: View {
     private let cornerRadius: CGFloat = 6
     
     private enum CopyState {
-        case idle, success
+        case idle, loading, success, error
     }
     
     var body: some View {
@@ -123,12 +123,40 @@ struct HoverControls: View {
     
     private var copyButton: some View {
         Button(action: copyImageAction) {
-            Image(systemName: copyState == .success ? "checkmark.app.fill" : "doc.on.doc.fill")
-                .frame(width: 13, height: 13)
-                .contentTransition(.symbolEffect(.replace))
+            ZStack {
+                if copyState == .loading {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .transition(.opacity)
+                } else {
+                    Image(systemName: copyIconName)
+                        .foregroundStyle(copyIconColor)
+                        .contentTransition(.symbolEffect(.replace))
+                        .transition(.opacity)
+                }
+            }
+            .frame(width: 13, height: 13)
+            .animation(.easeInOut(duration: 0.15), value: copyState)
         }
         .buttonStyle(.plain)
+        .disabled(copyState == .loading)
         .help(String(localized: "Copy image to clipboard"))
+    }
+    
+    private var copyIconColor: Color {
+        switch copyState {
+        case .idle, .loading: .secondary
+        case .success: .green
+        case .error: .red
+        }
+    }
+    
+    private var copyIconName: String {
+        switch copyState {
+        case .idle, .loading: "doc.on.doc.fill"
+        case .success: "checkmark.app.fill"
+        case .error: "exclamationmark.triangle.fill"
+        }
     }
     
     private var removeButton: some View {
@@ -140,18 +168,30 @@ struct HoverControls: View {
     }
     
     private func copyImageAction() {
-        Task {
+        copyState = .loading
+        
+        let pipeline = vm.buildPipeline()
+        let localAsset = asset
+        
+        Task.detached {
+            let result: CopyState
             do {
-                let pipeline = vm.buildPipeline()
-                let encoded = try pipeline.renderEncodedData(on: asset)
+                let encoded = try pipeline.renderEncodedData(on: localAsset)
                 ClipboardService.copyEncodedImage(data: encoded.data, uti: encoded.uti)
+                result = .success
             } catch {
-                ClipboardService.copyImage(from: asset.workingURL)
+                result = .error
             }
             
-            copyState = .success
+            await MainActor.run {
+                copyState = result
+            }
+            
             try? await Task.sleep(for: .seconds(1))
-            copyState = .idle
+            
+            await MainActor.run {
+                copyState = .idle
+            }
         }
     }
 }

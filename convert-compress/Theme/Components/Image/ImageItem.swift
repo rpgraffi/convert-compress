@@ -80,6 +80,7 @@ struct ImageItem: View {
         .onChange(of: vm.resizeMode) { vm.triggerEstimationForVisible([asset]) }
         .onChange(of: vm.resizeWidth) { vm.triggerEstimationForVisible([asset]) }
         .onChange(of: vm.resizeHeight) { vm.triggerEstimationForVisible([asset]) }
+        .onChange(of: vm.resizeLongEdge) { vm.triggerEstimationForVisible([asset]) }
         .onChange(of: vm.selectedFormat) { vm.triggerEstimationForVisible([asset]) }
         .onChange(of: vm.compressionPercent) { vm.triggerEstimationForVisible([asset]) }
         .onChange(of: vm.removeMetadata) { vm.triggerEstimationForVisible([asset]) }

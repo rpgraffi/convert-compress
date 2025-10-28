@@ -1,16 +1,17 @@
 import SwiftUI
 import AppKit
 
-/// Single numeric pixel field with inline dimension toggle ("width" / "height").
+/// Single numeric pixel field with inline dimension toggle ("width" / "height" / "long side").
 /// Supports dragging, scrolling, and text input to change values.
 struct ResizeSliderControl: View {
     @Binding var widthText: String
     @Binding var heightText: String
+    @Binding var longEdgeText: String
     let baseSize: CGSize?
     let containerSize: CGSize
     let squareLocked: Bool
     
-    private enum ActiveDimension { case width, height }
+    private enum ActiveDimension { case width, height, longEdge }
     
     @State private var activeDimension: ActiveDimension = .width
     @State private var hapticTracker = HapticStopTracker()
@@ -19,16 +20,27 @@ struct ResizeSliderControl: View {
     @FocusState private var fieldFocused: Bool
     
     private var activeText: String {
-        activeDimension == .width ? widthText : heightText
+        switch activeDimension {
+        case .width: return widthText
+        case .height: return heightText
+        case .longEdge: return longEdgeText
+        }
     }
     
     private func assignActive(_ newValue: String?) {
-        if activeDimension == .width {
+        switch activeDimension {
+        case .width:
             widthText = newValue ?? ""
             heightText = ""
-        } else {
+            longEdgeText = ""
+        case .height:
             heightText = newValue ?? ""
             widthText = ""
+            longEdgeText = ""
+        case .longEdge:
+            longEdgeText = newValue ?? ""
+            widthText = ""
+            heightText = ""
         }
     }
     
@@ -50,6 +62,8 @@ struct ResizeSliderControl: View {
             .font(Theme.Fonts.button)
             .onTapGesture {
                 isEditing = true
+                fieldFocused = true
+                TextFieldUtilities.selectAllText()
             }
             .scrollGesture(
                 totalSteps: stops.count + 1,
@@ -75,15 +89,36 @@ struct ResizeSliderControl: View {
         .onChange(of: activeDimension) {
             hapticTracker.reset()
         }
+        .onChange(of: widthText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
+        }
+        .onChange(of: heightText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
+        }
+        .onChange(of: longEdgeText) { _, _ in
+            if !isDragging && !isEditing {
+                initializeActiveDimension()
+            }
+        }
     }
     
     private func initializeActiveDimension() {
-        if !heightText.isEmpty, (widthText.isEmpty || (Int(widthText) == nil && Int(heightText) != nil)) {
+        if !longEdgeText.isEmpty, (widthText.isEmpty && heightText.isEmpty || (Int(widthText) == nil && Int(heightText) == nil && Int(longEdgeText) != nil)) {
+            activeDimension = .longEdge
+            widthText = ""
+            heightText = ""
+        } else if !heightText.isEmpty, (widthText.isEmpty || (Int(widthText) == nil && Int(heightText) != nil)) {
             activeDimension = .height
             widthText = ""
+            longEdgeText = ""
         } else {
             activeDimension = .width
             heightText = ""
+            longEdgeText = ""
         }
     }
     
@@ -135,7 +170,15 @@ struct ResizeSliderControl: View {
         let allStops = hardcodedStops()
         guard let base = baseSize, base.width > 0, base.height > 0 else { return allStops }
         
-        let maxValue = activeDimension == .width ? Int(base.width) : Int(base.height)
+        let maxValue: Int
+        switch activeDimension {
+        case .width:
+            maxValue = Int(base.width)
+        case .height:
+            maxValue = Int(base.height)
+        case .longEdge:
+            maxValue = Int(max(base.width, base.height))
+        }
         return allStops.filter { $0 <= maxValue }
     }
     
@@ -179,11 +222,25 @@ struct ResizeSliderControl: View {
         Button {
             withAnimation(Theme.Animations.fastSpring()) {
                 let value = activeText
-                activeDimension = activeDimension == .width ? .height : .width
+                switch activeDimension {
+                case .width:
+                    activeDimension = .height
+                case .height:
+                    activeDimension = .longEdge
+                case .longEdge:
+                    activeDimension = .width
+                }
                 assignActive(value)
             }
         } label: {
-            Text(activeDimension == .width ? String(localized: "Width") : String(localized: "Height"))
+            let labelText: String = {
+                switch activeDimension {
+                case .width: return String(localized: "Width")
+                case .height: return String(localized: "Height")
+                case .longEdge: return String(localized: "Long Edge")
+                }
+            }()
+            Text(labelText)
                 .contentTransition(.opacity)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.horizontal, 8)

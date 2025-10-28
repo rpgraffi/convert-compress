@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct PaywallView: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
-    @ObservedObject private var purchase = PurchaseManager.shared
+    @State private var purchase = PurchaseManager.shared
     
     var body: some View {
         VStack(spacing: 16) {
@@ -18,7 +17,7 @@ struct PaywallView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button(action: { vm.paywallContinueFree() }) {
+                    Button(action: { PaywallCoordinator.shared.dismiss() }) {
                         Text(String(localized:"Continue"))
                             .font(.system(size: 18))
                             .frame(maxWidth: .infinity)
@@ -113,7 +112,7 @@ struct PaywallView: View {
                 Link(String(localized:"Privacy"), destination: URL(string: "https://imagetool.app/privacy")!)
                 Link(String(localized:"Terms"), destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                 Link(String(localized:"Source Code"), destination: URL(string: "https://github.com/rpgraffi/image-tools")!)
-                Link(String(localized: "Help"), destination: URL(string: "mailto:me@raffi.studio")!)
+                Link(String(localized:"Help"), destination: URL(string: "mailto:me@raffi.studio")!)
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
@@ -129,7 +128,9 @@ struct PaywallView: View {
             Alert(title: Text(wrapper.message))
         }
         .onChange(of: purchase.isProUnlocked) {
-            if purchase.isProUnlocked { vm.paywallContinueFree() }
+            if purchase.isProUnlocked {
+                PaywallCoordinator.shared.dismiss()
+            }
         }
     }
 }
@@ -141,5 +142,4 @@ private struct LocalizedErrorWrapper: Identifiable {
 
 #Preview {
     PaywallView()
-        .environmentObject(ImageToolsViewModel())
 }

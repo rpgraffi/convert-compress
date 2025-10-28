@@ -21,11 +21,26 @@ enum Theme {
     struct Animations {
         static func spring() -> Animation { .spring(response: 0.6, dampingFraction: 0.85) }
         static func fastSpring() -> Animation { .spring(response: 0.3, dampingFraction: 0.85) }
-        static func pillFill() -> Animation { .spring(response: 0.7, dampingFraction: 0.85) }
+        static func smooth() -> Animation { .spring(response: 0.25, dampingFraction: 1.05) }
+        static func pillFill() -> Animation { .spring(response: 0.15, dampingFraction: 1) }
     }
     
     struct Fonts {
         static let button: Font = .system(size: 14, weight: .medium)
         static let captionMono: Font = .system(size: 10, weight: .regular).monospaced()
+    }
+    
+    struct Borders {
+        static func gradientBorder(cornerRadius: CGFloat = 32, lineWidth: CGFloat = 1) -> some View {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.25), Color.white.opacity(0.1)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: lineWidth
+                )
+        }
     }
 }

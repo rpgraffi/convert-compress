@@ -4,17 +4,18 @@ struct PillButton<LabelContent: View>: View {
     let role: ButtonRole?
     let action: () -> Void
     let label: () -> LabelContent
+    let height: CGFloat
 
     @State private var isHovering: Bool = false
 
-    init(role: ButtonRole? = nil, action: @escaping () -> Void, @ViewBuilder label: @escaping () -> LabelContent) {
+    init(role: ButtonRole? = nil, height: CGFloat? = nil, action: @escaping () -> Void, @ViewBuilder label: @escaping () -> LabelContent) {
         self.role = role
+        self.height = height ?? Theme.Metrics.controlHeight
         self.action = action
         self.label = label
     }
 
     var body: some View {
-        let height: CGFloat = Theme.Metrics.controlHeight
         let corner = Theme.Metrics.pillCornerRadius(forHeight: height)
         let destructiveActive = (role == .destructive && isHovering)
         Button(role: role, action: action) {

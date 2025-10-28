@@ -10,14 +10,7 @@ struct TrueSizeEstimator {
     // Estimate encoded byte sizes for assets concurrently. Skips flips for speed as requested.
     static func estimate(
         assets: [ImageAsset],
-        resizeMode: ResizeMode,
-        resizeWidth: String,
-        resizeHeight: String,
-        selectedFormat: ImageFormat?,
-        compressionPercent: Double,
-        flipV: Bool,
-        removeMetadata: Bool,
-        removeBackground: Bool
+        configuration: ProcessingConfiguration
     ) async -> [UUID: Int] {
         guard !assets.isEmpty else { return [:] }
 
@@ -34,14 +27,7 @@ struct TrueSizeEstimator {
                     group.addTask(priority: .utility) {
                         return estimateOne(
                             asset: asset,
-                            resizeMode: resizeMode,
-                            resizeWidth: resizeWidth,
-                            resizeHeight: resizeHeight,
-                            selectedFormat: selectedFormat,
-                            compressionPercent: compressionPercent,
-                            flipV: flipV,
-                            removeMetadata: removeMetadata,
-                            removeBackground: removeBackground
+                            configuration: configuration
                         )
                     }
                 }
@@ -59,28 +45,11 @@ struct TrueSizeEstimator {
 
     private static func estimateOne(
         asset: ImageAsset,
-        resizeMode: ResizeMode,
-        resizeWidth: String,
-        resizeHeight: String,
-        selectedFormat: ImageFormat?,
-        compressionPercent: Double,
-        flipV: Bool,
-        removeMetadata: Bool,
-        removeBackground: Bool
+        configuration: ProcessingConfiguration
     ) -> (UUID, Int)? {
         do {
-            // Build a pipeline identical to the real processing path
-            let pipeline = PipelineBuilder().build(
-                resizeMode: resizeMode,
-                resizeWidth: resizeWidth,
-                resizeHeight: resizeHeight,
-                selectedFormat: selectedFormat,
-                compressionPercent: compressionPercent,
-                flipV: flipV,
-                removeBackground: removeBackground,
-                removeMetadata: removeMetadata,
-                exportDirectory: nil
-            )
+            // Build a pipeline identical to the real processing path (exportDirectory not needed for estimation)
+            let pipeline = PipelineBuilder().build(configuration: configuration, exportDirectory: nil)
 
             // Apply the same operations in-memory
             var ci = try loadCIImageApplyingOrientation(from: asset.originalURL)

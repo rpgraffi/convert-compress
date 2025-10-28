@@ -26,7 +26,7 @@ struct ImageAsset: Identifiable, Hashable {
     }
 }
 
-struct ImageFormat: Identifiable, Hashable, Equatable {
+struct ImageFormat: Identifiable, Hashable, Equatable, Codable {
     let utType: UTType
 
     var id: String { utType.identifier }
@@ -48,6 +48,29 @@ struct ImageFormat: Identifiable, Hashable, Equatable {
     var fullName: String {
         utType.localizedDescription ?? utType.identifier
     }
+    
+    // MARK: - Codable
+    
+    init(utType: UTType) {
+        self.utType = utType
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let identifier = try container.decode(String.self)
+        guard let format = ImageIOCapabilities.shared.format(forIdentifier: identifier) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown image format: \(identifier)"
+            )
+        }
+        self.utType = format.utType
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(utType.identifier)
+    }
 }
 
 struct FormatCapabilities {
@@ -60,7 +83,7 @@ struct FormatCapabilities {
     let resizeRestricted: Bool
 }
 
-enum ResizeMode {
+enum ResizeMode: String, Codable {
     case resize
     case crop
 }

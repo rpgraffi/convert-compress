@@ -4,6 +4,8 @@ import UniformTypeIdentifiers
 
 struct MainView: View {
     @EnvironmentObject private var vm: ImageToolsViewModel
+    @Bindable private var paywallCoordinator = PaywallCoordinator.shared
+    @Bindable private var ratingCoordinator = RatingCoordinator.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -13,7 +15,7 @@ struct MainView: View {
             BottomBar()
         }
         .frame(minWidth: 680)
-        .background(.regularMaterial)
+        .background(.thickMaterial)
         .ignoresSafeArea(.all, edges: .top)
         .onAppear {
             WindowConfigurator.configureMainWindow()
@@ -24,8 +26,11 @@ struct MainView: View {
         .onCommand(#selector(NSText.paste(_:))) {
             vm.addFromPasteboard()
         }
-        .sheet(isPresented: $vm.isPaywallPresented) {
+        .sheet(isPresented: $paywallCoordinator.isPresented) {
             PaywallView()
+        }
+        .sheet(isPresented: $ratingCoordinator.isPresented) {
+            RatingView()
         }
     }
 }

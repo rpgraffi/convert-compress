@@ -1,17 +1,16 @@
 import SwiftUI
 
 struct TopBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
-    @StateObject private var purchaseManager = PurchaseManager.shared
+    @State private var purchaseManager = PurchaseManager.shared
+    @ObservedObject private var usageTracker = UsageTracker.shared
     @State private var isHovered: Bool = false
     
     var body: some View {
         HStack {
             Spacer()
-            
             // Titlebar content on trailing side
             HStack(spacing: 8) {
-                Text(isHovered ? "Converted: \(vm.totalImageConversions)" : "\(vm.totalImageConversions)")
+                Text(isHovered ? "Converted: \(usageTracker.totalImageConversions)" : "\(usageTracker.totalImageConversions)")
                     .font(.system(.caption, design: .monospaced))
                     // .foregroundStyle(.secondary)
                     .animation(.easeInOut(duration: 0.18), value: isHovered)
@@ -23,8 +22,7 @@ struct TopBar: View {
                 Menu {
                     if !purchaseManager.isProUnlocked {
                         Button {
-                            vm.paywallContext = .manual
-                            vm.isPaywallPresented = true
+                            PaywallCoordinator.shared.presentManually()
                         } label: {
                             Label("Buy Lifetime", systemImage: "sparkle") 
                         }
@@ -43,15 +41,15 @@ struct TopBar: View {
                         Label("Rate App", systemImage: "star")
                     }
                     
-                    Link(destination: URL(string: "https://www.image-tool.app")!) {
+                    Link(destination: URL(string: "https://convert-compress.com")!) {
                         Label("Website", systemImage: "globe")
                     }
                     
-                    ShareLink(item: URL(string: "https://www.image-tool.app")!) {
+                    ShareLink(item: URL(string: "https://convert-compress.com")!) {
                         Label("Share App", systemImage: "square.and.arrow.up")
                     }
                     
-                    Link(destination: URL(string: "https://github.com/rpgraffi/image-tools")!) {
+                    Link(destination: URL(string: "https://github.com/rpgraffi/convert-compress")!) {
                         Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
                 } label: {

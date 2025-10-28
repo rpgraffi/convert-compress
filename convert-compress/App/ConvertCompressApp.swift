@@ -6,6 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false
+        NSApp.servicesProvider = self
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -17,23 +18,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let expandedURLs = urls.flatMap { IngestionCoordinator.expandToSupportedImageURLs(from: $0) }
         vm.addURLs(expandedURLs)
     }
+    
+    @objc func handleFinderService(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
+        guard let urls = pboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] else {
+            return
+        }
+        
+        let expandedURLs = urls.flatMap { url -> [URL] in
+            let standardized = url.standardizedFileURL
+            SandboxAccessManager.shared.register(url: standardized)
+            return IngestionCoordinator.expandToSupportedImageURLs(from: standardized)
+        }
+
+        self.application(NSApp, open: expandedURLs)
+    }
 }
 
 @main
-struct ImageToolsApp: App {
-    @StateObject private var vm = ImageToolsViewModel()
+struct ConvertCompressApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    private let vm: ImageToolsViewModel
+    
+    init() {
+        self.vm = ImageToolsViewModel()
+        AppDelegate.sharedViewModel = vm
+    }
     
     var body: some Scene {
-        WindowGroup {
+        Window(AppConstants.localizedAppName, id: "main") {
             MainView()
                 .background(.clear)
-                .onAppear { AppDelegate.sharedViewModel = vm }
-                .handlesExternalEvents(preferring: ["main"], allowing: ["*"])
         }
+        .environmentObject(vm)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
-        .environmentObject(vm)
-        .handlesExternalEvents(matching: ["main"])
     }
 }

@@ -5,11 +5,9 @@ struct ControlsBar: View {
     
     var body: some View {
         HStack(spacing: 16) {
+            PresetButton()
             FormatControl()
-                .transition(.opacity.combined(with: .scale))
-            
             ResizeControl()
-                .transition(.opacity.combined(with: .scale))
             
             if shouldShowCompression {
                 QualityControl()
@@ -24,13 +22,13 @@ struct ControlsBar: View {
                     .transition(.opacity.combined(with: .scale))
             }
         }
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: vm.selectedFormat)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: vm.resizeMode)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: vm.overwriteOriginals)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: vm.removeMetadata)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: vm.allowedSquareSizes)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: shouldShowCompression)
-        .animation(.spring(response: 0.6, dampingFraction: 0.85), value: shouldShowMetadata)
+        .animation(Theme.Animations.spring(), value: vm.selectedFormat)
+        .animation(Theme.Animations.spring(), value: vm.resizeMode)
+        .animation(Theme.Animations.spring(), value: vm.overwriteOriginals)
+        .animation(Theme.Animations.spring(), value: vm.removeMetadata)
+        .animation(Theme.Animations.spring(), value: vm.allowedSquareSizes)
+        .animation(Theme.Animations.spring(), value: shouldShowCompression)
+        .animation(Theme.Animations.spring(), value: shouldShowMetadata)
         .padding(.bottom, 4)
         .padding(.horizontal, 8)
     }
