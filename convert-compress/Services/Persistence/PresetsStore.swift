@@ -6,7 +6,7 @@ final class PresetsStore {
     
     private let ubiquitousStore = NSUbiquitousKeyValueStore.default
     private var storeKey: String {
-        "\(Bundle.main.bundleIdentifier!).presets"
+        "\(AppConstants.bundleIdentifier).presets"
     }
     
     private let encoder: JSONEncoder = {
