@@ -114,19 +114,7 @@ enum IngestionCoordinator {
         guard panel.runModal() == .OK else { return }
         
         let expanded: [URL] = panel.urls.flatMap { url in
-            let standardized = url.standardizedFileURL
-            
-            // Store bookmark for the selected directory (or parent if it's a file)
-            let directoryToStore: URL
-            var isDirectory: ObjCBool = false
-            if FileManager.default.fileExists(atPath: standardized.path, isDirectory: &isDirectory), isDirectory.boolValue {
-                directoryToStore = standardized
-            } else {
-                directoryToStore = standardized.deletingLastPathComponent()
-            }
-            SandboxAccessManager.shared.storeBookmarkIfAccessible(for: directoryToStore)
-            
-            return expandToSupportedImageURLs(from: standardized)
+            return expandToSupportedImageURLs(from: url.standardizedFileURL)
         }
         completion(expanded)
     }

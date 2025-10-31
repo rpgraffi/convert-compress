@@ -17,6 +17,124 @@
         }
       }
     },
+    "%@ needs access to save files in %@. Please choose Allow when prompted." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحتاج %1$@ إلى إذن للوصول لحفظ الملفات في %2$@. يرجى اختيار 'السماح' عند الطلب."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ skal have adgang for at kunne gemme filer i %2$@. Vælg 'Tillad', når du bliver spurgt."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ benötigt Zugriff, um Dateien in %2$@ zu speichern. Bitte wähle 'Erlauben', wenn du dazu aufgefordert wirst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ needs access to save files in %2$@. Please choose Allow when prompted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ necesita acceso para guardar archivos en %2$@. Por favor, selecciona Permitir cuando se solicite."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ tarvitsee oikeuden tallentaa tiedostoja kohteeseen %2$@. Valitse Salli, kun sitä pyydetään."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ a besoin d'un accès pour enregistrer des fichiers dans %2$@. Veuillez choisir Autoriser lorsque l'invite s'affiche."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ha bisogno dell'accesso per salvare file in %2$@. Scegli Consenti quando richiesto."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ が %2$@ にファイルを保存するためのアクセス権が必要です。表示されたら［許可］を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@이(가) %2$@에 파일을 저장하려면 접근 권한이 필요합니다. 요청 시 '허용'을 선택하세요."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ trenger tilgang for å lagre filer i %2$@. Velg Tillat når du blir spurt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ heeft toegang nodig om bestanden op te slaan in %2$@. Kies Toestaan wanneer daarom wordt gevraagd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ potrzebuje dostępu, aby zapisywać pliki w %2$@. Wybierz Zezwól, gdy pojawi się monit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ precisa de acesso para salvar arquivos em %2$@. Escolha Permitir quando solicitado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ precisa de acesso para salvar arquivos em %2$@. Por favor, escolha Permitir quando solicitado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ требуется доступ для сохранения файлов в %2$@. Пожалуйста, выберите «Разрешить» при появлении запроса."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ behöver åtkomst för att spara filer i %2$@. Välj Tillåt när du uppmanas."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@'ın %2$@ konumuna dosya kaydedebilmesi için izne ihtiyacı var. İstendiğinde İzin Ver'i seçin."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 需要访问权限以便在 %2$@ 中保存文件。出现提示时请选择“允许”。"
+          }
+        }
+      }
+    },
     "%@×%@" : {
       "localizations" : {
         "en" : {
@@ -1107,6 +1225,124 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "允许"
+          }
+        }
+      }
+    },
+    "Allow %@ to save files in %@?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السماح لـ%1$@ بحفظ الملفات في %2$@؟"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillad %1$@ at gemme filer i %2$@?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soll %1$@ Dateien in %2$@ speichern dürfen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow %1$@ to save files in %2$@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Permitir que %1$@ guarde archivos en %2$@?"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sallitaanko %1$@ tallentaa tiedostoja kohteeseen %2$@?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser %1$@ à enregistrer des fichiers dans %2$@ ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consentire a %1$@ di salvare i file in %2$@?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@に%2$@へのファイル保存を許可しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@에서 %2$@에 파일을 저장하도록 허용할까요?"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillat at %1$@ lagrer filer i %2$@?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toestaan dat %1$@ bestanden opslaat in %2$@?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zezwolić %1$@ na zapis plików w %2$@?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir que %1$@ salve arquivos em %2$@?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir que %1$@ salve arquivos em %2$@?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешить %1$@ сохранять файлы в %2$@?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillåt att %1$@ sparar filer i %2$@?"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ uygulamasının %2$@ konumuna dosya kaydetmesine izin verilsin mi?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许 %1$@ 在 %2$@ 中保存文件吗？"
           }
         }
       }

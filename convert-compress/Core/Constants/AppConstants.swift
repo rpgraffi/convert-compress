@@ -7,5 +7,10 @@ enum AppConstants {
             ?? Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
             ?? "Convert & Compress"
     }()
+    
+    /// The bundle identifier of the app
+    static let bundleIdentifier: String = {
+        Bundle.main.bundleIdentifier ?? "raffistudio.image-tools"
+    }()
 }
 

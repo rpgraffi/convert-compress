@@ -4,7 +4,7 @@ import SwiftUI
 import OSLog
 
 extension ImageToolsViewModel {
-    nonisolated static let ingestionLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "image-tools", category: "Ingestion")
+    nonisolated static let ingestionLogger = Logger(subsystem: AppConstants.bundleIdentifier, category: "Ingestion")
     func addURLs(_ urls: [URL]) {
         Task(priority: .userInitiated) { [weak self] in
             await self?.ingest(urls: urls)
@@ -97,9 +97,6 @@ extension ImageToolsViewModel {
 
         Self.ingestionLogger.debug("Ingest new URLs: \(newURLs.count, privacy: .public)")
         
-        // Store bookmarks for source directories to enable future write access
-        storeSourceDirectoryBookmarks(for: newURLs)
-        
         updateSourceDirectory(from: newURLs)
         let newAssets = newURLs.map { ImageAsset(url: $0) }
         prepareIngestionState(for: newAssets.count)
@@ -125,22 +122,6 @@ extension ImageToolsViewModel {
     private func updateSourceDirectory(from urls: [URL]) {
         if let firstDirectory = urls.first?.deletingLastPathComponent() {
             sourceDirectory = firstDirectory
-        }
-    }
-    
-    private func storeSourceDirectoryBookmarks(for urls: [URL]) {
-        // Get unique parent directories
-        let directories = Set(urls.map { $0.deletingLastPathComponent().standardizedFileURL })
-        
-        // Skip temp directory (pasted images)
-        let tempDirPath = FileManager.default.temporaryDirectory.standardizedFileURL.path
-        
-        for directory in directories {
-            // Don't store bookmarks for temp directories
-            guard !directory.path.hasPrefix(tempDirPath) else { continue }
-            
-            // Try to store bookmark while we have temporary security-scoped access
-            SandboxAccessManager.shared.storeBookmarkIfAccessible(for: directory)
         }
     }
     
