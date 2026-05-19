@@ -5,7 +5,7 @@ struct ExportDestinationResolver {
     let exportDirectory: URL?
     let folderStructureRoot: URL?
 
-    func destinationPlan(for asset: ImageAsset, uti: UTType) -> ExportDestinationPlan {
+    func destinationURL(for asset: ImageAsset, uti: UTType) -> URL {
         let currentURL = asset.originalURL
         let ext = ImageIOCapabilities.shared.preferredFilenameExtension(for: uti)
         let tempDirPath = FileManager.default.temporaryDirectory.standardizedFileURL.path
@@ -40,13 +40,6 @@ struct ExportDestinationResolver {
             destinationURL = directory.appendingPathComponent(base + "." + ext)
         }
 
-        let directory = destinationURL.deletingLastPathComponent()
-        let stem = destinationURL.deletingPathExtension().lastPathComponent
-        return ExportDestinationPlan(
-            url: destinationURL,
-            directory: directory,
-            filenameStem: stem,
-            fileExtension: ext
-        )
+        return destinationURL
     }
 }

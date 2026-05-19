@@ -71,12 +71,11 @@ struct FormatControl: View {
         .onAppear { installKeyMonitor() }
         .onDisappear { removeKeyMonitor() }
     }
-}
 
-// MARK: - Menu Builders
-private extension FormatControl {
+    // MARK: - Menu Builders
+
     @ViewBuilder
-    func recentSection() -> some View {
+    private func recentSection() -> some View {
         let pinnedIds = Set(pinnedFormats.map { $0.id })
         let recents = vm.recentFormats.filter { !pinnedIds.contains($0.id) }.prefix(3)
         if !recents.isEmpty {
@@ -90,7 +89,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func pinnedSection() -> some View {
+    private func pinnedSection() -> some View {
         Section {
             ForEach(pinnedFormats, id: \.id) { f in
                 pinnedRowButton(f)
@@ -99,7 +98,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func moreSection() -> some View {
+    private func moreSection() -> some View {
         if !otherFormats.isEmpty {
             Menu(String(localized: "More")) {
                 ForEach(otherFormats, id: \.id) { f in
@@ -111,7 +110,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func pinnedRowButton(_ f: ImageFormat) -> some View {
+    private func pinnedRowButton(_ f: ImageFormat) -> some View {
         if let shortcut = shortcutFor(format: f) {
             Button(f.displayName) { selectFormat(f) }
                 .keyboardShortcut(KeyEquivalent(shortcut), modifiers: [])
@@ -121,14 +120,13 @@ private extension FormatControl {
                 .help(f.fullName)
         }
     }
-}
 
-// MARK: - Keyboard Handling
-private extension FormatControl {
-    func installKeyMonitor() {
+    // MARK: - Keyboard Handling
+
+    private func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = LocalEventMonitor(mask: .keyDown) { event in
-            if FirstResponderFocus.isTextInputFocused {
+            if KeyWindowEditing.isTextInputFocused {
                 return event
             }
             
@@ -150,7 +148,7 @@ private extension FormatControl {
         keyEventMonitor?.start()
     }
     
-    func removeKeyMonitor() {
+    private func removeKeyMonitor() {
         keyEventMonitor?.stop()
         keyEventMonitor = nil
     }

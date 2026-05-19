@@ -19,19 +19,22 @@ convert-compress/
 │   └── Models/       # Value-type domain models (structs/enums only)
 ├── Processing/       # Image pipeline (CIImage-based)
 │   ├── Encoder/      # CustomImageEncoder implementations
+│   ├── Loading/      # Raster/vector CIImage loading entry points
 │   ├── Metadata/     # Image metadata readers/helpers
+│   ├── Operations/   # ImageOperation implementations and shared operation helpers
 │   ├── Sizing/       # Resize/crop/preview sizing math
-│   └── Types/        # Processing-related type extensions
+│   ├── Types/        # Processing-related type extensions
+│   └── Vector/       # SVG/vector detection, intrinsic size, and rasterization
 ├── Services/         # Singletons & stateful coordinators (one folder per service)
-├── Shaders/          # Metal shaders
 ├── StoreKit/         # StoreKit configuration
 ├── Theme/
-│   └── Components/   # Reusable view components, grouped by category
+│   ├── Components/   # Reusable view components, grouped by category
+│   ├── Formatting/   # User-facing presentation formatters
+│   └── Shaders/      # Reusable Metal shaders used by themed visual effects
 ├── Utils/            # Stateless, reusable, non-domain helpers grouped by concern
-│   ├── AppKit/       # AppKit bridges and responder/event helpers
-│   ├── Collections/  # Generic collection/data-structure helpers
 │   ├── Concurrency/  # Generic async/timing helpers
-│   ├── Formatting/   # Generic parsing/formatting helpers
+│   ├── DataStructures/ # Generic data structures
+│   ├── Platform/     # macOS/AppKit bridges and responder/event helpers
 │   └── SwiftUI/      # Small SwiftUI-only extensions
 ├── ViewModels/       # @MainActor @Observable/ObservableObject VMs; split via extensions
 └── Views/            # SwiftUI views, scoped to features
@@ -42,6 +45,7 @@ convert-compress/
 - One type per file, named after the primary type: `Foo.swift` contains `struct Foo` (or closely related helpers in a `// MARK: -` section).
 - ViewModel partials: `ImageToolsViewModel+<Concern>.swift`. The concern must match the actual responsibility (e.g. `+Export`, not `+Processing`).
 - Views follow block/feature/control nesting: `Views/<Feature>/Blocks/...` for layout blocks; `Views/<Feature>/Controls/...` for interactive controls; each control lives under its own folder when it has more than one file.
+- Metal shaders live in `Theme/Shaders` and should represent reusable visual effects.
 - Test files in `convert-compress-tests/` mirror source layout.
 
 ## Architecture
@@ -51,6 +55,7 @@ convert-compress/
 - Inject dependencies explicitly. Singletons are reserved for truly app-wide services: `ImageIOCapabilities`, `SandboxAccessManager`, `PurchaseManager`, `PaywallCoordinator`, `RatingCoordinator`, `UsageTracker`, `PresetsStore`, `AppLogger`.
 - Side-effectful operations run via `Task` with explicit priority. Avoid `DispatchQueue.main.async*` except where SwiftUI-adjacent debouncing is simpler; prefer the `Debouncer` utility for debouncing.
 - Feature state machines: model as `enum` with associated values.
+- Domain-specific parsers live with their domain module. User-facing presentation formatters live in `Theme/Formatting`.
 
 ## UserDefaults / Persistence
 

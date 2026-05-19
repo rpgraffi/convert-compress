@@ -33,7 +33,7 @@ struct PresetItemView<TrailingButtons: View>: View {
         VStack(alignment: .leading, spacing: 4) {
             // Title or TextField
             if isEditing {
-                TextField("Name", text: $name.charLimit(30))
+                TextField("Name", text: $name.maxLength(30))
                     .textFieldStyle(.plain)
                     .focused($isFocused)
                     .onSubmit(onSubmit)

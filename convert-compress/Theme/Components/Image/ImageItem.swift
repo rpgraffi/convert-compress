@@ -29,23 +29,22 @@ struct ImageItem: View {
         .overlay { hoverBorder }
         .onDisappear { removeKeyMonitor() }
     }
-}
 
-// MARK: View Components
-private extension ImageItem {
-    var isActiveComparison: Bool {
+    // MARK: View Components
+
+    private var isActiveComparison: Bool {
         vm.comparisonSelection?.assetID == asset.id
     }
     
     /// Only the currently-compared grid item (or all items when no comparison is active)
     /// should participate in the hero geometry group. Other items use `properties: []`
     /// so they don't produce stale matches during rapid navigation.
-    var heroProperties: MatchedGeometryProperties {
+    private var heroProperties: MatchedGeometryProperties {
         vm.comparisonSelection == nil || isActiveComparison ? .frame : []
     }
     
     @ViewBuilder
-    var thumbnailLayer: some View {
+    private var thumbnailLayer: some View {
         ZStack {
             if let thumb = asset.thumbnail {
                 ImageThumbnail(thumbnail: thumb)
@@ -62,7 +61,7 @@ private extension ImageItem {
         .opacity(isActiveComparison ? 0 : 1)
     }
     
-    var fileNameOverlay: some View {
+    private var fileNameOverlay: some View {
         ZStack(alignment: .topLeading) {
             Color.clear
             SingleLineOverlayBadge(text: fileName)
@@ -75,21 +74,21 @@ private extension ImageItem {
         }
     }
     
-    var hoverControlsOverlay: some View {
+    private var hoverControlsOverlay: some View {
         ZStack(alignment: .topTrailing) {
             Color.clear
             HoverControls(asset: asset, isVisible: isHovering)
         }
     }
     
-    func infoOverlay(changeInfo: ImageChangeInfo) -> some View {
+    private func infoOverlay(changeInfo: ImageChangeInfo) -> some View {
         ZStack(alignment: .bottomLeading) {
             Color.clear
             InfoOverlay(changeInfo: changeInfo)
         }
     }
     
-    var hoverBorder: some View {
+    private var hoverBorder: some View {
         RoundedRectangle(cornerRadius: 10, style: .continuous)
             .inset(by: isHovering ? -2 : 0)
             .stroke(Color.secondary, lineWidth: 1.5)
@@ -97,7 +96,7 @@ private extension ImageItem {
             .animation(.easeInOut(duration: 0.15), value: isHovering)
     }
     
-    func handleHover(_ hovering: Bool) {
+    private func handleHover(_ hovering: Bool) {
         isHovering = hovering
         if hovering {
             installKeyMonitor()
@@ -105,11 +104,10 @@ private extension ImageItem {
             removeKeyMonitor()
         }
     }
-}
 
-// MARK: Keyboard Handling
-private extension ImageItem {
-    func installKeyMonitor() {
+    // MARK: Keyboard Handling
+
+    private func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [weak vm, asset] event in
             // Spacebar
@@ -127,7 +125,7 @@ private extension ImageItem {
         keyEventMonitor?.start()
     }
     
-    func removeKeyMonitor() {
+    private func removeKeyMonitor() {
         keyEventMonitor?.stop()
         keyEventMonitor = nil
     }

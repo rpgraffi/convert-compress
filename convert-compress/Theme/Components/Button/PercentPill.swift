@@ -48,8 +48,7 @@ struct PercentPill: View {
             }
             .contentShape(Rectangle())
             .onTapGesture { startEditing(progress: progress) }
-            .scrollGesture(
-                totalSteps: Int(1.0 / dragStep) + 1,
+            .horizontalScrollStep(
                 isEnabled: !isEditing
             ) { steps in
                 updateValue((value01 + Double(steps) * dragStep).clamped(to: 0...1))

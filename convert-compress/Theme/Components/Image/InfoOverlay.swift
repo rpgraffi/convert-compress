@@ -41,8 +41,8 @@ struct InfoOverlay: View {
     private var fileSizeBadge: some View {
         if let originalSize = changeInfo.originalFileSize {
             TwoLineOverlayBadge(
-                topText: ByteFormatting.string(forByteCount: originalSize),
-                bottomText: changeInfo.estimatedOutputSize.map { ByteFormatting.string(forByteCount: $0) } ?? "--- KB",
+                topText: FileSizeFormat.string(forByteCount: originalSize),
+                bottomText: changeInfo.estimatedOutputSize.map { FileSizeFormat.string(forByteCount: $0) } ?? "--- KB",
                 alignment: .trailing
             )
         }

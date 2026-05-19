@@ -2,6 +2,7 @@ import Foundation
 
 struct ExportWorkflow {
     let pipeline: ProcessingPipeline
+    let destinationResolver: ExportDestinationResolver
     let configuration: ProcessingConfiguration
     let targets: [ImageAsset]
     let initialImages: [ImageAsset]
@@ -68,6 +69,7 @@ struct ExportWorkflow {
 
         let runner = ExportRunner(
             pipeline: pipeline,
+            destinationResolver: destinationResolver,
             configuration: configuration,
             cacheSnapshot: cacheSnapshot,
             maxConcurrent: maxConcurrent,
@@ -113,19 +115,17 @@ struct ExportWorkflow {
             dependencies.revealInFinder(urlsToReveal)
         }
     }
-}
 
-private extension ExportWorkflow {
-    func destinationConflicts() -> [URL] {
-        let planned = targets.map { pipeline.plannedDestinationURL(for: $0) }
+    private func destinationConflicts() -> [URL] {
+        let planned = targets.map { destinationURL(for: $0) }
         let uniquePlanned = Array(Set(planned))
         let fileManager = FileManager.default
         return uniquePlanned.filter { fileManager.fileExists(atPath: $0.path) }
     }
 
-    func uniqueWriteScopeDirectories() -> [URL] {
+    private func uniqueWriteScopeDirectories() -> [URL] {
         let destinations = targets.map {
-            pipeline.plannedDestinationURL(for: $0).deletingLastPathComponent().standardizedFileURL
+            destinationURL(for: $0).deletingLastPathComponent().standardizedFileURL
         }
         var seen: Set<URL> = []
         var result: [URL] = []
@@ -139,7 +139,7 @@ private extension ExportWorkflow {
         return result
     }
 
-    func nearestExistingDirectory(for directory: URL) -> URL {
+    private func nearestExistingDirectory(for directory: URL) -> URL {
         let fileManager = FileManager.default
         var candidate = directory.standardizedFileURL
         var isDirectory: ObjCBool = false
@@ -154,5 +154,10 @@ private extension ExportWorkflow {
         }
 
         return candidate
+    }
+
+    private func destinationURL(for asset: ImageAsset) -> URL {
+        let outputUTType = pipeline.outputUTType(for: asset)
+        return destinationResolver.destinationURL(for: asset, uti: outputUTType)
     }
 }

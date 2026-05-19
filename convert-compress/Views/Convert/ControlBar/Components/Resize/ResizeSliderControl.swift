@@ -63,10 +63,9 @@ struct ResizeSliderControl: View {
             .onTapGesture {
                 isEditing = true
                 fieldFocused = true
-                TextFieldUtilities.selectAllText()
+                KeyWindowEditing.selectAllText()
             }
-            .scrollGesture(
-                totalSteps: stops.count + 1,
+            .horizontalScrollStep(
                 sensitivity: 7.0,
                 isEnabled: !isEditing
             ) { steps in
@@ -292,7 +291,7 @@ struct ResizeSliderControl: View {
             .foregroundStyle(.primary)
             .onAppear {
                 fieldFocused = true
-                TextFieldUtilities.selectAllText()
+                KeyWindowEditing.selectAllText()
             }
             .onSubmit {
                 isEditing = false

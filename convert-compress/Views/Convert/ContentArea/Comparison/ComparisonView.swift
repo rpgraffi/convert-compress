@@ -404,7 +404,7 @@ struct ComparisonView: View {
     private func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = LocalEventMonitor(mask: .keyDown) { event in
-            if FirstResponderFocus.isTextInputFocused {
+            if KeyWindowEditing.isTextInputFocused {
                 return event
             }
             

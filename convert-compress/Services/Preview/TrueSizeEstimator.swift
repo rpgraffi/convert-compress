@@ -7,7 +7,7 @@ struct TrueSizeEstimator {
     ) async -> [UUID: ProcessedImageData] {
         guard !assets.isEmpty else { return [:] }
 
-        let pipeline = PipelineBuilder().build(configuration: configuration, exportDirectory: nil)
+        let pipeline = ProcessingPipeline(configuration: configuration)
         let results = await ConcurrentMap.compactMap(
             assets,
             maxConcurrent: 4,

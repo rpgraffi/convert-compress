@@ -42,7 +42,7 @@ struct ComparisonBottom: View {
             
             // File size badge
             if let bytes = isOriginal ? asset.originalFileSizeBytes : estimatedOutputBytes {
-                SingleLineOverlayBadge(text: ByteFormatting.string(forByteCount: bytes), padding: 4)
+                SingleLineOverlayBadge(text: FileSizeFormat.string(forByteCount: bytes), padding: 4)
             }
             
             // Savings badges (only for preview/processed side)
@@ -55,7 +55,7 @@ struct ComparisonBottom: View {
                 let absValue = abs(difference)
                 let percentChange = Int(round(Double(absValue) / Double(original) * 100))
                 
-                SingleLineOverlayBadge(text: "\(sign)\(ByteFormatting.string(forByteCount: absValue))", padding: 4)
+                SingleLineOverlayBadge(text: "\(sign)\(FileSizeFormat.string(forByteCount: absValue))", padding: 4)
                 SingleLineOverlayBadge(text: "\(sign)\(percentChange)%", padding: 4)
             }
         }

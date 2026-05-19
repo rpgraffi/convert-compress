@@ -70,7 +70,6 @@ final class ImageToolsViewModel: ObservableObject {
     
     // MARK: - Export Progress
     
-    @Published var lastExportResult: ExportResult?
     @Published var exportProgress = ProgressState()
     var exportTask: Task<Void, Never>? = nil
 
@@ -94,18 +93,6 @@ final class ImageToolsViewModel: ObservableObject {
     
     @Published var ingestionProgress = ProgressState()
 
-    var isIngesting: Bool {
-        ingestionProgress.isActive
-    }
-
-    var ingestCompleted: Int {
-        ingestionProgress.completed
-    }
-
-    var ingestTotal: Int {
-        ingestionProgress.total
-    }
-    
     var ingestFraction: Double {
         ingestionProgress.fraction
     }
@@ -147,36 +134,5 @@ final class ImageToolsViewModel: ObservableObject {
         )
     }
     
-    // MARK: - Clearing
-
-    var hasExportedAndNewImages: Bool {
-        let hasExported = images.contains { $0.isEdited }
-        let hasNew = images.contains { !$0.isEdited }
-        return hasExported && hasNew
-    }
-
-    func clearAll() {
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
-            images.removeAll()
-        }
-        processedCache.removeAll()
-        if exportDirectory == nil {
-            sourceDirectory = nil
-        }
-        comparisonSelection = nil
-    }
-
-    func clearExported() {
-        let exportedIDs = Set(images.filter(\.isEdited).map(\.id))
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
-            images.removeAll { $0.isEdited }
-        }
-        for id in exportedIDs {
-            processedCache.removeValue(forKey: id)
-        }
-        if comparisonSelection.map({ exportedIDs.contains($0.assetID) }) == true {
-            comparisonSelection = nil
-        }
-    }
 }
 

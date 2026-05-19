@@ -33,7 +33,7 @@ struct ResizeCropControl: View {
     /// Parses dimension strings like "680x340", "680 x 340", "680X340", "680 340", "680/340", etc.
     /// If a valid pattern is found, automatically populates both width and height fields.
     private func parseDimensionsIfNeeded(from text: String) {
-        guard let dimensions = DimensionParser.parse(text) else {
+        guard let dimensions = ResizeDimensionParser.parse(text) else {
             return
         }
         

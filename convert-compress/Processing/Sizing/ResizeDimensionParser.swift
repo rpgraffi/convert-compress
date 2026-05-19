@@ -1,6 +1,6 @@
 import Foundation
 
-enum DimensionParser {
+enum ResizeDimensionParser {
     /// Parses dimension strings in various formats and extracts width and height values.
     ///
     /// Supported formats include `680x340`, `680 x 340`, `680*340`, `680-340`,

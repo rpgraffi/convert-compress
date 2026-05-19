@@ -1,6 +1,6 @@
 import Foundation
 
-enum ByteFormatting {
+enum FileSizeFormat {
     static func string(forByteCount bytes: Int) -> String {
         let kilobyte = 1024.0
         let megabyte = kilobyte * 1024.0

@@ -19,22 +19,9 @@ extension ImageToolsViewModel {
         }
     }
 
-    func ingestURLStream(_ stream: AsyncStream<[URL]>) {
-        Task(priority: .medium) { [weak self] in
-            guard let self else { return }
-            for await urls in stream {
-                await self.ingest(urls: urls)
-            }
-        }
-    }
-
     func addFromPasteboard() {
         let urls = IngestionCoordinator.collectURLsFromPasteboard()
         addURLs(urls)
-    }
-
-    func isSupportedImage(_ url: URL) -> Bool {
-        ImageIOCapabilities.shared.isReadableURL(url)
     }
 
     func remove(_ asset: ImageAsset) {
@@ -42,31 +29,6 @@ extension ImageToolsViewModel {
             if let idx = images.firstIndex(of: asset) { images.remove(at: idx) }
         }
         processedCache.removeValue(forKey: asset.id)
-    }
-
-    func prefillPixelsIfPossible() {
-        guard let firstAsset = images.first,
-              let firstSize = firstAsset.originalPixelSize else {
-            return
-        }
-        
-        let targetSize = (width: Int(firstSize.width.rounded()), height: Int(firstSize.height.rounded()))
-        
-        let allSameSize = images.allSatisfy { asset in
-            guard let size = asset.originalPixelSize else {
-                return false
-            }
-            return Int(size.width.rounded()) == targetSize.width &&
-                   Int(size.height.rounded()) == targetSize.height
-        }
-        
-        if allSameSize {
-            resizeWidth = String(targetSize.width)
-            resizeHeight = String(targetSize.height)
-        } else {
-            resizeWidth = ""
-            resizeHeight = ""
-        }
     }
 
     func bumpRecentFormats(_ format: ImageFormat) {

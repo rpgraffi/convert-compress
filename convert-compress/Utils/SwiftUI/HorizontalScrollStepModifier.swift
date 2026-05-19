@@ -2,8 +2,7 @@ import SwiftUI
 import AppKit
 
 /// A view modifier that adds horizontal scroll gesture support for discrete steps.
-struct ScrollGestureModifier: ViewModifier {
-    let totalSteps: Int
+struct HorizontalScrollStepModifier: ViewModifier {
     let sensitivity: Double
     let isEnabled: Bool
     let onScroll: (Int) -> Void
@@ -46,18 +45,15 @@ struct ScrollGestureModifier: ViewModifier {
 extension View {
     /// Adds horizontal scroll gesture support for discrete steps.
     /// - Parameters:
-    ///   - totalSteps: Total number of discrete steps (controls scroll speed normalization)
     ///   - sensitivity: Scroll ticks required per step (default: 3.0, lower = faster)
     ///   - isEnabled: Whether scroll is enabled (default: true)
     ///   - onScroll: Callback with step delta (+1 for right, -1 for left, etc.)
-    func scrollGesture(
-        totalSteps: Int,
+    func horizontalScrollStep(
         sensitivity: Double = 5.0,
         isEnabled: Bool = true,
         onScroll: @escaping (Int) -> Void
     ) -> some View {
-        modifier(ScrollGestureModifier(
-            totalSteps: totalSteps,
+        modifier(HorizontalScrollStepModifier(
             sensitivity: sensitivity,
             isEnabled: isEnabled,
             onScroll: onScroll

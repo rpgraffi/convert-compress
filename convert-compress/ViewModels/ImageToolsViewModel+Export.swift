@@ -4,12 +4,7 @@ import AppKit
 
 extension ImageToolsViewModel {
     func buildPipeline() -> ProcessingPipeline {
-        let keepStructure = UserDefaults.standard.bool(forKey: StorageKeys.Preferences.keepFolderStructure)
-        return PipelineBuilder().build(
-            configuration: currentConfiguration,
-            exportDirectory: exportDirectory,
-            folderStructureRoot: keepStructure ? sourceDirectory : nil
-        )
+        ProcessingPipeline(configuration: currentConfiguration)
     }
 
     /// Recommended concurrency for export, balancing CPU / memory / thermal state.
@@ -38,15 +33,15 @@ extension ImageToolsViewModel {
         let cacheSnapshot = processedCache.snapshot()
         let initialImages = imagesSnapshot()
         let maxConcurrent = recommendedConcurrency()
+        let destinationResolver = exportDestinationResolver()
         let dependencies = exportWorkflowDependencies()
-
-        lastExportResult = nil
 
         exportTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
 
             let workflow = ExportWorkflow(
                 pipeline: pipeline,
+                destinationResolver: destinationResolver,
                 configuration: config,
                 targets: targets,
                 initialImages: initialImages,
@@ -61,9 +56,9 @@ extension ImageToolsViewModel {
             self.exportTask = nil
         }
     }
-}
 
-extension ImageToolsViewModel {
+    // MARK: - Progress
+
     private func beginExport(total: Int) {
         exportProgress.begin(total: total)
     }
@@ -76,12 +71,21 @@ extension ImageToolsViewModel {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8, blendDuration: 0.3)) {
             images = result.updatedImages
         }
-        lastExportResult = result
         exportProgress.reset()
     }
 
     private func imagesSnapshot() -> [ImageAsset] {
         images
+    }
+
+    // MARK: - Dependencies
+
+    private func exportDestinationResolver() -> ExportDestinationResolver {
+        let keepStructure = UserDefaults.standard.bool(forKey: StorageKeys.Preferences.keepFolderStructure)
+        return ExportDestinationResolver(
+            exportDirectory: exportDirectory,
+            folderStructureRoot: keepStructure ? sourceDirectory : nil
+        )
     }
 
     private func exportWorkflowDependencies() -> ExportWorkflowDependencies {
@@ -117,6 +121,8 @@ extension ImageToolsViewModel {
             }
         )
     }
+
+    // MARK: - Alerts
 
     /// Returns true if export should proceed, false if user cancelled.
     private func confirmReplace(conflictingURLs: [URL]) -> Bool {

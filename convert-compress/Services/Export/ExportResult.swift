@@ -1,42 +1,14 @@
 import Foundation
 
-enum ExportFailureReason: String {
-    case loadFailed
-    case exportFailed
-    case backgroundRemovalUnavailable
-    case permissionDenied
-    case unknown
-
-    init(error: Error) {
-        guard let operationError = error as? ImageOperationError else {
-            self = .unknown
-            return
-        }
-
-        switch operationError {
-        case .loadFailed:
-            self = .loadFailed
-        case .exportFailed:
-            self = .exportFailed
-        case .backgroundRemovalUnavailable:
-            self = .backgroundRemovalUnavailable
-        case .permissionDenied:
-            self = .permissionDenied
-        }
-    }
-}
-
 struct ExportAssetFailure: Identifiable {
     let id = UUID()
     let assetID: UUID
     let originalURL: URL
-    let reason: ExportFailureReason
     let message: String
 
     init(asset: ImageAsset, error: Error) {
         self.assetID = asset.id
         self.originalURL = asset.originalURL
-        self.reason = ExportFailureReason(error: error)
         self.message = error.localizedDescription
     }
 }
@@ -138,11 +110,4 @@ struct ExportResult {
             deniedDirectory: nil
         )
     }
-}
-
-struct ExportRunnerResult {
-    let updatedImages: [ImageAsset]
-    let failures: [ExportAssetFailure]
-    let completedCount: Int
-    let wasCancelled: Bool
 }

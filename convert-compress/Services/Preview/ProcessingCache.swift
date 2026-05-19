@@ -22,7 +22,7 @@ struct ProcessingCache {
 
     func freshEntry(for assetID: UUID, configuration: ProcessingConfiguration) -> ProcessedImageData? {
         guard let cached = storage.peekValue(forKey: assetID),
-              cached.configuration == configuration else {
+              cached.isFresh(for: configuration) else {
             return nil
         }
         return cached

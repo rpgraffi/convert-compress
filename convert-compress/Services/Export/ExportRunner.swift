@@ -1,7 +1,9 @@
 import Foundation
+import UniformTypeIdentifiers
 
 struct ExportRunner {
     let pipeline: ProcessingPipeline
+    let destinationResolver: ExportDestinationResolver
     let configuration: ProcessingConfiguration
     let cacheSnapshot: [UUID: ProcessedImageData]
     let maxConcurrent: Int
@@ -42,18 +44,12 @@ struct ExportRunner {
                     }
 
                     do {
-                        let cached = cacheSnapshot[asset.id]
-                        let preEncoded = (cached?.configuration == configuration)
-                            ? cached.map { (data: $0.data, uti: $0.uti) }
-                            : nil
-                        let updated = try pipeline.run(
-                            on: asset,
-                            preEncoded: preEncoded,
-                            writeAccess: writeAccess
-                        )
+                        let preEncoded = cacheSnapshot[asset.id]?.encodedOutput(ifFreshFor: configuration)
+                        let encoded = try preEncoded ?? pipeline.renderEncodedData(on: asset)
+                        let updated = try write(asset: asset, encoded: encoded)
                         return .success(original: asset, updated: updated)
                     } catch {
-                        AppLogger.export.error("Pipeline run failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                        AppLogger.export.error("Export failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
                         return .failure(ExportAssetFailure(asset: asset, error: error))
                     }
                 }
@@ -100,6 +96,46 @@ struct ExportRunner {
             wasCancelled: wasCancelled
         )
     }
+
+    private func write(asset: ImageAsset, encoded: (data: Data, uti: UTType)) throws -> ImageAsset {
+        let destinationURL = destinationResolver.destinationURL(for: asset, uti: encoded.uti)
+        let destinationDirectory = destinationURL.deletingLastPathComponent()
+
+        guard writeAccess.allowsWriting(to: destinationDirectory) else {
+            throw ImageOperationError.permissionDenied
+        }
+
+        if !FileManager.default.fileExists(atPath: destinationDirectory.path) {
+            try FileManager.default.createDirectory(at: destinationDirectory, withIntermediateDirectories: true)
+        }
+
+        let temporaryURL = destinationDirectory.appendingPathComponent(
+            destinationURL.deletingPathExtension().lastPathComponent
+                + "_tmp_"
+                + String(UUID().uuidString.prefix(8))
+                + "."
+                + destinationURL.pathExtension
+        )
+        try encoded.data.write(to: temporaryURL, options: [.atomic])
+
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            _ = try FileManager.default.replaceItemAt(destinationURL, withItemAt: temporaryURL, backupItemName: nil, options: [])
+        } else {
+            try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
+        }
+
+        var updated = asset
+        updated.workingURL = destinationURL
+        updated.isEdited = true
+        return updated
+    }
+}
+
+struct ExportRunnerResult {
+    let updatedImages: [ImageAsset]
+    let failures: [ExportAssetFailure]
+    let completedCount: Int
+    let wasCancelled: Bool
 }
 
 private enum ExportRunnerTaskResult {

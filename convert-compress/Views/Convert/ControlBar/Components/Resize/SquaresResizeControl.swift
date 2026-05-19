@@ -57,7 +57,7 @@ struct SquaresResizeControl: View {
             .padding(.horizontal, 12)
         }
         .contentShape(Rectangle())
-        .scrollGesture(totalSteps: sizes.count, sensitivity: 10.0) { steps in
+        .horizontalScrollStep(sensitivity: 10.0) { steps in
             let currentIdx = sizes.firstIndex(of: Int(vm.resizeWidth) ?? 0) ?? 0
             let newIdx = (currentIdx + steps).clamped(to: 0...(sizes.count - 1))
             selectSquare(sizes[newIdx])
