@@ -8,7 +8,9 @@ struct ConvertCompressApp: App {
     
     init() {
         self.vm = ImageToolsViewModel()
-        AppDelegate.sharedViewModel = vm
+        appDelegate.openImageURLs = { [vm] urls in
+            vm.addURLs(urls)
+        }
     }
     
     var body: some Scene {
