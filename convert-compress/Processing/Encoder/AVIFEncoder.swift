@@ -4,6 +4,8 @@ import UniformTypeIdentifiers
 import libavif
 
 struct AVIFEncoder: CustomImageEncoder {
+    var supportsMetadataStripping: Bool { false }
+
     func canEncode(utType: UTType) -> Bool {
         utType == .avif
     }

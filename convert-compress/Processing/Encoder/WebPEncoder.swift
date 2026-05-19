@@ -5,6 +5,8 @@ import SDWebImage
 import SDWebImageWebPCoder
 
 struct WebPEncoder: CustomImageEncoder {
+    var supportsMetadataStripping: Bool { false }
+
     func canEncode(utType: UTType) -> Bool {
         return utType == UTType.webP
     }

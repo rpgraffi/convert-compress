@@ -1,7 +1,7 @@
 import Foundation
 
-struct TrueSizeEstimator {
-    static func estimate(
+struct PreviewEncode {
+    static func run(
         assets: [ImageAsset],
         configuration: ProcessingConfiguration
     ) async -> [UUID: ProcessedImageData] {
@@ -33,7 +33,7 @@ struct TrueSizeEstimator {
             )
             return (asset.id, result)
         } catch {
-            AppLogger.processing.error("Preview size estimation failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            AppLogger.processing.error("Preview encode failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }

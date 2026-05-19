@@ -7,7 +7,3 @@ protocol CustomImageEncoder {
     func canEncode(utType: UTType) -> Bool
     func encode(cgImage: CGImage, pixelSize: CGSize, utType: UTType, compressionQuality: Double?, stripMetadata: Bool) throws -> Data
 }
-
-extension CustomImageEncoder {
-    var supportsMetadataStripping: Bool { false }
-}

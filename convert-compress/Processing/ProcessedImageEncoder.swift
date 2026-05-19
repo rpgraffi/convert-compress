@@ -4,25 +4,22 @@ import AppKit
 import UniformTypeIdentifiers
 import ImageIO
 
-struct ImageExporter {
+struct ProcessedImageEncoder {
     private static let sharedCIContext: CIContext = {
         CIContext()
     }()
+
     // MARK: - DRY helpers
+
     private static func decideActualUTType(originalURL: URL, requestedFormat: ImageFormat?) -> UTType {
-        let caps = ImageIOCapabilities.shared
-        let resolvedRequest: UTType = requestedFormat?.utType
-            ?? inferFormat(from: originalURL)?.utType
-            ?? caps.format(forIdentifier: UTType.png.identifier)?.utType
+        requestedFormat?.utType
+            ?? ImageIOCapabilities.shared.formatForURL(originalURL)?.utType
             ?? .png
-        if caps.supportsWriting(utType: resolvedRequest) { return resolvedRequest }
-        if caps.supportsWriting(utType: .png) { return .png }
-        return .jpeg
     }
 
     // Exposed helper for planning destination names without doing any encode work
     static func decideUTTypeForExport(originalURL: URL, requestedFormat: ImageFormat?) -> UTType {
-        return decideActualUTType(originalURL: originalURL, requestedFormat: requestedFormat)
+        decideActualUTType(originalURL: originalURL, requestedFormat: requestedFormat)
     }
 
     private static func buildDestinationProperties(originalURL: URL, actualUTI: UTType, compressionQuality: Double?, stripMetadata: Bool) -> [CFString: Any] {
@@ -46,7 +43,7 @@ struct ImageExporter {
 
     static func encodeToData(ciImage: CIImage, originalURL: URL, format: ImageFormat?, compressionQuality: Double?, stripMetadata: Bool = false) throws -> (data: Data, uti: UTType) {
         let actualUTI = decideActualUTType(originalURL: originalURL, requestedFormat: format)
-        let ciContext = ImageExporter.sharedCIContext
+        let ciContext = ProcessedImageEncoder.sharedCIContext
         guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else {
             throw ImageOperationError.exportFailed
         }
@@ -79,8 +76,4 @@ struct ImageExporter {
         let data = cfData as Data
         return (data, actualUTI)
     }
-
-    static func inferFormat(from url: URL) -> ImageFormat? {
-        return ImageIOCapabilities.shared.formatForURL(url)
-    }
-} 
+}

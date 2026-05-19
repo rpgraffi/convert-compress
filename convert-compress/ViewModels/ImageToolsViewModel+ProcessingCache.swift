@@ -6,16 +6,13 @@ extension ImageToolsViewModel {
 
     // MARK: - Preview
 
-    func previewInfo(for asset: ImageAsset) -> PreviewInfo {
-        PreviewEstimator.estimate(
-            for: asset,
-            configuration: currentConfiguration
-        )
+    func targetSize(for asset: ImageAsset) -> CGSize? {
+        TargetSize.size(for: asset, configuration: currentConfiguration)
     }
 
     // MARK: - Cache Accessors
 
-    func estimatedByteCount(for assetID: UUID) -> Int? {
+    func outputByteCount(for assetID: UUID) -> Int? {
         processedCache.freshEntry(for: assetID, configuration: currentConfiguration)?.data.count
     }
 
@@ -55,7 +52,7 @@ extension ImageToolsViewModel {
 
         processingTask = Task(priority: .utility) { [weak self] in
             guard let self else { return }
-            let results = await TrueSizeEstimator.estimate(
+            let results = await PreviewEncode.run(
                 assets: assetsToProcess,
                 configuration: config
             )

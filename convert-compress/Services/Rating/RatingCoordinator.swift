@@ -16,7 +16,7 @@ final class RatingCoordinator {
     private init() {}
     
     func checkAndShowIfNeeded() {
-        guard !hasShown, !declined, UsageTracker.shared.totalImageConversions >= 100 else { return }
+        guard !hasShown, !declined, UsageTracker.shared.totalImageConversions >= 50 else { return }
         showSecondPrompt = false
         isPresented = true
     }

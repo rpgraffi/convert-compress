@@ -8,10 +8,7 @@ struct ProcessingPipeline {
     var finalFormat: ImageFormat? = nil
     var compressionPercent: Double? = nil
 
-    init() {}
-
     init(configuration: ProcessingConfiguration) {
-        self.init()
         removeMetadata = configuration.removeMetadata
         finalFormat = configuration.selectedFormat
         compressionPercent = configuration.compressionPercent
@@ -59,8 +56,8 @@ struct ProcessingPipeline {
 
     /// Determine the UTType that encoding will use, without rendering the image.
     func outputUTType(for asset: ImageAsset) -> UTType {
-        let chosenFormat = finalFormat ?? ImageExporter.inferFormat(from: asset.originalURL)
-        return ImageExporter.decideUTTypeForExport(originalURL: asset.originalURL, requestedFormat: chosenFormat)
+        let chosenFormat = finalFormat ?? ImageIOCapabilities.shared.formatForURL(asset.originalURL)
+        return ProcessedImageEncoder.decideUTTypeForExport(originalURL: asset.originalURL, requestedFormat: chosenFormat)
     }
 
     // MARK: - DRY helper
@@ -74,9 +71,9 @@ struct ProcessingPipeline {
         for operation in operations {
             image = try operation.transformed(image)
         }
-        let chosenFormat = finalFormat ?? ImageExporter.inferFormat(from: originalURL)
+        let chosenFormat = finalFormat ?? ImageIOCapabilities.shared.formatForURL(originalURL)
         let quality = compressionPercent.map { max(min($0, 1.0), 0.01) }
-        let encoded = try ImageExporter.encodeToData(ciImage: image,
+        let encoded = try ProcessedImageEncoder.encodeToData(ciImage: image,
                                                      originalURL: originalURL,
                                                      format: chosenFormat,
                                                      compressionQuality: quality,

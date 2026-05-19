@@ -8,7 +8,7 @@ struct ImageChangeInfo {
     let originalPixelSize: CGSize?
     let targetPixelSize: CGSize?
     let originalFileSize: Int?
-    let estimatedOutputSize: Int?
+    let outputSize: Int?
     let originalFormat: ImageFormat?
     let targetFormat: ImageFormat?
 
@@ -18,13 +18,11 @@ struct ImageChangeInfo {
 
     @MainActor
     init(asset: ImageAsset, vm: ImageToolsViewModel) {
-        let preview = vm.previewInfo(for: asset)
-
         self.originalPixelSize = asset.originalPixelSize
-        self.targetPixelSize = preview.targetPixelSize
+        self.targetPixelSize = vm.targetSize(for: asset)
         self.originalFileSize = asset.originalFileSizeBytes
-        self.estimatedOutputSize = vm.estimatedByteCount(for: asset.id)
-        self.originalFormat = ImageExporter.inferFormat(from: asset.originalURL)
+        self.outputSize = vm.outputByteCount(for: asset.id)
+        self.originalFormat = ImageIOCapabilities.shared.formatForURL(asset.originalURL)
         self.targetFormat = vm.selectedFormat ?? originalFormat
 
         self.resolutionChanged = Self.hasResolutionChange(
@@ -33,7 +31,7 @@ struct ImageChangeInfo {
         )
         self.fileSizeChanged = Self.hasFileSizeChange(
             from: originalFileSize,
-            to: estimatedOutputSize
+            to: outputSize
         )
         self.formatChanged = (originalFormat != targetFormat)
     }

@@ -41,16 +41,16 @@ struct ComparisonBottom: View {
             }
             
             // File size badge
-            if let bytes = isOriginal ? asset.originalFileSizeBytes : estimatedOutputBytes {
+            if let bytes = isOriginal ? asset.originalFileSizeBytes : outputBytes {
                 SingleLineOverlayBadge(text: FileSizeFormat.string(forByteCount: bytes), padding: 4)
             }
             
             // Savings badges (only for preview/processed side)
             if !isOriginal,
                let original = asset.originalFileSizeBytes,
-               let estimated = estimatedOutputBytes,
-               original != estimated {
-                let difference = original - estimated
+               let output = outputBytes,
+               original != output {
+                let difference = original - output
                 let sign = difference > 0 ? "-" : "+"
                 let absValue = abs(difference)
                 let percentChange = Int(round(Double(absValue) / Double(original) * 100))
@@ -64,7 +64,7 @@ struct ComparisonBottom: View {
     // MARK: - Computed Properties
     
     private var originalFormat: ImageFormat? {
-        ImageExporter.inferFormat(from: asset.originalURL)
+        ImageIOCapabilities.shared.formatForURL(asset.originalURL)
     }
     
     private var targetFormat: ImageFormat? {
@@ -72,11 +72,11 @@ struct ComparisonBottom: View {
     }
     
     private var targetPixelSize: CGSize? {
-        vm.previewInfo(for: asset).targetPixelSize
+        vm.targetSize(for: asset)
     }
-    
-    private var estimatedOutputBytes: Int? {
-        vm.estimatedByteCount(for: asset.id)
+
+    private var outputBytes: Int? {
+        vm.outputByteCount(for: asset.id)
     }
 }
 

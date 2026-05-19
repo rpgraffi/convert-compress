@@ -1,15 +1,12 @@
 import Foundation
 
-enum PreviewEstimator {
-    static func estimate(for asset: ImageAsset,
-                         configuration: ProcessingConfiguration) -> PreviewInfo {
-        let targetSize = EffectiveImageSizing.targetPixelSize(
+enum TargetSize {
+    static func size(for asset: ImageAsset, configuration: ProcessingConfiguration) -> CGSize? {
+        EffectiveImageSizing.targetPixelSize(
             originalSize: asset.originalPixelSize,
             isVector: VectorImageSupport.isVectorImage(asset.originalURL),
             resize: configuration.resizeSpecification,
             selectedFormat: configuration.selectedFormat
         )
-        return PreviewInfo(targetPixelSize: targetSize)
     }
 }
-
