@@ -14,7 +14,6 @@ extension ImageToolsViewModel {
         
         // Observe comparison selection changes
         $comparisonSelection
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] selection in
                 guard let self else { return }
                 if selection == nil {
