@@ -23,48 +23,42 @@ extension ImageToolsViewModel {
         }
     }
 
+    func cancelExport() {
+        exportTask?.cancel()
+    }
+
     private func executeExport() {
+        guard exportTask == nil else { return }
+
         let pipeline = buildPipeline()
         if let selectedFormat { bumpRecentFormats(selectedFormat) }
         let config = currentConfiguration
         let targets = images
         guard !targets.isEmpty else { return }
-
-        if !preflightReplaceIfNecessary(pipeline: pipeline, targets: targets) {
-            return
-        }
-
-        let directories = uniqueDestinationDirectories(for: targets, pipeline: pipeline)
         let cacheSnapshot = processedCache.snapshot()
+        let initialImages = imagesSnapshot()
+        let maxConcurrent = recommendedConcurrency()
+        let dependencies = exportWorkflowDependencies()
 
-        Task(priority: .userInitiated) { [weak self] in
+        lastExportResult = nil
+
+        exportTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
 
-            for directory in directories {
-                let message = String(localized: "Allow \(AppConstants.localizedAppName) to save files in \(directory.lastPathComponent)?")
-                let granted = await SandboxAccessManager.shared.requestAccessIfNeeded(to: directory, message: message)
-                if !granted {
-                    self.presentAccessDeniedAlert(for: directory)
-                    return
-                }
-            }
-
-            self.beginExport(total: targets.count)
-
-            let runner = ExportRunner(
+            let workflow = ExportWorkflow(
                 pipeline: pipeline,
                 configuration: config,
-                cacheSnapshot: cacheSnapshot,
-                maxConcurrent: self.recommendedConcurrency()
-            )
-            let updatedImages = await runner.run(
                 targets: targets,
-                initialImages: self.imagesSnapshot()
-            ) {
-                self.incrementExportProgress()
-            }
+                initialImages: initialImages,
+                cacheSnapshot: cacheSnapshot,
+                maxConcurrent: maxConcurrent,
+                dependencies: dependencies
+            )
 
-            self.finishExport(with: updatedImages)
+            let result = await workflow.run()
+            self.finishExport(with: result)
+            workflow.performPostExportSideEffects(for: result)
+            self.exportTask = nil
         }
     }
 }
@@ -78,41 +72,58 @@ extension ImageToolsViewModel {
         exportProgress.increment()
     }
 
-    private func finishExport(with imagesToCommit: [ImageAsset]) {
+    private func finishExport(with result: ExportResult) {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8, blendDuration: 0.3)) {
-            images = imagesToCommit
+            images = result.updatedImages
         }
+        lastExportResult = result
         exportProgress.reset()
-
-        let processedCount = imagesToCommit.filter { $0.isEdited }.count
-        UsageTracker.shared.recordPipelineApplied(imageCount: processedCount)
-        RatingCoordinator.shared.checkAndShowIfNeeded()
-
-        if UserDefaults.standard.object(forKey: StorageKeys.Preferences.revealExportInFinder) as? Bool ?? true {
-            let urlsToReveal = imagesToCommit.compactMap { $0.isEdited ? $0.workingURL : nil }
-            if !urlsToReveal.isEmpty {
-                NSWorkspace.shared.activateFileViewerSelecting(urlsToReveal)
-            }
-        }
     }
 
     private func imagesSnapshot() -> [ImageAsset] {
         images
     }
 
-    /// Returns true if export should proceed, false if user cancelled.
-    private func preflightReplaceIfNecessary(pipeline: ProcessingPipeline, targets: [ImageAsset]) -> Bool {
-        guard !targets.isEmpty else { return true }
-        let planned: [URL] = targets.map { pipeline.plannedDestinationURL(for: $0) }
-        let uniquePlanned = Array(Set(planned))
-        let fm = FileManager.default
-        let conflicts = uniquePlanned.filter { fm.fileExists(atPath: $0.path) }
-        guard !conflicts.isEmpty else { return true }
+    private func exportWorkflowDependencies() -> ExportWorkflowDependencies {
+        ExportWorkflowDependencies(
+            confirmReplace: { [weak self] conflictingURLs in
+                self?.confirmReplace(conflictingURLs: conflictingURLs) ?? false
+            },
+            requestAccess: { directory, message in
+                await SandboxAccessManager.shared.requestAccessIfNeeded(to: directory, message: message)
+            },
+            beginAccess: { directory in
+                SandboxAccessManager.shared.beginAccess(for: directory)
+            },
+            presentAccessDenied: { [weak self] directory in
+                self?.presentAccessDeniedAlert(for: directory)
+            },
+            beginProgress: { [weak self] total in
+                self?.beginExport(total: total)
+            },
+            incrementProgress: { [weak self] in
+                self?.incrementExportProgress()
+            },
+            recordUsage: { imageCount in
+                UsageTracker.shared.recordPipelineApplied(imageCount: imageCount)
+            },
+            checkRatingPrompt: {
+                RatingCoordinator.shared.checkAndShowIfNeeded()
+            },
+            revealInFinder: { urls in
+                if UserDefaults.standard.object(forKey: StorageKeys.Preferences.revealExportInFinder) as? Bool ?? true {
+                    NSWorkspace.shared.activateFileViewerSelecting(urls)
+                }
+            }
+        )
+    }
 
-        let parentDirs = Set(conflicts.map { $0.deletingLastPathComponent().path })
+    /// Returns true if export should proceed, false if user cancelled.
+    private func confirmReplace(conflictingURLs: [URL]) -> Bool {
+        let parentDirs = Set(conflictingURLs.map { $0.deletingLastPathComponent().path })
         let folderHintPath = parentDirs.count == 1 ? parentDirs.first! : nil
         let message = String(localized: "Replace existing files?")
-        let count = conflicts.count
+        let count = conflictingURLs.count
         var info = ""
         if let folderPath = folderHintPath {
             let folderName = FileManager.default.displayName(atPath: folderPath)
@@ -147,19 +158,6 @@ extension ImageToolsViewModel {
         }
 
         return presentAlert()
-    }
-
-    func uniqueDestinationDirectories(for targets: [ImageAsset], pipeline: ProcessingPipeline) -> [URL] {
-        let destinations = targets.map { pipeline.plannedDestinationURL(for: $0).deletingLastPathComponent().standardizedFileURL }
-        var seen: Set<URL> = []
-        var result: [URL] = []
-        for directory in destinations {
-            if !seen.contains(directory) {
-                seen.insert(directory)
-                result.append(directory)
-            }
-        }
-        return result
     }
 
     @MainActor

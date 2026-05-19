@@ -70,7 +70,9 @@ final class ImageToolsViewModel: ObservableObject {
     
     // MARK: - Export Progress
     
+    @Published var lastExportResult: ExportResult?
     @Published var exportProgress = ProgressState()
+    var exportTask: Task<Void, Never>? = nil
 
     var isExporting: Bool {
         exportProgress.isActive

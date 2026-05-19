@@ -17,7 +17,11 @@ struct ProcessingPipeline {
     /// Process an asset and write it to its destination.
     /// When `preEncoded` is provided (e.g. from the estimation cache),
     /// the expensive encode step is skipped entirely.
-    func run(on asset: ImageAsset, preEncoded: (data: Data, uti: UTType)? = nil) throws -> ImageAsset {
+    func run(
+        on asset: ImageAsset,
+        preEncoded: (data: Data, uti: UTType)? = nil,
+        writeAccess: ExportWriteAccess
+    ) throws -> ImageAsset {
         let currentURL = asset.originalURL
 
         guard let sourceToken = SandboxAccessToken(url: currentURL) else {
@@ -29,13 +33,13 @@ struct ProcessingPipeline {
         let plan = destinationResolver.destinationPlan(for: asset, uti: encoded.uti)
 
         let destParent = plan.directory
+        guard writeAccess.allowsWriting(to: destParent) else {
+            throw ImageOperationError.permissionDenied
+        }
+
         if !FileManager.default.fileExists(atPath: destParent.path) {
             try FileManager.default.createDirectory(at: destParent, withIntermediateDirectories: true)
         }
-        guard let accessToken = SandboxAccessManager.shared.beginAccess(for: destParent) else {
-            throw ImageOperationError.permissionDenied
-        }
-        defer { accessToken.stop() }
 
         let tempFilename = plan.filenameStem + "_tmp_" + String(UUID().uuidString.prefix(8)) + "." + plan.fileExtension
         let tempInDest = destParent.appendingPathComponent(tempFilename)
