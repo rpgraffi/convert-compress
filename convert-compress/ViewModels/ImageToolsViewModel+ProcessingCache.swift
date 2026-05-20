@@ -1,6 +1,4 @@
 import Foundation
-import Combine
-import UniformTypeIdentifiers
 
 extension ImageToolsViewModel {
 
@@ -30,13 +28,6 @@ extension ImageToolsViewModel {
     func scheduleProcessing() {
         processingDebouncer.schedule(after: .milliseconds(150)) { [weak self] in
             self?.runProcessing()
-        }
-    }
-
-    /// Re-processes visible assets when the configuration has changed.
-    func setupProcessingCacheObservation() {
-        observeConfigurationChanges { [weak self] in
-            self?.scheduleProcessing()
         }
     }
 

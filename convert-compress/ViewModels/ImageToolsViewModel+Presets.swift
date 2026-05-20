@@ -37,9 +37,7 @@ extension ImageToolsViewModel {
         removeMetadata = config.removeMetadata
         removeBackground = config.removeBackground
         
-        if comparisonSelection != nil {
-            scheduleComparisonPreviewRefresh()
-        }
+        scheduleConfigurationSideEffectsIfNeeded()
     }
     
     // MARK: - Update Preset

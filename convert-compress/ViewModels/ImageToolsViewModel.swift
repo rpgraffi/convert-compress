@@ -104,13 +104,14 @@ final class ImageToolsViewModel: ObservableObject {
     // MARK: - Subscriptions
     
     var cancellables = Set<AnyCancellable>()
+    var lastConfigurationForSideEffects: ProcessingConfiguration?
     
     // MARK: - Initialization
     
     init() {
         loadPersistedState()
+        setupConfigurationChangeObservation()
         setupComparisonObservation()
-        setupProcessingCacheObservation()
         setupPersistenceObservation()
         loadPresets()
     }

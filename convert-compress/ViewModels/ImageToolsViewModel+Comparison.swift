@@ -25,11 +25,6 @@ extension ImageToolsViewModel {
                 // Note: Don't trigger refresh here - let ComparisonView do it after animation
             }
             .store(in: &cancellables)
-        
-        // Refresh comparison preview when any pipeline-affecting setting changes
-        observeConfigurationChanges { [weak self] in
-            self?.scheduleComparisonPreviewRefresh()
-        }
     }
     // MARK: - Comparison Flow
     
