@@ -33,29 +33,12 @@ struct ProcessingCache {
         self.storage = LRUCache(capacity: capacity)
     }
 
-    subscript(assetID: UUID) -> ProcessingCacheEntry? {
-        get {
-            storage.peekValue(forKey: assetID)
-        }
-        set {
-            if let newValue {
-                storage.insert(newValue, forKey: assetID)
-            } else {
-                storage.removeValue(forKey: assetID)
-            }
-        }
-    }
-
     func freshStatus(for assetID: UUID, configuration: ProcessingConfiguration) -> ProcessingCacheEntry? {
         guard let cached = storage.peekValue(forKey: assetID),
               cached.isFresh(for: configuration) else {
             return nil
         }
         return cached
-    }
-
-    func freshEntry(for assetID: UUID, configuration: ProcessingConfiguration) -> ProcessedImageData? {
-        freshStatus(for: assetID, configuration: configuration)?.data
     }
 
     func needsProcessing(for assetID: UUID, configuration: ProcessingConfiguration) -> Bool {
@@ -97,9 +80,5 @@ struct ProcessingCache {
 
     mutating func removeAll() {
         storage.removeAll()
-    }
-
-    func snapshot() -> [UUID: ProcessedImageData] {
-        storage.dictionarySnapshot().compactMapValues(\.data)
     }
 }

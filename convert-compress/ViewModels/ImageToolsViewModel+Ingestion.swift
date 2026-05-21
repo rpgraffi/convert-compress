@@ -28,7 +28,7 @@ extension ImageToolsViewModel {
         withAnimation(.spring(response: 0.45, dampingFraction: 0.9, blendDuration: 0.2)) {
             if let idx = images.firstIndex(of: asset) { images.remove(at: idx) }
         }
-        processedCache.removeValue(forKey: asset.id)
+        encodedOutputCache.removeValue(forKey: asset.id)
     }
 
     func bumpRecentFormats(_ format: ImageFormat) {

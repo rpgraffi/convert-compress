@@ -3,7 +3,7 @@ import StoreKit
 
 struct TopBar: View {
     @State private var purchaseManager = PurchaseManager.shared
-    @ObservedObject private var usageTracker = UsageTracker.shared
+    @State private var usageTracker = UsageTracker.shared
     @State private var isHovered: Bool = false
     
     var body: some View {

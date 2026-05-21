@@ -1,8 +1,16 @@
+import Combine
 import Foundation
 
 private let previewProcessingConcurrency = 4
 
 extension ImageToolsViewModel {
+    func setupEncodedOutputObservation() {
+        encodedOutputCache.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
 
     // MARK: - Preview
 
@@ -19,10 +27,24 @@ extension ImageToolsViewModel {
         )
     }
 
-    // MARK: - Cache Accessors
+    // MARK: - Clipboard
 
-    func cachedProcessedData(for assetID: UUID) -> ProcessedImageData? {
-        processedCache.freshEntry(for: assetID, configuration: currentConfiguration)
+    func temporaryEncodedOutputURL(for asset: ImageAsset) async throws -> URL {
+        let configuration = currentConfiguration
+        let encodedOutputCache = encodedOutputCache
+
+        return try await Task.detached(priority: .medium) {
+            let data = try await encodedOutputCache.resolve(
+                asset: asset,
+                configuration: configuration
+            ) {
+                !Task.isCancelled
+            }
+            return try ProcessingPipeline(configuration: configuration).renderTemporaryURL(
+                on: asset,
+                preEncoded: data.encodedOutput
+            )
+        }.value
     }
 
     // MARK: - Background Processing
@@ -44,7 +66,7 @@ extension ImageToolsViewModel {
         let configuration = currentConfiguration
         let assetsToProcess = images
             .filter { visibleAssetIDs.contains($0.id) }
-            .filter { processedCache.needsProcessing(for: $0.id, configuration: configuration) }
+            .filter { encodedOutputCache.needsProcessing(for: $0.id, configuration: configuration) }
         let assetIDs = Set(assetsToProcess.map(\.id))
 
         if let processingBatch,
@@ -58,7 +80,7 @@ extension ImageToolsViewModel {
 
         let batch = PreviewProcessingBatch(assetIDs: assetIDs, configuration: configuration)
         processingBatch = batch
-        processedCache.markPending(
+        encodedOutputCache.markPending(
             assetIDs: assetIDs,
             configuration: configuration
         )
@@ -77,30 +99,35 @@ extension ImageToolsViewModel {
         }
 
         let semaphore = AsyncSemaphore(value: previewProcessingConcurrency)
+        let encodedOutputCache = encodedOutputCache
 
-        await withTaskGroup(of: PreviewEncode.Output?.self) { group in
+        await withTaskGroup(of: Void.self) { group in
             for asset in assets {
                 group.addTask(priority: .utility) {
-                    guard !Task.isCancelled else { return nil }
+                    guard !Task.isCancelled else { return }
 
                     await semaphore.acquire()
                     guard !Task.isCancelled else {
                         await semaphore.release()
-                        return nil
+                        return
                     }
 
-                    let output = PreviewEncode.process(
-                        asset: asset,
-                        configuration: batch.configuration
-                    )
-                    await semaphore.release()
-                    return output
-                }
-            }
+                    do {
+                        _ = try await encodedOutputCache.resolve(
+                            asset: asset,
+                            configuration: batch.configuration
+                        ) { [weak self] in
+                            guard let self else { return false }
+                            return self.processingBatch?.id == batch.id
+                                && self.currentConfiguration == batch.configuration
+                                && self.images.contains(where: { $0.id == asset.id })
+                        }
+                    } catch {
+                        AppLogger.processing.error("Preview encode failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                    }
 
-            for await output in group {
-                guard let output else { continue }
-                applyPreviewProcessingOutput(output, batch: batch)
+                    await semaphore.release()
+                }
             }
         }
     }
@@ -109,7 +136,7 @@ extension ImageToolsViewModel {
         processingTask?.cancel()
 
         if let processingBatch {
-            processedCache.removePending(
+            encodedOutputCache.removePending(
                 assetIDs: processingBatch.assetIDs,
                 configuration: processingBatch.configuration
             )
@@ -126,26 +153,8 @@ extension ImageToolsViewModel {
         processingBatch = nil
     }
 
-    private func applyPreviewProcessingOutput(
-        _ output: PreviewEncode.Output,
-        batch: PreviewProcessingBatch
-    ) {
-        guard processingBatch?.id == batch.id,
-              currentConfiguration == batch.configuration,
-              images.contains(where: { $0.id == output.assetID }) else {
-            return
-        }
-
-        switch output {
-        case .ready(let assetID, let data):
-            processedCache.storeReady(data, forKey: assetID)
-        case .failed(let assetID):
-            processedCache.storeFailure(forKey: assetID, configuration: batch.configuration)
-        }
-    }
-
     private func outputDisplayStatus(for assetID: UUID) -> ImageOutputDisplayStatus? {
-        guard let status = processedCache.freshStatus(for: assetID, configuration: currentConfiguration) else {
+        guard let status = encodedOutputCache.freshStatus(for: assetID, configuration: currentConfiguration) else {
             return nil
         }
 

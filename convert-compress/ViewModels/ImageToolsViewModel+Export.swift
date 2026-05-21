@@ -3,10 +3,6 @@ import SwiftUI
 import AppKit
 
 extension ImageToolsViewModel {
-    func buildPipeline() -> ProcessingPipeline {
-        ProcessingPipeline(configuration: currentConfiguration)
-    }
-
     /// Recommended concurrency for export, balancing CPU / memory / thermal state.
     func recommendedConcurrency() -> Int {
         ExportConcurrencyPolicy.recommended()
@@ -25,27 +21,25 @@ extension ImageToolsViewModel {
     private func executeExport() {
         guard exportTask == nil else { return }
 
-        let pipeline = buildPipeline()
         if let selectedFormat { bumpRecentFormats(selectedFormat) }
         let config = currentConfiguration
         let targets = images
         guard !targets.isEmpty else { return }
-        let cacheSnapshot = processedCache.snapshot()
         let initialImages = imagesSnapshot()
         let maxConcurrent = recommendedConcurrency()
         let destinationResolver = exportDestinationResolver()
         let dependencies = exportWorkflowDependencies()
+        let encodedOutputCache = encodedOutputCache
 
         exportTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
 
             let workflow = ExportWorkflow(
-                pipeline: pipeline,
                 destinationResolver: destinationResolver,
                 configuration: config,
                 targets: targets,
                 initialImages: initialImages,
-                cacheSnapshot: cacheSnapshot,
+                encodedOutputCache: encodedOutputCache,
                 maxConcurrent: maxConcurrent,
                 dependencies: dependencies
             )

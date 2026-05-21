@@ -11,7 +11,7 @@ extension ImageToolsViewModel {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
             images.removeAll()
         }
-        processedCache.removeAll()
+        encodedOutputCache.removeAll()
         if exportDirectory == nil {
             sourceDirectory = nil
         }
@@ -24,7 +24,7 @@ extension ImageToolsViewModel {
             images.removeAll { $0.isEdited }
         }
         for id in exportedIDs {
-            processedCache.removeValue(forKey: id)
+            encodedOutputCache.removeValue(forKey: id)
         }
         if comparisonSelection.map({ exportedIDs.contains($0.assetID) }) == true {
             comparisonSelection = nil

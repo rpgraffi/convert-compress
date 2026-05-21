@@ -2,10 +2,9 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct ExportRunner {
-    let pipeline: ProcessingPipeline
     let destinationResolver: ExportDestinationResolver
     let configuration: ProcessingConfiguration
-    let cacheSnapshot: [UUID: ProcessedImageData]
+    let encodedOutputCache: EncodedOutputCache
     let maxConcurrent: Int
     let writeAccess: ExportWriteAccess
 
@@ -44,9 +43,13 @@ struct ExportRunner {
                     }
 
                     do {
-                        let preEncoded = cacheSnapshot[asset.id]?.encodedOutput(ifFreshFor: configuration)
-                        let encoded = try preEncoded ?? pipeline.renderEncodedData(on: asset)
-                        let updated = try write(asset: asset, encoded: encoded)
+                        let encoded = try await encodedOutputCache.resolve(
+                            asset: asset,
+                            configuration: configuration
+                        ) {
+                            !Task.isCancelled
+                        }
+                        let updated = try write(asset: asset, encoded: encoded.encodedOutput)
                         return .success(original: asset, updated: updated)
                     } catch {
                         AppLogger.export.error("Export failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")

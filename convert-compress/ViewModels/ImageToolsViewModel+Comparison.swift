@@ -115,36 +115,28 @@ extension ImageToolsViewModel {
             )
         }
         
-        do {
-            let cached = cachedProcessedData(for: assetID)
-            let pipeline = cached == nil ? buildPipeline() : nil
-            let config = currentConfiguration
+        let config = currentConfiguration
+        let encodedOutputCache = encodedOutputCache
 
-            let (processed, processedPixelSize, cacheEntry) = try await Task.detached(priority: .medium) {
-                let data: Data
-                let cacheEntry: ProcessedImageData?
-                if let cached {
-                    data = cached.data
-                    cacheEntry = nil
-                } else {
-                    guard let pipeline else {
-                        throw ImageOperationError.exportFailed
-                    }
-                    let encoded = try pipeline.renderEncodedData(on: asset)
-                    data = encoded.data
-                    cacheEntry = ProcessedImageData(data: data, uti: encoded.uti, configuration: config)
+        do {
+            let (processed, processedPixelSize) = try await Task.detached(priority: .medium) {
+                let data = try await encodedOutputCache.resolve(
+                    asset: asset,
+                    configuration: config
+                ) { [weak self] in
+                    guard let self else { return false }
+                    return self.comparisonSelection?.assetID == assetID
+                        && self.currentConfiguration == config
                 }
-                let image = NSImage(data: data)
-                let pixelSize = ImageMetadata.pixelSize(for: data)
-                return (image, pixelSize, cacheEntry)
+
+                let image = NSImage(data: data.data)
+                let pixelSize = ImageMetadata.pixelSize(for: data.data)
+                return (image, pixelSize)
             }.value
             
-            guard await isStillSelected(assetID) else { return }
+            guard await isStillShowingComparison(assetID, configuration: config) else { return }
             
             await MainActor.run {
-                if let cacheEntry {
-                    processedCache.storeReady(cacheEntry, forKey: assetID)
-                }
                 comparisonPreview = ComparisonPreviewState(
                     originalImage: original,
                     processedImage: processed,
@@ -156,7 +148,7 @@ extension ImageToolsViewModel {
                 )
             }
         } catch {
-            guard await isStillSelected(assetID) else { return }
+            guard await isStillShowingComparison(assetID, configuration: config) else { return }
             
             await MainActor.run {
                 comparisonPreview = ComparisonPreviewState(
@@ -174,6 +166,15 @@ extension ImageToolsViewModel {
     
     private func isStillSelected(_ assetID: UUID) async -> Bool {
         await MainActor.run { comparisonSelection?.assetID == assetID }
+    }
+
+    private func isStillShowingComparison(
+        _ assetID: UUID,
+        configuration: ProcessingConfiguration
+    ) async -> Bool {
+        await MainActor.run {
+            comparisonSelection?.assetID == assetID && currentConfiguration == configuration
+        }
     }
     
     /// Calculate the normalized crop region (0-1 coordinates) on the original image

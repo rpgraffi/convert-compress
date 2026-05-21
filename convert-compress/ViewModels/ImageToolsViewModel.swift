@@ -67,7 +67,7 @@ final class ImageToolsViewModel: ObservableObject {
 
     /// Cached processed results from estimation. Reused by clipboard,
     /// comparison, and export to avoid redundant processing.
-    @Published var processedCache = ProcessingCache()
+    let encodedOutputCache = EncodedOutputCache()
     var processingTask: Task<Void, Never>? = nil
     var processingBatch: PreviewProcessingBatch? = nil
     let processingDebouncer = Debouncer()
@@ -116,6 +116,7 @@ final class ImageToolsViewModel: ObservableObject {
     // MARK: - Initialization
     
     init() {
+        setupEncodedOutputObservation()
         loadPersistedState()
         setupConfigurationChangeObservation()
         setupComparisonObservation()
@@ -143,4 +144,3 @@ final class ImageToolsViewModel: ObservableObject {
     }
     
 }
-

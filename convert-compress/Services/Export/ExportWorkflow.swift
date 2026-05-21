@@ -1,12 +1,11 @@
 import Foundation
 
 struct ExportWorkflow {
-    let pipeline: ProcessingPipeline
     let destinationResolver: ExportDestinationResolver
     let configuration: ProcessingConfiguration
     let targets: [ImageAsset]
     let initialImages: [ImageAsset]
-    let cacheSnapshot: [UUID: ProcessedImageData]
+    let encodedOutputCache: EncodedOutputCache
     let maxConcurrent: Int
     let dependencies: ExportWorkflowDependencies
 
@@ -68,10 +67,9 @@ struct ExportWorkflow {
         let writeAccess = ExportWriteAccess(scopeDirectories: writeScopeDirectories)
 
         let runner = ExportRunner(
-            pipeline: pipeline,
             destinationResolver: destinationResolver,
             configuration: configuration,
-            cacheSnapshot: cacheSnapshot,
+            encodedOutputCache: encodedOutputCache,
             maxConcurrent: maxConcurrent,
             writeAccess: writeAccess
         )
@@ -157,7 +155,10 @@ struct ExportWorkflow {
     }
 
     private func destinationURL(for asset: ImageAsset) -> URL {
-        let outputUTType = pipeline.outputUTType(for: asset)
+        let outputUTType = ProcessedImageEncoder.decideUTTypeForExport(
+            originalURL: asset.originalURL,
+            requestedFormat: configuration.selectedFormat ?? asset.originalFormat
+        )
         return destinationResolver.destinationURL(for: asset, uti: outputUTType)
     }
 }

@@ -12,15 +12,4 @@ struct ProcessedImageData {
     var encodedOutput: (data: Data, uti: UTType) {
         (data, uti)
     }
-
-    func isFresh(for configuration: ProcessingConfiguration) -> Bool {
-        self.configuration == configuration
-    }
-
-    func encodedOutput(ifFreshFor configuration: ProcessingConfiguration) -> (data: Data, uti: UTType)? {
-        guard isFresh(for: configuration) else {
-            return nil
-        }
-        return encodedOutput
-    }
 }
