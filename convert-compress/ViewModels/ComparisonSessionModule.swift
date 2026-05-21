@@ -1,71 +1,91 @@
-import Foundation
 import AppKit
-import Combine
+import Foundation
+import Observation
 
-extension ImageToolsViewModel {
-    // Setup comparison state observation
-    func setupComparisonObservation() {
-        // Observe images array changes to validate comparison selection
-        $images
-            .sink { [weak self] _ in
-                self?.refreshComparisonPreviewIfNeeded()
-            }
-            .store(in: &cancellables)
-        
-        // Observe comparison selection changes
-        $comparisonSelection
-            .sink { [weak self] selection in
-                guard let self else { return }
-                if selection == nil {
-                    self.comparisonPreview = .empty
-                    self.comparisonPreviewTask?.cancel()
-                    self.comparisonPreviewTask = nil
-                    self.liveRenderDebouncer.cancel()
-                }
-                // Note: Don't trigger refresh here - let ComparisonView do it after animation
-            }
-            .store(in: &cancellables)
+@MainActor
+@Observable
+final class ComparisonSessionModule {
+    var comparisonSelection: ComparisonSelection? = nil {
+        didSet {
+            guard comparisonSelection == nil else { return }
+            comparisonPreview = .empty
+            comparisonPreviewTask?.cancel()
+            comparisonPreviewTask = nil
+            liveRenderDebouncer.cancel()
+        }
     }
-    // MARK: - Comparison Flow
-    
+    var comparisonPreview: ComparisonPreviewState = .empty
+
+    @ObservationIgnored private let settings: PipelineSettingsModule
+    @ObservationIgnored private let assets: AssetCollectionModule
+    @ObservationIgnored private let encodedOutput: EncodedOutputModule
+    @ObservationIgnored private var comparisonPreviewTask: Task<Void, Never>?
+    @ObservationIgnored private let liveRenderDebouncer = Debouncer()
+
+    init(
+        settings: PipelineSettingsModule,
+        assets: AssetCollectionModule,
+        encodedOutput: EncodedOutputModule
+    ) {
+        self.settings = settings
+        self.assets = assets
+        self.encodedOutput = encodedOutput
+    }
+
     func presentComparison(for asset: ImageAsset) {
         comparisonSelection = ComparisonSelection(assetID: asset.id)
     }
-    
+
     func dismissComparison() {
         comparisonSelection = nil
     }
-    
+
+    func dismissIfSelected(assetIDs: Set<UUID>) {
+        if comparisonSelection.map({ assetIDs.contains($0.assetID) }) == true {
+            comparisonSelection = nil
+        }
+    }
+
     func navigateToNextImage() {
         guard let selection = comparisonSelection else { return }
-        guard let currentIndex = images.firstIndex(where: { $0.id == selection.assetID }) else { return }
-        let nextIndex = (currentIndex + 1) % images.count
-        comparisonSelection = ComparisonSelection(assetID: images[nextIndex].id)
+        guard let currentIndex = assets.images.firstIndex(where: { $0.id == selection.assetID }) else { return }
+        let nextIndex = (currentIndex + 1) % assets.images.count
+        comparisonSelection = ComparisonSelection(assetID: assets.images[nextIndex].id)
     }
-    
+
     func navigateToPreviousImage() {
         guard let selection = comparisonSelection else { return }
-        guard let currentIndex = images.firstIndex(where: { $0.id == selection.assetID }) else { return }
-        let previousIndex = (currentIndex - 1 + images.count) % images.count
-        comparisonSelection = ComparisonSelection(assetID: images[previousIndex].id)
+        guard let currentIndex = assets.images.firstIndex(where: { $0.id == selection.assetID }) else { return }
+        let previousIndex = (currentIndex - 1 + assets.images.count) % assets.images.count
+        comparisonSelection = ComparisonSelection(assetID: assets.images[previousIndex].id)
     }
-    
+
+    func selectedAsset() -> ImageAsset? {
+        guard let selection = comparisonSelection else { return nil }
+        return assets.images.first(where: { $0.id == selection.assetID })
+    }
+
+    func indexLabel(for asset: ImageAsset) -> String? {
+        guard let currentIndex = assets.images.firstIndex(where: { $0.id == asset.id }) else {
+            return nil
+        }
+        return "\(currentIndex + 1)/\(assets.images.count)"
+    }
+
     func refreshComparisonPreviewIfNeeded() {
         guard let selection = comparisonSelection else { return }
-        guard images.contains(where: { $0.id == selection.assetID }) else {
+        guard assets.images.contains(where: { $0.id == selection.assetID }) else {
             comparisonSelection = nil
             return
         }
     }
-    
+
     func refreshComparisonPreview() {
         guard let selection = comparisonSelection,
-              let asset = images.first(where: { $0.id == selection.assetID }) else { return }
-        
-        // Calculate crop region immediately for consistency
+              let asset = assets.images.first(where: { $0.id == selection.assetID }) else { return }
+
         let cropRegion = calculateCropRegion(for: asset)
-        
-        // Immediately show thumbnail for instant feedback
+
         comparisonPreview = ComparisonPreviewState(
             originalImage: asset.thumbnail,
             processedImage: nil,
@@ -75,34 +95,46 @@ extension ImageToolsViewModel {
             originalSize: asset.originalPixelSize,
             processedSize: nil
         )
-        
+
         comparisonPreviewTask?.cancel()
         comparisonPreviewTask = Task { [weak self] in
             await self?.loadComparisonPreview(for: asset)
         }
     }
-    
+
     func scheduleComparisonPreviewRefresh() {
         guard comparisonSelection != nil else { return }
         liveRenderDebouncer.schedule(after: .milliseconds(250)) { [weak self] in
             self?.refreshComparisonPreview()
         }
     }
-    
-    // MARK: - Private
-    
+
+    func calculateCropRegion(for asset: ImageAsset) -> CGRect? {
+        guard let targetSize = settings.currentConfiguration.resizeSpecification.cropSize,
+              let originalSize = asset.originalPixelSize,
+              originalSize.width > 0,
+              originalSize.height > 0 else {
+            return nil
+        }
+
+        return CropGeometry.normalizedCenterCropRegion(
+            originalSize: originalSize,
+            targetSize: targetSize
+        )
+    }
+
     private func loadComparisonPreview(for asset: ImageAsset) async {
         let assetID = asset.id
         let cropRegion = await MainActor.run { calculateCropRegion(for: asset) }
-        
+
         let original = await Task.detached(priority: .medium) {
             NSImage(contentsOf: asset.originalURL)
         }.value
-        
+
         let originalSize = original?.size
-        
+
         guard await isStillSelected(assetID) else { return }
-        
+
         await MainActor.run {
             comparisonPreview = ComparisonPreviewState(
                 originalImage: original,
@@ -114,28 +146,27 @@ extension ImageToolsViewModel {
                 processedSize: nil
             )
         }
-        
-        let config = currentConfiguration
-        let encodedOutputCache = encodedOutputCache
+
+        let configuration = settings.currentConfiguration
 
         do {
             let (processed, processedPixelSize) = try await Task.detached(priority: .medium) {
-                let data = try await encodedOutputCache.resolve(
+                let data = try await self.encodedOutput.resolve(
                     asset: asset,
-                    configuration: config
+                    configuration: configuration
                 ) { [weak self] in
                     guard let self else { return false }
                     return self.comparisonSelection?.assetID == assetID
-                        && self.currentConfiguration == config
+                        && self.settings.currentConfiguration == configuration
                 }
 
                 let image = NSImage(data: data.data)
                 let pixelSize = ImageMetadata.pixelSize(for: data.data)
                 return (image, pixelSize)
             }.value
-            
-            guard await isStillShowingComparison(assetID, configuration: config) else { return }
-            
+
+            guard await isStillShowingComparison(assetID, configuration: configuration) else { return }
+
             await MainActor.run {
                 comparisonPreview = ComparisonPreviewState(
                     originalImage: original,
@@ -148,8 +179,8 @@ extension ImageToolsViewModel {
                 )
             }
         } catch {
-            guard await isStillShowingComparison(assetID, configuration: config) else { return }
-            
+            guard await isStillShowingComparison(assetID, configuration: configuration) else { return }
+
             await MainActor.run {
                 comparisonPreview = ComparisonPreviewState(
                     originalImage: original,
@@ -163,7 +194,7 @@ extension ImageToolsViewModel {
             }
         }
     }
-    
+
     private func isStillSelected(_ assetID: UUID) async -> Bool {
         await MainActor.run { comparisonSelection?.assetID == assetID }
     }
@@ -173,23 +204,7 @@ extension ImageToolsViewModel {
         configuration: ProcessingConfiguration
     ) async -> Bool {
         await MainActor.run {
-            comparisonSelection?.assetID == assetID && currentConfiguration == configuration
+            comparisonSelection?.assetID == assetID && settings.currentConfiguration == configuration
         }
-    }
-    
-    /// Calculate the normalized crop region (0-1 coordinates) on the original image
-    func calculateCropRegion(for asset: ImageAsset) -> CGRect? {
-        guard let targetSize = currentConfiguration.resizeSpecification.cropSize,
-              let originalSize = asset.originalPixelSize,
-              originalSize.width > 0,
-              originalSize.height > 0 else {
-            return nil
-        }
-
-        return CropGeometry.normalizedCenterCropRegion(
-            originalSize: originalSize,
-            targetSize: targetSize
-        )
     }
 }
-

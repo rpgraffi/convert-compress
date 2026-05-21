@@ -2,27 +2,29 @@ import SwiftUI
 import AppKit
 
 struct ResizeCropControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
+        @Bindable var settings = settings
+
         HStack(spacing: 2) {
             // Width field
             InputPillField(
                 label: "W",
-                text: $vm.resizeWidth,
+                text: $settings.resizeWidth,
                 cornerRadius: .infinity
             )
-            .onChange(of: vm.resizeWidth) { _, newValue in
+            .onChange(of: settings.resizeWidth) { _, newValue in
                 parseDimensionsIfNeeded(from: newValue)
             }
             
             // Height field
             InputPillField(
                 label: "H",
-                text: $vm.resizeHeight,
+                text: $settings.resizeHeight,
                 cornerRadius: .infinity
             )
-            .onChange(of: vm.resizeHeight) { _, newValue in
+            .onChange(of: settings.resizeHeight) { _, newValue in
                 parseDimensionsIfNeeded(from: newValue)
             }
         }
@@ -37,8 +39,8 @@ struct ResizeCropControl: View {
             return
         }
         
-        vm.resizeWidth = dimensions.width
-        vm.resizeHeight = dimensions.height
+        settings.resizeWidth = dimensions.width
+        settings.resizeHeight = dimensions.height
     }
 }
 

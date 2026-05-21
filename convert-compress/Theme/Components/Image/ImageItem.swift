@@ -4,7 +4,9 @@ import AppKit
 // MARK: Main View
 struct ImageItem: View {
     let asset: ImageAsset
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(EncodedOutputModule.self) private var encodedOutput
+    @Environment(ComparisonSessionModule.self) private var comparison
     let heroNamespace: Namespace.ID
     
     @State private var isHovering: Bool = false
@@ -15,7 +17,7 @@ struct ImageItem: View {
     }
     
     var body: some View {
-        let displayInfo = vm.displayInfo(for: asset)
+        let displayInfo = encodedOutput.displayInfo(for: asset)
 
         ZStack {
             thumbnailLayer
@@ -33,14 +35,14 @@ struct ImageItem: View {
     // MARK: View Components
 
     private var isActiveComparison: Bool {
-        vm.comparisonSelection?.assetID == asset.id
+        comparison.comparisonSelection?.assetID == asset.id
     }
     
     /// Only the currently-compared grid item (or all items when no comparison is active)
     /// should participate in the hero geometry group. Other items use `properties: []`
     /// so they don't produce stale matches during rapid navigation.
     private var heroProperties: MatchedGeometryProperties {
-        vm.comparisonSelection == nil || isActiveComparison ? .frame : []
+        comparison.comparisonSelection == nil || isActiveComparison ? .frame : []
     }
     
     @ViewBuilder
@@ -109,15 +111,15 @@ struct ImageItem: View {
 
     private func installKeyMonitor() {
         removeKeyMonitor()
-        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [weak vm, asset] event in
+        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [assets, comparison, asset] event in
             // Spacebar
             if event.keyCode == 49 {
-                vm?.presentComparison(for: asset)
+                comparison.presentComparison(for: asset)
                 return nil
             }
             // X key
             if event.keyCode == 7 { 
-                vm?.remove(asset)
+                assets.remove(asset)
                 return nil
             }
             return event

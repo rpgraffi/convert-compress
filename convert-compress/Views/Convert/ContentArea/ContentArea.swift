@@ -3,7 +3,8 @@ import UniformTypeIdentifiers
 import AppKit
 
 struct ContentArea: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(ComparisonSessionModule.self) private var comparison
     @State private var isDropping: Bool = false
     
     // Layout
@@ -15,7 +16,7 @@ struct ContentArea: View {
         [GridItem(.adaptive(minimum: 220, maximum: tileMaxWidth), spacing: gridSpacing, alignment: .top)]
     }
     
-    private var allImages: [ImageAsset] { vm.images }
+    private var allImages: [ImageAsset] { assets.images }
     private var isEmpty: Bool { allImages.isEmpty }
     
     @Environment(\.colorScheme) private var colorScheme
@@ -38,10 +39,10 @@ struct ContentArea: View {
         ZStack {
             if isEmpty {
                 ImagesGridEmptyState(
-                    onPaste: { vm.addFromPasteboard() },
+                    onPaste: { assets.addFromPasteboard() },
                     onPickFromFinder: {
-                        IngestionCoordinator.presentOpenPanel { urls in
-                            vm.addURLs(urls)
+                        IngestionOpenPanelView().present { urls in
+                            assets.addURLs(urls)
                         }
                     }
                 )
@@ -53,14 +54,13 @@ struct ContentArea: View {
                 )
             }
             
-            if let selection = vm.comparisonSelection,
-               let asset = vm.images.first(where: { $0.id == selection.assetID }) {
+            if let asset = comparison.selectedAsset() {
                 ComparisonView(asset: asset, heroNamespace: heroNamespace)
                     .transition(.opacity.combined(with: .scale(scale: 0.96)))
                     .zIndex(1)
             }
         }
-        .animation(Theme.Animations.smooth(), value: vm.comparisonSelection != nil)
+        .animation(Theme.Animations.smooth(), value: comparison.comparisonSelection != nil)
         .background(containerBackground())
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .overlay(containerOverlay())
@@ -99,7 +99,7 @@ struct ContentArea: View {
     
     private func handleProviderDrop(_ providers: [NSItemProvider]) -> Bool {
         guard IngestionCoordinator.canHandle(providers: providers) else { return false }
-        vm.addProvidersStreaming(providers, batchSize: 16)
+        assets.addProvidersStreaming(providers, batchSize: 16)
         return true
     }
     

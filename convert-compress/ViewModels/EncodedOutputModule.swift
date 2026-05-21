@@ -1,36 +1,60 @@
 import Combine
 import Foundation
+import Observation
 
 private let previewProcessingConcurrency = 4
 
-extension ImageToolsViewModel {
-    func setupEncodedOutputObservation() {
+@MainActor
+@Observable
+final class EncodedOutputModule {
+    struct PreviewProcessingBatch {
+        let id = UUID()
+        let assetIDs: Set<UUID>
+        let configuration: ProcessingConfiguration
+    }
+
+    @ObservationIgnored private let settings: PipelineSettingsModule
+    @ObservationIgnored private let assets: AssetCollectionModule
+    @ObservationIgnored private let encodedOutputCache = EncodedOutputCache()
+    @ObservationIgnored private var processingTask: Task<Void, Never>?
+    @ObservationIgnored private var processingBatch: PreviewProcessingBatch?
+    @ObservationIgnored private let processingDebouncer = Debouncer()
+    @ObservationIgnored private var cancellables = Set<AnyCancellable>()
+
+    private var visibleAssetIDs: Set<UUID> = []
+    private var cacheRevision: Int = 0
+
+    init(settings: PipelineSettingsModule, assets: AssetCollectionModule) {
+        self.settings = settings
+        self.assets = assets
+
         encodedOutputCache.objectWillChange
             .sink { [weak self] _ in
-                self?.objectWillChange.send()
+                self?.cacheRevision += 1
             }
             .store(in: &cancellables)
     }
 
-    // MARK: - Preview
+    var cache: EncodedOutputCache {
+        encodedOutputCache
+    }
 
     func targetSize(for asset: ImageAsset) -> CGSize? {
-        TargetSize.size(for: asset, configuration: currentConfiguration)
+        TargetSize.size(for: asset, configuration: settings.currentConfiguration)
     }
 
     func displayInfo(for asset: ImageAsset) -> ImageAssetDisplayInfo {
-        ImageAssetDisplayInfo(
+        _ = cacheRevision
+        return ImageAssetDisplayInfo(
             asset: asset,
             targetPixelSize: targetSize(for: asset),
             outputStatus: outputDisplayStatus(for: asset.id),
-            selectedFormat: selectedFormat
+            selectedFormat: settings.selectedFormat
         )
     }
 
-    // MARK: - Clipboard
-
     func temporaryEncodedOutputURL(for asset: ImageAsset) async throws -> URL {
-        let configuration = currentConfiguration
+        let configuration = settings.currentConfiguration
         let encodedOutputCache = encodedOutputCache
 
         return try await Task.detached(priority: .medium) {
@@ -47,7 +71,17 @@ extension ImageToolsViewModel {
         }.value
     }
 
-    // MARK: - Background Processing
+    func resolve(
+        asset: ImageAsset,
+        configuration: ProcessingConfiguration,
+        shouldCommit: @escaping @MainActor () -> Bool = { true }
+    ) async throws -> ProcessedImageData {
+        try await encodedOutputCache.resolve(
+            asset: asset,
+            configuration: configuration,
+            shouldCommit: shouldCommit
+        )
+    }
 
     func updateVisibleAssets(_ ids: Set<UUID>) {
         visibleAssetIDs = ids
@@ -60,11 +94,17 @@ extension ImageToolsViewModel {
         }
     }
 
-    // MARK: - Private
+    func removeValue(forKey assetID: UUID) {
+        encodedOutputCache.removeValue(forKey: assetID)
+    }
+
+    func removeAll() {
+        encodedOutputCache.removeAll()
+    }
 
     private func runProcessing() {
-        let configuration = currentConfiguration
-        let assetsToProcess = images
+        let configuration = settings.currentConfiguration
+        let assetsToProcess = assets.images
             .filter { visibleAssetIDs.contains($0.id) }
             .filter { encodedOutputCache.needsProcessing(for: $0.id, configuration: configuration) }
         let assetIDs = Set(assetsToProcess.map(\.id))
@@ -91,7 +131,7 @@ extension ImageToolsViewModel {
     }
 
     private func processPreviews(
-        _ assets: [ImageAsset],
+        _ assetsToProcess: [ImageAsset],
         batch: PreviewProcessingBatch
     ) async {
         defer {
@@ -102,7 +142,7 @@ extension ImageToolsViewModel {
         let encodedOutputCache = encodedOutputCache
 
         await withTaskGroup(of: Void.self) { group in
-            for asset in assets {
+            for asset in assetsToProcess {
                 group.addTask(priority: .utility) {
                     guard !Task.isCancelled else { return }
 
@@ -119,8 +159,8 @@ extension ImageToolsViewModel {
                         ) { [weak self] in
                             guard let self else { return false }
                             return self.processingBatch?.id == batch.id
-                                && self.currentConfiguration == batch.configuration
-                                && self.images.contains(where: { $0.id == asset.id })
+                                && self.settings.currentConfiguration == batch.configuration
+                                && self.assets.images.contains(where: { $0.id == asset.id })
                         }
                     } catch {
                         AppLogger.processing.error("Preview encode failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -154,7 +194,7 @@ extension ImageToolsViewModel {
     }
 
     private func outputDisplayStatus(for assetID: UUID) -> ImageOutputDisplayStatus? {
-        guard let status = encodedOutputCache.freshStatus(for: assetID, configuration: currentConfiguration) else {
+        guard let status = encodedOutputCache.freshStatus(for: assetID, configuration: settings.currentConfiguration) else {
             return nil
         }
 

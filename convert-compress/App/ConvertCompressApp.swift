@@ -4,12 +4,13 @@ import SwiftUI
 struct ConvertCompressApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    private let vm: ImageToolsViewModel
+    private let modules: ImageToolsModules
     
     init() {
-        self.vm = ImageToolsViewModel()
-        appDelegate.openImageURLs = { [vm] urls in
-            vm.addURLs(urls)
+        let modules = ImageToolsModules()
+        self.modules = modules
+        appDelegate.openImageURLs = { [assets = modules.assets] urls in
+            assets.addURLs(urls)
         }
     }
     
@@ -17,8 +18,8 @@ struct ConvertCompressApp: App {
         Window(AppConstants.localizedAppName, id: "main") {
             MainView()
                 .background(.clear)
+                .imageToolsEnvironment(modules)
         }
-        .environmentObject(vm)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)
         .commands {

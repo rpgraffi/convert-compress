@@ -1,21 +1,22 @@
 import SwiftUI
 
 struct ClearControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(ExportSessionModule.self) private var export
 
     private var mode: ClearControlMode {
-        ClearControlMode(viewModel: vm)
+        ClearControlMode(assets: assets, export: export)
     }
 
     var body: some View {
         PillButton(role: .destructive) {
-            mode.perform(on: vm)
+            mode.perform(assets: assets, export: export)
         } label: {
             Text(mode.label)
             .contentTransition(.interpolate)
         }
         .help(mode.helpText)
-        .disabled(mode.requiresImages && vm.images.isEmpty)
+        .disabled(mode.requiresImages && assets.images.isEmpty)
         .animation(.easeInOut(duration: 0.2), value: mode)
     }
 }
@@ -26,10 +27,10 @@ private enum ClearControlMode: Equatable {
     case clearAll
 
     @MainActor
-    init(viewModel: ImageToolsViewModel) {
-        if viewModel.isExporting {
+    init(assets: AssetCollectionModule, export: ExportSessionModule) {
+        if export.isExporting {
             self = .stopExport
-        } else if viewModel.hasExportedAndNewImages {
+        } else if assets.hasExportedAndNewImages {
             self = .clearExported
         } else {
             self = .clearAll
@@ -63,14 +64,14 @@ private enum ClearControlMode: Equatable {
     }
 
     @MainActor
-    func perform(on viewModel: ImageToolsViewModel) {
+    func perform(assets: AssetCollectionModule, export: ExportSessionModule) {
         switch self {
         case .stopExport:
-            viewModel.cancelExport()
+            export.cancelExport()
         case .clearExported:
-            viewModel.clearExported()
+            assets.clearExported()
         case .clearAll:
-            viewModel.clearAll()
+            assets.clearAll()
         }
     }
 }

@@ -5,7 +5,8 @@ struct HoverControls: View {
     let asset: ImageAsset
     let isVisible: Bool
 
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(EncodedOutputModule.self) private var encodedOutput
     @State private var copyState: CopyState = .idle
 
     private enum CopyState {
@@ -74,7 +75,7 @@ struct HoverControls: View {
     }
 
     private var removeButton: some View {
-        Button(role: .destructive, action: { vm.remove(asset) }) {
+        Button(role: .destructive, action: { assets.remove(asset) }) {
             Image(systemName: "xmark.circle.fill")
         }
         .buttonStyle(.plain)
@@ -88,7 +89,7 @@ struct HoverControls: View {
 
         Task {
             do {
-                let tempURL = try await vm.temporaryEncodedOutputURL(for: localAsset)
+                let tempURL = try await encodedOutput.temporaryEncodedOutputURL(for: localAsset)
                 ClipboardService.copyFileURL(tempURL)
                 copyState = .success
             } catch {

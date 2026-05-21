@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ControlsBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
         HStack(spacing: 16) {
@@ -9,7 +9,7 @@ struct ControlsBar: View {
             FormatControl()
             ResizeControl()
             
-            if vm.shouldShowCompressionControl {
+            if settings.shouldShowCompressionControl {
                 QualityControl()
                     .transition(.opacity.combined(with: .scale))
             }
@@ -17,18 +17,17 @@ struct ControlsBar: View {
             FlipControl()
             RemoveBackgroundControl()
             
-            if vm.shouldShowMetadataControl {
+            if settings.shouldShowMetadataControl {
                 MetadataControl()
                     .transition(.opacity.combined(with: .scale))
             }
         }
-        .animation(Theme.Animations.spring(), value: vm.selectedFormat)
-        .animation(Theme.Animations.spring(), value: vm.resizeMode)
-        .animation(Theme.Animations.spring(), value: vm.overwriteOriginals)
-        .animation(Theme.Animations.spring(), value: vm.removeMetadata)
-        .animation(Theme.Animations.spring(), value: vm.allowedSquareSizes)
-        .animation(Theme.Animations.spring(), value: vm.shouldShowCompressionControl)
-        .animation(Theme.Animations.spring(), value: vm.shouldShowMetadataControl)
+        .animation(Theme.Animations.spring(), value: settings.selectedFormat)
+        .animation(Theme.Animations.spring(), value: settings.resizeMode)
+        .animation(Theme.Animations.spring(), value: settings.removeMetadata)
+        .animation(Theme.Animations.spring(), value: settings.allowedSquareSizes)
+        .animation(Theme.Animations.spring(), value: settings.shouldShowCompressionControl)
+        .animation(Theme.Animations.spring(), value: settings.shouldShowMetadataControl)
         .padding(.bottom, 4)
         .padding(.horizontal, 8)
     }

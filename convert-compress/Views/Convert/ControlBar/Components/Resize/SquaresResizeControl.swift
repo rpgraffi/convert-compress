@@ -4,7 +4,7 @@ import AppKit
 /// UI for formats that only support a fixed set of square sizes (e.g., ICNS/ICO).
 /// Uses a discrete pill slider across allowed sizes and a menu to pick exact size.
 struct SquaresResizeControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     let allowedSizes: [Int] // sorted ascending
     @State private var menuHandler: MenuHandler?
     @State private var hapticTracker = HapticStopTracker()
@@ -29,9 +29,9 @@ struct SquaresResizeControl: View {
     }
     
     private func selectSquare(_ side: Int) {
-        vm.resizeMode = .crop
-        vm.resizeWidth = String(side)
-        vm.resizeHeight = String(side)
+        settings.resizeMode = .crop
+        settings.resizeWidth = String(side)
+        settings.resizeHeight = String(side)
     }
     
     private func discretePercentPill(containerSize: CGSize, corner: CGFloat, sizes: [Int]) -> some View {
@@ -58,7 +58,7 @@ struct SquaresResizeControl: View {
         }
         .contentShape(Rectangle())
         .horizontalScrollStep(sensitivity: 10.0) { steps in
-            let currentIdx = sizes.firstIndex(of: Int(vm.resizeWidth) ?? 0) ?? 0
+            let currentIdx = sizes.firstIndex(of: Int(settings.resizeWidth) ?? 0) ?? 0
             let newIdx = (currentIdx + steps).clamped(to: 0...(sizes.count - 1))
             selectSquare(sizes[newIdx])
             hapticTracker.handleStopChange(currentIndex: newIdx)
@@ -79,15 +79,15 @@ struct SquaresResizeControl: View {
     }
     
     private func currentSizeLabel(sizes: [Int]) -> String {
-        let w = Int(vm.resizeWidth) ?? 0
-        let h = Int(vm.resizeHeight) ?? 0
+        let w = Int(settings.resizeWidth) ?? 0
+        let h = Int(settings.resizeHeight) ?? 0
         if w == h && sizes.contains(w) { return "\(w)x\(h)" }
         let nearest = sizes.min(by: { abs($0 - w) < abs($1 - w) }) ?? sizes.first ?? 0
         return "\(nearest)x\(nearest)"
     }
     
     private func valueToProgress(sizes: [Int]) -> Double {
-        let current = Int(vm.resizeWidth) ?? sizes.first ?? 0
+        let current = Int(settings.resizeWidth) ?? sizes.first ?? 0
         guard let idx = sizes.firstIndex(of: current), sizes.count > 1 else { return 0 }
         return Double(idx) / Double(sizes.count - 1)
     }

@@ -2,7 +2,8 @@ import SwiftUI
 import AppKit
 
 struct ImagesGridView: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(EncodedOutputModule.self) private var encodedOutput
+    @Environment(ComparisonSessionModule.self) private var comparison
     let images: [ImageAsset]
     let columns: [GridItem]
     let heroNamespace: Namespace.ID
@@ -12,7 +13,7 @@ struct ImagesGridView: View {
 
     private func scheduleVisibilityUpdate() {
         visibilityDebouncer.schedule(after: .milliseconds(150)) { [visibleIds] in
-            vm.updateVisibleAssets(visibleIds)
+            encodedOutput.updateVisibleAssets(visibleIds)
         }
     }
     
@@ -29,7 +30,7 @@ struct ImagesGridView: View {
                     .scaleEffect(appearedIds.contains(asset.id) ? 1 : 0.94)
                     .animation(.spring(response: 0.45, dampingFraction: 0.75), value: appearedIds.contains(asset.id))
                     .onTapGesture { 
-                        vm.presentComparison(for: asset) 
+                        comparison.presentComparison(for: asset)
                     }
                     .onAppear {
                         visibleIds.insert(asset.id)
@@ -49,7 +50,7 @@ struct ImagesGridView: View {
 
 struct ImagesGridView_Previews: PreviewProvider {
     static var previews: some View {
-        let vm = ImageToolsViewModel()
+        let modules = ImageToolsModules()
         let urls: [URL] = [
             makeTempImageURL(size: NSSize(width: 640, height: 360), color: .systemBlue),
             makeTempImageURL(size: NSSize(width: 800, height: 800), color: .systemGreen),
@@ -58,18 +59,18 @@ struct ImagesGridView_Previews: PreviewProvider {
         let assets = urls.map { ImageAsset(url: $0) }
         let columns = [GridItem(.adaptive(minimum: 220, maximum: 300), spacing: 12, alignment: .top)]
         
-        return PreviewWrapper(assets: assets, columns: columns, vm: vm)
+        return PreviewWrapper(assets: assets, columns: columns, modules: modules)
     }
     
     private struct PreviewWrapper: View {
         let assets: [ImageAsset]
         let columns: [GridItem]
-        let vm: ImageToolsViewModel
+        let modules: ImageToolsModules
         @Namespace private var heroNamespace
         
         var body: some View {
             ImagesGridView(images: assets, columns: columns, heroNamespace: heroNamespace)
-                .environmentObject(vm)
+                .imageToolsEnvironment(modules)
                 .frame(width: 900, height: 600)
                 .padding()
         }

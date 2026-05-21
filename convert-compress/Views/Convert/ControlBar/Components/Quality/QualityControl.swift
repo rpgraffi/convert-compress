@@ -2,14 +2,16 @@ import SwiftUI
 import AppKit
 
 struct QualityControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     @FocusState private var kbFieldFocused: Bool
     
     var body: some View {
+        @Bindable var settings = settings
+
         PercentPill(
             label: String(localized: "Quality"),
-            value01: $vm.compressionPercent,
+            value01: $settings.compressionPercent,
             dragStep: 0.05,
             showsTenPercentHaptics: true,
             showsFullBoundaryHaptic: true

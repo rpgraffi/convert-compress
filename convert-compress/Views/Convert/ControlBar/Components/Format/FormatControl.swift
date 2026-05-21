@@ -3,22 +3,22 @@ import UniformTypeIdentifiers
 import AppKit
 
 struct FormatControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     private let controlHeight: CGFloat = Theme.Metrics.controlHeight
     
     @State private var keyEventMonitor: LocalEventMonitor?
     
     private var pinnedFormats: [ImageFormat] {
-        vm.pinnedWritableFormats
+        settings.pinnedWritableFormats
     }
     
     private var otherFormats: [ImageFormat] {
-        vm.otherWritableFormats
+        settings.otherWritableFormats
     }
     
     private var selectedLabel: String {
-        vm.selectedFormat?.displayName ?? String(localized: "Format")
+        settings.selectedFormat?.displayName ?? String(localized: "Format")
     }
     
     private func shortcutFor(format: ImageFormat) -> Character? {
@@ -32,8 +32,7 @@ struct FormatControl: View {
     }
     
     private func selectFormat(_ format: ImageFormat?) {
-        vm.selectedFormat = format
-        if let f = format { vm.bumpRecentFormats(f) }
+        settings.selectFormat(format)
     }
     
     var body: some View {
@@ -56,10 +55,10 @@ struct FormatControl: View {
                 Text(selectedLabel)
                     .font(Theme.Fonts.button)
             }
-            .foregroundStyle(vm.selectedFormat != nil ? Color.accentColor : .primary)
+            .foregroundStyle(settings.selectedFormat != nil ? Color.accentColor : .primary)
         }
         .menuStyle(.borderlessButton)
-        .help(vm.selectedFormat?.fullName ?? "")
+        .help(settings.selectedFormat?.fullName ?? "")
         .frame(height: controlHeight)
         .padding(.horizontal, 8)
         .background(shape.fill(Theme.Colors.controlBackground))
@@ -72,7 +71,7 @@ struct FormatControl: View {
     @ViewBuilder
     private func recentSection() -> some View {
         let pinnedIds = Set(pinnedFormats.map { $0.id })
-        let recents = vm.recentFormats.filter { !pinnedIds.contains($0.id) }.prefix(3)
+        let recents = settings.recentFormats.filter { !pinnedIds.contains($0.id) }.prefix(3)
         if !recents.isEmpty {
             Section(String(localized: "Recent")) {
                 ForEach(Array(recents), id: \.id) { f in
@@ -151,31 +150,31 @@ struct FormatControl: View {
 
 struct FormatControlView_Previews: PreviewProvider {
     static var previews: some View {
-        let vmDefault = ImageToolsViewModel()
-        let vmPNG: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsDefault = PipelineSettingsModule()
+        let settingsPNG: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .png)
             return v
         }()
-        let vmJPEG: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsJPEG: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .jpeg)
             return v
         }()
-        let vmWebP: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsWebP: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .webP)
             return v
         }()
         return VStack(alignment: .leading, spacing: 16) {
             FormatControl()
-                .environmentObject(vmDefault)
+                .environment(settingsDefault)
             FormatControl()
-                .environmentObject(vmPNG)
+                .environment(settingsPNG)
             FormatControl()
-                .environmentObject(vmJPEG)
+                .environment(settingsJPEG)
             FormatControl()
-                .environmentObject(vmWebP)
+                .environment(settingsWebP)
         }
         .padding()
         .frame(width: 360)
