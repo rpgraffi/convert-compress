@@ -11,7 +11,8 @@ import SwiftUI
 /// - Mouse wheel + Option: Zoom (for mouse users)
 /// - Keyboard: Space/Esc (close), arrows (navigate), C (toggle comparison)
 struct ComparisonView: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(EncodedOutputModule.self) private var encodedOutput
+    @Environment(ComparisonSessionModule.self) private var comparison
     let asset: ImageAsset
     let heroNamespace: Namespace.ID
     
@@ -25,7 +26,7 @@ struct ComparisonView: View {
     @State private var handleDragStartPosition: CGFloat? = nil
     @State private var longPressActive: Bool = false
     
-    private var preview: ComparisonPreviewState { vm.comparisonPreview }
+    private var preview: ComparisonPreviewState { comparison.comparisonPreview }
     private var fileName: String { asset.originalURL.lastPathComponent }
     
     private var mainContent: some View {
@@ -79,7 +80,7 @@ struct ComparisonView: View {
             }
             .overlay(alignment: .bottom) {
                 if showUI {
-                    ComparisonBottom(asset: asset)
+                    ComparisonBottom(displayInfo: encodedOutput.displayInfo(for: asset))
                         .transition(
                             .move(edge: .bottom).combined(with: .opacity)
                         )
@@ -103,7 +104,7 @@ struct ComparisonView: View {
             .comparisonScrollHandler(zoomPanState: zoomPanState)
             .onAppear {
             sliderPosition = 0.5
-            vm.refreshComparisonPreview()
+            comparison.refreshComparisonPreview()
             withAnimation(Theme.Animations.fastSpring()) {
                 showUI = true
             }
@@ -112,11 +113,11 @@ struct ComparisonView: View {
         .onChange(of: asset.id) { _, _ in
             sliderPosition = 0.5
             zoomPanState.reset(animated: false)
-            vm.refreshComparisonPreview()
+            comparison.refreshComparisonPreview()
         }
         .onChange(of: preview.processedImage) { _, newImage in
             if newImage != nil {
-                vm.scheduleProcessing()
+                encodedOutput.scheduleProcessing()
             }
         }
         .onDisappear {
@@ -404,19 +405,19 @@ struct ComparisonView: View {
     private func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = LocalEventMonitor(mask: .keyDown) { event in
-            if FirstResponderFocus.isTextInputFocused {
+            if KeyWindowEditing.isTextInputFocused {
                 return event
             }
             
             switch event.keyCode {
             case 49, 53: // Spacebar or Escape
-                vm.dismissComparison()
+                comparison.dismissComparison()
                 return nil
             case 123: // Left arrow
-                vm.navigateToPreviousImage()
+                comparison.navigateToPreviousImage()
                 return nil
             case 124: // Right arrow
-                vm.navigateToNextImage()
+                comparison.navigateToNextImage()
                 return nil
             case 8: // C key - toggle comparison slider
                 sliderPosition = sliderPosition < 0.5 ? 1.0 : 0.0

@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct RemoveBackgroundControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
+        @Bindable var settings = settings
+
         CircleIconToggle(
-            isOn: $vm.removeBackground,
+            isOn: $settings.removeBackground,
             icon: Image(systemName: "person.and.background.dotted"),
             text: nil
         )

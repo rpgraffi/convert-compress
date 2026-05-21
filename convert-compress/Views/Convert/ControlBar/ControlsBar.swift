@@ -1,15 +1,15 @@
 import SwiftUI
 
 struct ControlsBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Layout.spacing) {
             PresetButton()
             FormatControl()
             ResizeControl()
             
-            if shouldShowCompression {
+            if settings.shouldShowCompressionControl {
                 QualityControl()
                     .transition(.opacity.combined(with: .scale))
             }
@@ -17,35 +17,26 @@ struct ControlsBar: View {
             FlipControl()
             RemoveBackgroundControl()
             
-            if shouldShowMetadata {
+            if settings.shouldShowMetadataControl {
                 MetadataControl()
                     .transition(.opacity.combined(with: .scale))
             }
         }
-        .animation(Theme.Animations.spring(), value: vm.selectedFormat)
-        .animation(Theme.Animations.spring(), value: vm.resizeMode)
-        .animation(Theme.Animations.spring(), value: vm.overwriteOriginals)
-        .animation(Theme.Animations.spring(), value: vm.removeMetadata)
-        .animation(Theme.Animations.spring(), value: vm.allowedSquareSizes)
-        .animation(Theme.Animations.spring(), value: shouldShowCompression)
-        .animation(Theme.Animations.spring(), value: shouldShowMetadata)
+        .animation(Theme.Animations.spring(), value: settings.selectedFormat)
+        .animation(Theme.Animations.spring(), value: settings.resizeMode)
+        .animation(Theme.Animations.spring(), value: settings.removeMetadata)
+        .animation(Theme.Animations.spring(), value: settings.allowedSquareSizes)
+        .animation(Theme.Animations.spring(), value: settings.shouldShowCompressionControl)
+        .animation(Theme.Animations.spring(), value: settings.shouldShowMetadataControl)
         .padding(.bottom, 4)
-        .padding(.horizontal, 8)
+        .padding(.horizontal, Layout.horizontalPadding)
     }
-    
-    private var shouldShowCompression: Bool {
-        if let f = vm.selectedFormat {
-            return ImageIOCapabilities.shared.capabilities(for: f).supportsQuality
-        }
-        return true
+}
+
+extension ControlsBar {
+    enum Layout {
+        static let spacing: CGFloat = 16
+        static let horizontalPadding: CGFloat = 8
     }
-    
-    private var shouldShowMetadata: Bool {
-        if let f = vm.selectedFormat {
-            return ImageIOCapabilities.shared.capabilities(for: f).supportsMetadata
-        }
-        return true
-    }
-    
 }
 

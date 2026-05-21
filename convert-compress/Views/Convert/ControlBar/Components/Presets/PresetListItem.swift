@@ -3,7 +3,7 @@ import SwiftUI
 struct PresetListItem: View {
     let preset: Preset
     let index: Int
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PresetLibraryModule.self) private var presets
     @Binding var isPresented: Bool
     
     @State private var isHovered = false
@@ -33,7 +33,7 @@ struct PresetListItem: View {
         .contentShape(Rectangle())
         .onTapGesture {
             guard !isEditing else { return }
-            vm.applyPreset(preset)
+            presets.applyPreset(preset)
             isPresented = false
         }
         .onHover { hovering in
@@ -48,7 +48,7 @@ struct PresetListItem: View {
         .onDrop(of: [.text], delegate: PresetDropDelegate(
             preset: preset,
             index: index,
-            vm: vm,
+            presets: presets,
             isBeingDragged: $isBeingDragged
         ))
         .onChange(of: isEditing) { _, editing in
@@ -80,7 +80,7 @@ struct PresetListItem: View {
                 systemName: "trash.fill",
                 action: {
                     withAnimation(Theme.Animations.smooth()) {
-                        vm.deletePreset(preset)
+                        presets.deletePreset(preset)
                     }
                 },
                 destructive: true,
@@ -122,7 +122,7 @@ struct PresetListItem: View {
             name: trimmedName.isEmpty ? nil : trimmedName,
             configuration: preset.configuration
         )
-        vm.updatePreset(updatedPreset)
+        presets.updatePreset(updatedPreset)
         
         withAnimation(.easeInOut(duration: 0.2)) {
             isEditing = false
@@ -135,7 +135,7 @@ struct PresetListItem: View {
 struct PresetDropDelegate: DropDelegate {
     let preset: Preset
     let index: Int
-    let vm: ImageToolsViewModel
+    let presets: PresetLibraryModule
     @Binding var isBeingDragged: Bool
     
     
@@ -159,13 +159,13 @@ struct PresetDropDelegate: DropDelegate {
             }
             
             DispatchQueue.main.async {
-                guard let sourceIndex = vm.presets.firstIndex(where: { $0.id == draggedID }),
+                guard let sourceIndex = presets.presets.firstIndex(where: { $0.id == draggedID }),
                       sourceIndex != index else {
                     return
                 }
                 
                 withAnimation(.spring(response: 0.2, dampingFraction: 1.0)) {
-                    vm.reorderPresets(from: sourceIndex, to: index)
+                    presets.reorderPresets(from: sourceIndex, to: index)
                 }
             }
         }

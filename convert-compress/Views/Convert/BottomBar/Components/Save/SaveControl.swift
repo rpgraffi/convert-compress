@@ -1,18 +1,23 @@
 import SwiftUI
 
 struct SaveControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(ExportSessionModule.self) private var export
     @State private var showDoneText: Bool = false
     
     var body: some View {
-        let controlState = SaveControlState(viewModel: vm, showDoneText: showDoneText)
-        let isInProgress = vm.isExporting
+        let controlState = SaveControlState(
+            assets: assets,
+            export: export,
+            showDoneText: showDoneText
+        )
+        let isInProgress = export.isExporting
         let height: CGFloat = 40
         let progressWidth: CGFloat = 200
         
         Button(role: .none) {
             guard controlState.allowsAction else { return }
-            vm.applyPipelineAsync()
+            export.applyPipelineAsync()
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: controlState.iconName)
@@ -82,13 +87,17 @@ private enum SaveControlState: Equatable {
     case done
 
     @MainActor
-    init(viewModel: ImageToolsViewModel, showDoneText: Bool) {
-        if let ingestText = viewModel.ingestCounterText {
-            self = .ingesting(text: ingestText, progress: viewModel.ingestFraction)
-        } else if viewModel.isExporting {
-            let text = "\(viewModel.exportCompleted)/\(viewModel.exportTotal)"
-            self = .exporting(text: text, progress: viewModel.exportFraction)
-        } else if viewModel.images.isEmpty {
+    init(
+        assets: AssetCollectionModule,
+        export: ExportSessionModule,
+        showDoneText: Bool
+    ) {
+        if let ingestText = assets.ingestCounterText {
+            self = .ingesting(text: ingestText, progress: assets.ingestFraction)
+        } else if export.isExporting {
+            let text = "\(export.exportCompleted)/\(export.exportTotal)"
+            self = .exporting(text: text, progress: export.exportFraction)
+        } else if assets.images.isEmpty {
             self = .disabled
         } else if showDoneText {
             self = .done

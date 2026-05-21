@@ -1,12 +1,21 @@
 import SwiftUI
 
 struct MetadataControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
-        StrikePillToggle(isOn: $vm.removeMetadata) {
+        @Bindable var settings = settings
+
+        StrikePillToggle(isOn: $settings.removeMetadata) {
             Text(String(localized: "Metadata"))
         }
-        .help(String(localized: vm.removeMetadata ? "Metadata will be removed" : "Preserve metadata"))
+        .frame(minWidth: Layout.minWidth)
+        .help(String(localized: settings.removeMetadata ? "Metadata will be removed" : "Preserve metadata"))
     }
-} 
+}
+
+extension MetadataControl {
+    enum Layout {
+        static let minWidth: CGFloat = 92
+    }
+}

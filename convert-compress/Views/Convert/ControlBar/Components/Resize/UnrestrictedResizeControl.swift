@@ -2,18 +2,21 @@ import SwiftUI
 import AppKit
 
 struct UnrestrictedResizeControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
+    @Environment(AssetCollectionModule.self) private var assets
     
     var body: some View {
+        @Bindable var settings = settings
+
         ZStack {
             GeometryReader { geo in
                 let size = geo.size
                 Group {
-                    if vm.resizeMode == .resize {
+                    if settings.resizeMode == .resize {
                         ResizeSliderControl(
-                            widthText: $vm.resizeWidth,
-                            heightText: $vm.resizeHeight,
-                            longEdgeText: $vm.resizeLongEdge,
+                            widthText: $settings.resizeWidth,
+                            heightText: $settings.resizeHeight,
+                            longEdgeText: $settings.resizeLongEdge,
                             baseSize: basePixelSizeForCurrentSelection(),
                             containerSize: size,
                             squareLocked: false
@@ -25,18 +28,12 @@ struct UnrestrictedResizeControl: View {
                     }
                 }
             }
+            .frame(minWidth: ResizeControl.Layout.pillMinWidth)
         }
     }
     
     private func basePixelSizeForCurrentSelection() -> CGSize? {
-        let sizes: [CGSize] = vm.images.compactMap { asset in
-            guard let size = asset.originalPixelSize else { return nil }
-            return VectorImageSupport.isVectorImage(asset.originalURL) ? VectorImageSupport.generousSize(for: size) : size
-        }
-        guard !sizes.isEmpty else { return nil }
-        let maxWidth = sizes.map { $0.width }.max() ?? 0
-        let maxHeight = sizes.map { $0.height }.max() ?? 0
-        return CGSize(width: maxWidth, height: maxHeight)
+        assets.basePixelSizeForCurrentSelection()
     }
 }
 

@@ -36,7 +36,7 @@ struct InlinePercentEditor: View {
                 }
                 .onAppear {
                     fieldFocused = true
-                    TextFieldUtilities.selectAllText()
+                    KeyWindowEditing.selectAllText()
                 }
             }
         }

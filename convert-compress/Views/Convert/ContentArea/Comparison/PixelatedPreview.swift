@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Shows a breathing pixelated preview of the source image while
+/// Shows a diagonal pixelated blur wave over the source image while
 /// the processed result is being rendered. Uses a Metal shader for
-/// GPU-accelerated pixelation — no CPU-side image work at all.
+/// GPU-accelerated sampling — no CPU-side image work at all.
 struct PixelatedPreview: View {
     let sourceImage: NSImage
     let cropRegion: CGRect?
@@ -12,26 +12,33 @@ struct PixelatedPreview: View {
     let sliderPosition: CGFloat
     @ObservedObject var zoomPanState: ZoomPanState
 
-    private let maxPixelSize: CGFloat = 48
-    private let minPixelSize: CGFloat = 4
-    private let cycleDuration: TimeInterval = 5
+    private let pixelSize: CGFloat = 10
+    private let minBlurRadius: CGFloat = 0.75
+    private let maxBlurRadius: CGFloat = 18
+    private let waveLength: CGFloat = 180
 
     @State private var startDate = Date()
+
+    private var sampleOffset: CGFloat {
+        pixelSize / 2 + maxBlurRadius
+    }
 
     var body: some View {
         TimelineView(.animation) { timeline in
             let elapsed = timeline.date.timeIntervalSince(startDate)
-            let t = (1 - cos(elapsed * 2 * .pi / cycleDuration)) / 2
-            let pixelSize = minPixelSize + (maxPixelSize - minPixelSize) * t
 
             GeometryReader { geo in
                 imageContent
-                    .distortionEffect(
+                    .layerEffect(
                         ShaderLibrary.pixelate(
+                            .float(Float(elapsed)),
                             .float(Float(pixelSize)),
-                            .float2(Float(displaySize.width / 2), Float(displaySize.height / 2))
+                            .float(Float(minBlurRadius)),
+                            .float(Float(maxBlurRadius)),
+                            .float(Float(waveLength)),
+                            .float2(Float(displaySize.width), Float(displaySize.height))
                         ),
-                        maxSampleOffset: CGSize(width: maxPixelSize, height: maxPixelSize)
+                        maxSampleOffset: CGSize(width: sampleOffset, height: sampleOffset)
                     )
                     .clipped()
                     .overlay {

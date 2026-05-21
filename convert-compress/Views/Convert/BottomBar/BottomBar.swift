@@ -1,9 +1,12 @@
 import SwiftUI
 
 struct BottomBar: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(ExportSessionModule.self) private var export
     
     var body: some View {
+        @Bindable var export = export
+
         HStack(spacing: 8) {
             HStack(spacing: 8) {
                 ClearControl()
@@ -14,13 +17,13 @@ struct BottomBar: View {
             
             HStack(spacing: 8) {
                 ExportDirectoryControl(
-                    directory: $vm.exportDirectory,
-                    sourceDirectory: vm.sourceDirectory,
-                    hasActiveImages: !vm.images.isEmpty
+                    directory: $export.exportDirectory,
+                    sourceDirectory: assets.sourceDirectory,
+                    hasActiveImages: !assets.images.isEmpty
                 )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
-            .animation(Theme.Animations.spring(), value: vm.isExportingToSource)
+            .animation(Theme.Animations.spring(), value: export.isExportingToSource)
         }
         .padding(.horizontal, 8)
         .padding(.bottom, 8)

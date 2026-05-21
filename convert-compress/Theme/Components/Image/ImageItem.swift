@@ -4,7 +4,9 @@ import AppKit
 // MARK: Main View
 struct ImageItem: View {
     let asset: ImageAsset
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(EncodedOutputModule.self) private var encodedOutput
+    @Environment(ComparisonSessionModule.self) private var comparison
     let heroNamespace: Namespace.ID
     
     @State private var isHovering: Bool = false
@@ -15,13 +17,13 @@ struct ImageItem: View {
     }
     
     var body: some View {
-        let changeInfo = ImageChangeInfo(asset: asset, vm: vm)
-        
+        let displayInfo = encodedOutput.displayInfo(for: asset)
+
         ZStack {
             thumbnailLayer
             fileNameOverlay
             hoverControlsOverlay
-            infoOverlay(changeInfo: changeInfo)
+            infoOverlay(displayInfo: displayInfo)
         }
         .contentShape(Rectangle())
         .onHover(perform: handleHover)
@@ -29,23 +31,22 @@ struct ImageItem: View {
         .overlay { hoverBorder }
         .onDisappear { removeKeyMonitor() }
     }
-}
 
-// MARK: View Components
-private extension ImageItem {
-    var isActiveComparison: Bool {
-        vm.comparisonSelection?.assetID == asset.id
+    // MARK: View Components
+
+    private var isActiveComparison: Bool {
+        comparison.comparisonSelection?.assetID == asset.id
     }
     
     /// Only the currently-compared grid item (or all items when no comparison is active)
     /// should participate in the hero geometry group. Other items use `properties: []`
     /// so they don't produce stale matches during rapid navigation.
-    var heroProperties: MatchedGeometryProperties {
-        vm.comparisonSelection == nil || isActiveComparison ? .frame : []
+    private var heroProperties: MatchedGeometryProperties {
+        comparison.comparisonSelection == nil || isActiveComparison ? .frame : []
     }
     
     @ViewBuilder
-    var thumbnailLayer: some View {
+    private var thumbnailLayer: some View {
         ZStack {
             if let thumb = asset.thumbnail {
                 ImageThumbnail(thumbnail: thumb)
@@ -62,7 +63,7 @@ private extension ImageItem {
         .opacity(isActiveComparison ? 0 : 1)
     }
     
-    var fileNameOverlay: some View {
+    private var fileNameOverlay: some View {
         ZStack(alignment: .topLeading) {
             Color.clear
             SingleLineOverlayBadge(text: fileName)
@@ -75,21 +76,21 @@ private extension ImageItem {
         }
     }
     
-    var hoverControlsOverlay: some View {
+    private var hoverControlsOverlay: some View {
         ZStack(alignment: .topTrailing) {
             Color.clear
             HoverControls(asset: asset, isVisible: isHovering)
         }
     }
     
-    func infoOverlay(changeInfo: ImageChangeInfo) -> some View {
+    private func infoOverlay(displayInfo: ImageAssetDisplayInfo) -> some View {
         ZStack(alignment: .bottomLeading) {
             Color.clear
-            InfoOverlay(changeInfo: changeInfo)
+            InfoOverlay(displayInfo: displayInfo)
         }
     }
     
-    var hoverBorder: some View {
+    private var hoverBorder: some View {
         RoundedRectangle(cornerRadius: 10, style: .continuous)
             .inset(by: isHovering ? -2 : 0)
             .stroke(Color.secondary, lineWidth: 1.5)
@@ -97,7 +98,7 @@ private extension ImageItem {
             .animation(.easeInOut(duration: 0.15), value: isHovering)
     }
     
-    func handleHover(_ hovering: Bool) {
+    private func handleHover(_ hovering: Bool) {
         isHovering = hovering
         if hovering {
             installKeyMonitor()
@@ -105,21 +106,20 @@ private extension ImageItem {
             removeKeyMonitor()
         }
     }
-}
 
-// MARK: Keyboard Handling
-private extension ImageItem {
-    func installKeyMonitor() {
+    // MARK: Keyboard Handling
+
+    private func installKeyMonitor() {
         removeKeyMonitor()
-        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [weak vm, asset] event in
+        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [assets, comparison, asset] event in
             // Spacebar
             if event.keyCode == 49 {
-                vm?.presentComparison(for: asset)
+                comparison.presentComparison(for: asset)
                 return nil
             }
             // X key
             if event.keyCode == 7 { 
-                vm?.remove(asset)
+                assets.remove(asset)
                 return nil
             }
             return event
@@ -127,7 +127,7 @@ private extension ImageItem {
         keyEventMonitor?.start()
     }
     
-    func removeKeyMonitor() {
+    private func removeKeyMonitor() {
         keyEventMonitor?.stop()
         keyEventMonitor = nil
     }

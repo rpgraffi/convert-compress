@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FlipControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     @State private var vFlipRotation: Double = 0
     
@@ -14,13 +14,13 @@ struct FlipControl: View {
     }
     
     private func flipButton() -> some View {
-        Button(action: { vm.flipV.toggle() }) {
+        Button(action: { settings.flipV.toggle() }) {
             ZStack {
                 Circle()
-                    .fill(vm.flipV ? Color.accentColor : Theme.Colors.iconBackground)
+                    .fill(settings.flipV ? Color.accentColor : Theme.Colors.iconBackground)
                 Image(systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill")
                     .font(Theme.Fonts.button)
-                    .foregroundStyle(vm.flipV ? Color.white : Theme.Colors.iconForeground)
+                    .foregroundStyle(settings.flipV ? Color.white : Theme.Colors.iconForeground)
                     .rotation3DEffect(.degrees(vFlipRotation), axis: (x: 0, y: 1, z: 0), perspective: 0.7)
                     .help(String(localized: "Flip Horizontal"))
             }
@@ -29,7 +29,7 @@ struct FlipControl: View {
         .contentShape(Circle())
         .frame(height: controlHeight)
         .aspectRatio(1, contentMode: .fit)
-        .onChange(of: vm.flipV) { _, newValue in
+        .onChange(of: settings.flipV) { _, newValue in
             guard newValue else { return }
             withAnimation(.none) { vFlipRotation = 0 }
             DispatchQueue.main.async {
@@ -40,8 +40,9 @@ struct FlipControl: View {
 }
 
 #Preview {
+    let settings = PipelineSettingsModule()
     FlipControl()
-        .environmentObject(ImageToolsViewModel())
+        .environment(settings)
         .padding()
 }
 

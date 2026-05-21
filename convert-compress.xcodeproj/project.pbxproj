@@ -542,7 +542,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/image-tools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/image-tools";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/convert-compress.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/convert-compress";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -566,7 +566,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/image-tools.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/image-tools";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/convert-compress.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/convert-compress";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;

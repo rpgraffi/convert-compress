@@ -5,7 +5,8 @@ struct HoverControls: View {
     let asset: ImageAsset
     let isVisible: Bool
 
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
+    @Environment(EncodedOutputModule.self) private var encodedOutput
     @State private var copyState: CopyState = .idle
 
     private enum CopyState {
@@ -74,7 +75,7 @@ struct HoverControls: View {
     }
 
     private var removeButton: some View {
-        Button(role: .destructive, action: { vm.remove(asset) }) {
+        Button(role: .destructive, action: { assets.remove(asset) }) {
             Image(systemName: "xmark.circle.fill")
         }
         .buttonStyle(.plain)
@@ -84,24 +85,19 @@ struct HoverControls: View {
     private func copyToClipboard() {
         copyState = .loading
 
-        let cached = vm.cachedProcessedData(for: asset.id)
-        let preEncoded = cached.map { (data: $0.data, uti: $0.uti) }
-        let pipeline = vm.buildPipeline()
         let localAsset = asset
 
-        Task.detached {
-            let success: Bool
+        Task {
             do {
-                let tempURL = try pipeline.renderTemporaryURL(on: localAsset, preEncoded: preEncoded)
+                let tempURL = try await encodedOutput.temporaryEncodedOutputURL(for: localAsset)
                 ClipboardService.copyFileURL(tempURL)
-                success = true
+                copyState = .success
             } catch {
-                success = false
+                copyState = .error
             }
 
-            await MainActor.run { copyState = success ? .success : .error }
             try? await Task.sleep(for: .seconds(1))
-            await MainActor.run { copyState = .idle }
+            copyState = .idle
         }
     }
 }

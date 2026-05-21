@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct PresetPopover: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
+    @Environment(PresetLibraryModule.self) private var presets
     @Binding var isPresented: Bool
     @State private var isAddingPreset = false
     @State private var newPresetName = ""
@@ -11,7 +12,7 @@ struct PresetPopover: View {
         VStack(spacing: 0) {
             
             // Presets list
-            if vm.presets.isEmpty {
+            if presets.presets.isEmpty {
                 VStack(spacing: 4) {
                     Text("Here are your presets")
                         .foregroundStyle(.secondary)
@@ -26,7 +27,7 @@ struct PresetPopover: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 0) {
-                            ForEach(Array(vm.presets.enumerated()), id: \.element.id) { index, preset in
+                            ForEach(Array(presets.presets.enumerated()), id: \.element.id) { index, preset in
                                 PresetListItem(
                                     preset: preset,
                                     index: index,
@@ -38,8 +39,8 @@ struct PresetPopover: View {
                         .padding(8)
                     }
                     .frame(maxHeight: 400)
-                    .onChange(of: vm.presets.count) { oldCount, newCount in
-                        guard newCount > oldCount, let lastPreset = vm.presets.last else { return }
+                    .onChange(of: presets.presets.count) { oldCount, newCount in
+                        guard newCount > oldCount, let lastPreset = presets.presets.last else { return }
                         Task { @MainActor in
                             await Task.yield()
                             withAnimation(.easeOut(duration: 0.30)) {
@@ -91,7 +92,7 @@ struct PresetPopover: View {
     
     private var inlinePresetEditor: some View {
         PresetItemView(
-            configuration: vm.currentConfiguration,
+            configuration: settings.currentConfiguration,
             name: $newPresetName,
             isEditing: true,
             backgroundColor: Color.accentColor.opacity(0.10),
@@ -126,7 +127,7 @@ struct PresetPopover: View {
     
     private func saveNewPreset() {
         let trimmedName = newPresetName.trimmingCharacters(in: .whitespacesAndNewlines)
-        vm.savePreset(name: trimmedName.isEmpty ? nil : trimmedName)
+        presets.savePreset(name: trimmedName.isEmpty ? nil : trimmedName)
         
         withAnimation(.easeInOut(duration: 0.2)) {
             isAddingPreset = false

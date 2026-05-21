@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct ComparisonBottom: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
-    
-    let asset: ImageAsset
+    let displayInfo: ImageAssetDisplayInfo
     
     var body: some View {
         HStack(alignment: .bottom) {
@@ -31,52 +29,31 @@ struct ComparisonBottom: View {
             }
             
             // Format badge
-            if let format = isOriginal ? originalFormat : targetFormat {
+            if let format = isOriginal ? displayInfo.originalFormat : displayInfo.targetFormat {
                 SingleLineOverlayBadge(text: format.displayName, padding: 4)
             }
             
             // Resolution badge
-            if let size = isOriginal ? asset.originalPixelSize : targetPixelSize {
+            if let size = isOriginal ? displayInfo.originalPixelSize : displayInfo.targetPixelSize {
                 SingleLineOverlayBadge(text: "\(Int(size.width))×\(Int(size.height))", padding: 4)
             }
             
             // File size badge
-            if let bytes = isOriginal ? asset.originalFileSizeBytes : estimatedOutputBytes {
-                SingleLineOverlayBadge(text: ByteFormatting.string(forByteCount: bytes), padding: 4)
+            if let bytes = isOriginal ? displayInfo.originalFileSizeBytes : displayInfo.outputByteCount {
+                SingleLineOverlayBadge(text: FileSizeFormat.string(forByteCount: bytes), padding: 4)
             }
             
             // Savings badges (only for preview/processed side)
             if !isOriginal,
-               let original = asset.originalFileSizeBytes,
-               let estimated = estimatedOutputBytes,
-               original != estimated {
-                let difference = original - estimated
+               let difference = displayInfo.outputByteDifference,
+               let percentChange = displayInfo.outputByteChangePercent {
                 let sign = difference > 0 ? "-" : "+"
                 let absValue = abs(difference)
-                let percentChange = Int(round(Double(absValue) / Double(original) * 100))
                 
-                SingleLineOverlayBadge(text: "\(sign)\(ByteFormatting.string(forByteCount: absValue))", padding: 4)
+                SingleLineOverlayBadge(text: "\(sign)\(FileSizeFormat.string(forByteCount: absValue))", padding: 4)
                 SingleLineOverlayBadge(text: "\(sign)\(percentChange)%", padding: 4)
             }
         }
-    }
-    
-    // MARK: - Computed Properties
-    
-    private var originalFormat: ImageFormat? {
-        ImageExporter.inferFormat(from: asset.originalURL)
-    }
-    
-    private var targetFormat: ImageFormat? {
-        vm.selectedFormat ?? originalFormat
-    }
-    
-    private var targetPixelSize: CGSize? {
-        vm.previewInfo(for: asset).targetPixelSize
-    }
-    
-    private var estimatedOutputBytes: Int? {
-        vm.estimatedByteCount(for: asset.id)
     }
 }
 

@@ -12,6 +12,7 @@ struct ImageAsset: Identifiable, Hashable {
     // Metadata
     var originalPixelSize: CGSize?
     var originalFileSizeBytes: Int?
+    var originalFormat: ImageFormat?
 
     init(url: URL) {
         self.id = UUID()
@@ -22,5 +23,6 @@ struct ImageAsset: Identifiable, Hashable {
         self.backupURL = nil
         self.originalPixelSize = nil
         self.originalFileSizeBytes = nil
+        self.originalFormat = nil
     }
 }

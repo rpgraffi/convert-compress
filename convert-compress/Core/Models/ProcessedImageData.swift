@@ -8,4 +8,8 @@ struct ProcessedImageData {
     let data: Data
     let uti: UTType
     let configuration: ProcessingConfiguration
+
+    var encodedOutput: (data: Data, uti: UTType) {
+        (data, uti)
+    }
 }

@@ -3,27 +3,22 @@ import UniformTypeIdentifiers
 import AppKit
 
 struct FormatControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     private let controlHeight: CGFloat = Theme.Metrics.controlHeight
     
     @State private var keyEventMonitor: LocalEventMonitor?
     
     private var pinnedFormats: [ImageFormat] {
-        [ImageFormat(utType: .png), ImageFormat(utType: .jpeg), ImageFormat(utType: .heic), ImageFormat(utType: .webP)]
-            .filter { ImageIOCapabilities.shared.supportsWriting(utType: $0.utType) }
+        settings.pinnedWritableFormats
     }
     
     private var otherFormats: [ImageFormat] {
-        let pinnedIds = Set(pinnedFormats.map { $0.id })
-        return ImageIOCapabilities.shared
-            .writableFormats()
-            .filter { !pinnedIds.contains($0.id) }
-            .sorted { $0.displayName < $1.displayName }
+        settings.otherWritableFormats
     }
     
     private var selectedLabel: String {
-        vm.selectedFormat?.displayName ?? String(localized: "Format")
+        settings.selectedFormat?.displayName ?? String(localized: "Format")
     }
     
     private func shortcutFor(format: ImageFormat) -> Character? {
@@ -37,8 +32,7 @@ struct FormatControl: View {
     }
     
     private func selectFormat(_ format: ImageFormat?) {
-        vm.selectedFormat = format
-        if let f = format { vm.bumpRecentFormats(f) }
+        settings.selectFormat(format)
     }
     
     var body: some View {
@@ -60,25 +54,28 @@ struct FormatControl: View {
                 
                 Text(selectedLabel)
                     .font(Theme.Fonts.button)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .contentTransition(.opacity)
             }
-            .foregroundStyle(vm.selectedFormat != nil ? Color.accentColor : .primary)
+            .foregroundStyle(settings.selectedFormat != nil ? Color.accentColor : .primary)
+            .fixedSize(horizontal: true, vertical: false)
         }
         .menuStyle(.borderlessButton)
-        .help(vm.selectedFormat?.fullName ?? "")
+        .help(settings.selectedFormat?.fullName ?? "")
         .frame(height: controlHeight)
         .padding(.horizontal, 8)
         .background(shape.fill(Theme.Colors.controlBackground))
+        .animation(Theme.Animations.spring(), value: settings.selectedFormat?.id)
         .onAppear { installKeyMonitor() }
         .onDisappear { removeKeyMonitor() }
     }
-}
 
-// MARK: - Menu Builders
-private extension FormatControl {
+    // MARK: - Menu Builders
+
     @ViewBuilder
-    func recentSection() -> some View {
+    private func recentSection() -> some View {
         let pinnedIds = Set(pinnedFormats.map { $0.id })
-        let recents = vm.recentFormats.filter { !pinnedIds.contains($0.id) }.prefix(3)
+        let recents = settings.recentFormats.filter { !pinnedIds.contains($0.id) }.prefix(3)
         if !recents.isEmpty {
             Section(String(localized: "Recent")) {
                 ForEach(Array(recents), id: \.id) { f in
@@ -90,7 +87,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func pinnedSection() -> some View {
+    private func pinnedSection() -> some View {
         Section {
             ForEach(pinnedFormats, id: \.id) { f in
                 pinnedRowButton(f)
@@ -99,7 +96,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func moreSection() -> some View {
+    private func moreSection() -> some View {
         if !otherFormats.isEmpty {
             Menu(String(localized: "More")) {
                 ForEach(otherFormats, id: \.id) { f in
@@ -111,7 +108,7 @@ private extension FormatControl {
     }
     
     @ViewBuilder
-    func pinnedRowButton(_ f: ImageFormat) -> some View {
+    private func pinnedRowButton(_ f: ImageFormat) -> some View {
         if let shortcut = shortcutFor(format: f) {
             Button(f.displayName) { selectFormat(f) }
                 .keyboardShortcut(KeyEquivalent(shortcut), modifiers: [])
@@ -121,14 +118,13 @@ private extension FormatControl {
                 .help(f.fullName)
         }
     }
-}
 
-// MARK: - Keyboard Handling
-private extension FormatControl {
-    func installKeyMonitor() {
+    // MARK: - Keyboard Handling
+
+    private func installKeyMonitor() {
         removeKeyMonitor()
         keyEventMonitor = LocalEventMonitor(mask: .keyDown) { event in
-            if FirstResponderFocus.isTextInputFocused {
+            if KeyWindowEditing.isTextInputFocused {
                 return event
             }
             
@@ -150,7 +146,7 @@ private extension FormatControl {
         keyEventMonitor?.start()
     }
     
-    func removeKeyMonitor() {
+    private func removeKeyMonitor() {
         keyEventMonitor?.stop()
         keyEventMonitor = nil
     }
@@ -158,31 +154,31 @@ private extension FormatControl {
 
 struct FormatControlView_Previews: PreviewProvider {
     static var previews: some View {
-        let vmDefault = ImageToolsViewModel()
-        let vmPNG: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsDefault = PipelineSettingsModule()
+        let settingsPNG: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .png)
             return v
         }()
-        let vmJPEG: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsJPEG: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .jpeg)
             return v
         }()
-        let vmWebP: ImageToolsViewModel = {
-            let v = ImageToolsViewModel()
+        let settingsWebP: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
             v.selectedFormat = ImageFormat(utType: .webP)
             return v
         }()
         return VStack(alignment: .leading, spacing: 16) {
             FormatControl()
-                .environmentObject(vmDefault)
+                .environment(settingsDefault)
             FormatControl()
-                .environmentObject(vmPNG)
+                .environment(settingsPNG)
             FormatControl()
-                .environmentObject(vmJPEG)
+                .environment(settingsJPEG)
             FormatControl()
-                .environmentObject(vmWebP)
+                .environment(settingsWebP)
         }
         .padding()
         .frame(width: 360)

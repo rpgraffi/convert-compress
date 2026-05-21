@@ -1,5 +1,4 @@
 import Foundation
-import AppKit
 
 /// Manages security-scoped access to a URL. Automatically stops access on deinit.
 final class SandboxAccessToken {
@@ -40,7 +39,11 @@ actor SandboxAccessManager {
 
     /// Ensures we have write access to a directory, prompting user if needed.
     @discardableResult
-    func requestAccessIfNeeded(to directory: URL, message: String?) async -> Bool {
+    func requestAccessIfNeeded(
+        to directory: URL,
+        message: String?,
+        panelView: SandboxAccessPanelView = SandboxAccessPanelView()
+    ) async -> Bool {
         let dir = directory.standardizedFileURL
         
         // Already granted in this session?
@@ -55,22 +58,7 @@ actor SandboxAccessManager {
             return true
         }
 
-        // Ask user for permission (NSOpenPanel must run on main thread)
-        let selected = await MainActor.run { () -> URL? in
-            let panel = NSOpenPanel()
-            panel.message = message ?? String(localized: "Allow access to this folder.")
-            panel.prompt = String(localized: "Allow")
-            panel.allowsMultipleSelection = false
-            panel.canChooseFiles = false
-            panel.canChooseDirectories = true
-            panel.canCreateDirectories = false
-            panel.directoryURL = dir
-            
-            guard panel.runModal() == .OK, let url = panel.urls.first else {
-                return nil
-            }
-            return url.standardizedFileURL
-        }
+        let selected = await panelView.requestAccess(to: dir, message: message)
         
         guard let selected else {
             AppLogger.sandbox.warning("Access denied: \(dir.path, privacy: .public)")

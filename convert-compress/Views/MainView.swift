@@ -3,7 +3,7 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct MainView: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(AssetCollectionModule.self) private var assets
     @Bindable private var paywallCoordinator = PaywallCoordinator.shared
     @Bindable private var ratingCoordinator = RatingCoordinator.shared
     
@@ -14,7 +14,7 @@ struct MainView: View {
             ContentArea()
             BottomBar()
         }
-        .frame(minWidth: 680)
+        .frame(minWidth: ControlLayout.mainWindowMinWidth)
         .background(.thickMaterial)
         .ignoresSafeArea(.all, edges: .top)
         .onAppear {
@@ -24,7 +24,7 @@ struct MainView: View {
         .focusable()
         .focusEffectDisabled()
         .onCommand(#selector(NSText.paste(_:))) {
-            vm.addFromPasteboard()
+            assets.addFromPasteboard()
         }
         .sheet(isPresented: $paywallCoordinator.isPresented) {
             PaywallView()
@@ -36,6 +36,7 @@ struct MainView: View {
 }
 
 #Preview {
+    let modules = ImageToolsModules()
     MainView()
-        .environmentObject(ImageToolsViewModel())
+        .imageToolsEnvironment(modules)
 }

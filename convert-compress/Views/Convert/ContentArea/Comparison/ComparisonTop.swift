@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ComparisonTop: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(ComparisonSessionModule.self) private var comparison
     
     let asset: ImageAsset
     let heroNamespace: Namespace.ID
@@ -17,8 +17,8 @@ struct ComparisonTop: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 4) {
-            if let currentIndex = vm.images.firstIndex(where: { $0.id == asset.id }) {
-                SingleLineOverlayBadge(text: "\(currentIndex + 1)/\(vm.images.count)")
+            if let indexLabel = comparison.indexLabel(for: asset) {
+                SingleLineOverlayBadge(text: indexLabel)
             }
             
             SingleLineOverlayBadge(text: fileName)
@@ -74,7 +74,7 @@ struct ComparisonTop: View {
             .contentShape(Circle())
             .help(sliderPosition < 0.5 ? String(localized: "Show processed image") : String(localized: "Show original image"))
             
-            Button(action: { vm.dismissComparison() }) {
+            Button(action: { comparison.dismissComparison() }) {
                 ZStack {
                     Circle()
                         .fill(.regularMaterial)

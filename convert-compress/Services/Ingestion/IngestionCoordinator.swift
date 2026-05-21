@@ -102,32 +102,6 @@ enum IngestionCoordinator {
         return []
     }
     
-    /// Presents a system open panel for selecting image files or directories.
-    /// - Parameters:
-    ///   - allowsDirectories: Whether directories can be selected
-    ///   - allowsMultiple: Whether multiple items can be selected
-    ///   - allowedContentTypes: Allowed file types (defaults to images only)
-    ///   - completion: Called with the selected and expanded URLs
-    static func presentOpenPanel(
-        allowsDirectories: Bool = true,
-        allowsMultiple: Bool = true,
-        allowedContentTypes: [UTType] = [.image],
-        completion: @escaping ([URL]) -> Void
-    ) {
-        let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = allowsMultiple
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = allowsDirectories
-        panel.allowedContentTypes = allowedContentTypes
-        
-        guard panel.runModal() == .OK else { return }
-        
-        let expanded: [URL] = panel.urls.flatMap { url in
-            return expandToSupportedImageURLs(from: url.standardizedFileURL)
-        }
-        completion(expanded)
-    }
-    
     // MARK: - Private Helpers
     
     /// Processes multiple providers concurrently and returns all discovered URLs.

@@ -2,43 +2,46 @@ import SwiftUI
 import AppKit
 
 struct ResizeCropControl: View {
-    @EnvironmentObject private var vm: ImageToolsViewModel
+    @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
+        @Bindable var settings = settings
+
         HStack(spacing: 2) {
             // Width field
             InputPillField(
                 label: "W",
-                text: $vm.resizeWidth,
+                text: $settings.resizeWidth,
                 cornerRadius: .infinity
             )
-            .onChange(of: vm.resizeWidth) { _, newValue in
+            .onChange(of: settings.resizeWidth) { _, newValue in
                 parseDimensionsIfNeeded(from: newValue)
             }
             
             // Height field
             InputPillField(
                 label: "H",
-                text: $vm.resizeHeight,
+                text: $settings.resizeHeight,
                 cornerRadius: .infinity
             )
-            .onChange(of: vm.resizeHeight) { _, newValue in
+            .onChange(of: settings.resizeHeight) { _, newValue in
                 parseDimensionsIfNeeded(from: newValue)
             }
         }
         .frame(height: Theme.Metrics.controlHeight)
+        .frame(minWidth: ResizeControl.Layout.pillMinWidth)
         .cornerRadius(.infinity)
     }
     
     /// Parses dimension strings like "680x340", "680 x 340", "680X340", "680 340", "680/340", etc.
     /// If a valid pattern is found, automatically populates both width and height fields.
     private func parseDimensionsIfNeeded(from text: String) {
-        guard let dimensions = DimensionParser.parse(text) else {
+        guard let dimensions = ResizeDimensionParser.parse(text) else {
             return
         }
         
-        vm.resizeWidth = dimensions.width
-        vm.resizeHeight = dimensions.height
+        settings.resizeWidth = dimensions.width
+        settings.resizeHeight = dimensions.height
     }
 }
 
