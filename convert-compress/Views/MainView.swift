@@ -14,7 +14,7 @@ struct MainView: View {
             ContentArea()
             BottomBar()
         }
-        .frame(minWidth: 680)
+        .frame(minWidth: ControlLayout.mainWindowMinWidth)
         .background(.thickMaterial)
         .ignoresSafeArea(.all, edges: .top)
         .onAppear {

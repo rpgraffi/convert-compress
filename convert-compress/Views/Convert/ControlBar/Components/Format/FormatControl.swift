@@ -54,14 +54,18 @@ struct FormatControl: View {
                 
                 Text(selectedLabel)
                     .font(Theme.Fonts.button)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .contentTransition(.opacity)
             }
             .foregroundStyle(settings.selectedFormat != nil ? Color.accentColor : .primary)
+            .fixedSize(horizontal: true, vertical: false)
         }
         .menuStyle(.borderlessButton)
         .help(settings.selectedFormat?.fullName ?? "")
         .frame(height: controlHeight)
         .padding(.horizontal, 8)
         .background(shape.fill(Theme.Colors.controlBackground))
+        .animation(Theme.Animations.spring(), value: settings.selectedFormat?.id)
         .onAppear { installKeyMonitor() }
         .onDisappear { removeKeyMonitor() }
     }

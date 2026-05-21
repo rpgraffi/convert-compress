@@ -5,10 +5,12 @@ import AppKit
 struct ResizeControl: View {
     @Environment(PipelineSettingsModule.self) private var settings
     
-    private let controlMaxWidth: CGFloat = Theme.Metrics.controlMaxWidth
+    private var showsModeToggle: Bool {
+        settings.allowedSquareSizes == nil
+    }
     
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: Layout.pillSpacing) {
             Group {
                 if let sizes = settings.allowedSquareSizes {
                     SquaresResizeControl(allowedSizes: sizes.sorted())
@@ -16,11 +18,11 @@ struct ResizeControl: View {
                     UnrestrictedResizeControl()
                 }
             }
-            .frame(minWidth: Theme.Metrics.controlMinWidth)
+            .frame(minWidth: Layout.pillMinWidth, maxWidth: Theme.Metrics.controlMaxWidth)
             .help(String(localized: "Change image size"))
             
             
-            if settings.allowedSquareSizes == nil {
+            if showsModeToggle {
                 CircleIconButton(action: toggleMode) {
                     Image(systemName: settings.resizeMode == .resize ? "crop" : "arrow.down.forward.and.arrow.up.backward")
                         .font(.system(size: 11, weight: .medium))
@@ -31,7 +33,10 @@ struct ResizeControl: View {
             }
         }
         .frame(height: Theme.Metrics.controlHeight)
-        .frame(maxWidth: controlMaxWidth + 36)
+        .frame(
+            minWidth: ControlLayout.resizeControlMinWidth(includesModeToggle: showsModeToggle),
+            maxWidth: ControlLayout.resizeControlMaxWidth(includesModeToggle: showsModeToggle)
+        )
         .animation(Theme.Animations.spring(), value: settings.resizeMode)
     }
     
@@ -43,5 +48,12 @@ struct ResizeControl: View {
                 settings.resizeMode = .resize
             }
         }
+    }
+}
+
+extension ResizeControl {
+    enum Layout {
+        static let pillSpacing: CGFloat = 4
+        static let pillMinWidth: CGFloat = 168
     }
 }

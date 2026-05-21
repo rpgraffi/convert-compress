@@ -28,6 +28,7 @@ struct UnrestrictedResizeControl: View {
                     }
                 }
             }
+            .frame(minWidth: ResizeControl.Layout.pillMinWidth)
         }
     }
     

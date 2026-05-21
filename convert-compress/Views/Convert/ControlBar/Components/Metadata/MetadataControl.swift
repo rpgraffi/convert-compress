@@ -9,6 +9,13 @@ struct MetadataControl: View {
         StrikePillToggle(isOn: $settings.removeMetadata) {
             Text(String(localized: "Metadata"))
         }
+        .frame(minWidth: Layout.minWidth)
         .help(String(localized: settings.removeMetadata ? "Metadata will be removed" : "Preserve metadata"))
     }
-} 
+}
+
+extension MetadataControl {
+    enum Layout {
+        static let minWidth: CGFloat = 92
+    }
+}

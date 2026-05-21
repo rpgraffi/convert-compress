@@ -4,7 +4,7 @@ struct ControlsBar: View {
     @Environment(PipelineSettingsModule.self) private var settings
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Layout.spacing) {
             PresetButton()
             FormatControl()
             ResizeControl()
@@ -29,7 +29,14 @@ struct ControlsBar: View {
         .animation(Theme.Animations.spring(), value: settings.shouldShowCompressionControl)
         .animation(Theme.Animations.spring(), value: settings.shouldShowMetadataControl)
         .padding(.bottom, 4)
-        .padding(.horizontal, 8)
+        .padding(.horizontal, Layout.horizontalPadding)
+    }
+}
+
+extension ControlsBar {
+    enum Layout {
+        static let spacing: CGFloat = 16
+        static let horizontalPadding: CGFloat = 8
     }
 }
 

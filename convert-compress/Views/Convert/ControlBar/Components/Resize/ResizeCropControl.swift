@@ -29,6 +29,7 @@ struct ResizeCropControl: View {
             }
         }
         .frame(height: Theme.Metrics.controlHeight)
+        .frame(minWidth: ResizeControl.Layout.pillMinWidth)
         .cornerRadius(.infinity)
     }
     

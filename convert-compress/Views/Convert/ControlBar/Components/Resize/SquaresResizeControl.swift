@@ -18,6 +18,7 @@ struct SquaresResizeControl: View {
                     showSizesMenuAtMouseLocation(sizes: allowedSizes)
                 }
         }
+        .frame(minWidth: ResizeControl.Layout.pillMinWidth)
     }
     
     private func sizesMenu(_ sizes: [Int]) -> some View {
