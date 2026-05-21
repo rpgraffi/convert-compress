@@ -1,40 +1,34 @@
 import Foundation
 
 struct PreviewEncode {
-    static func run(
-        assets: [ImageAsset],
-        configuration: ProcessingConfiguration
-    ) async -> [UUID: ProcessedImageData] {
-        guard !assets.isEmpty else { return [:] }
+    enum Output {
+        case ready(assetID: UUID, data: ProcessedImageData)
+        case failed(assetID: UUID)
 
-        let pipeline = ProcessingPipeline(configuration: configuration)
-        let results = await ConcurrentMap.compactMap(
-            assets,
-            maxConcurrent: 4,
-            priority: .utility
-        ) { asset in
-            processOne(asset: asset, pipeline: pipeline, configuration: configuration)
+        var assetID: UUID {
+            switch self {
+            case .ready(let assetID, _), .failed(let assetID):
+                assetID
+            }
         }
-
-        return Dictionary(uniqueKeysWithValues: results)
     }
 
-    private static func processOne(
+    static func process(
         asset: ImageAsset,
-        pipeline: ProcessingPipeline,
         configuration: ProcessingConfiguration
-    ) -> (UUID, ProcessedImageData)? {
+    ) -> Output {
         do {
+            let pipeline = ProcessingPipeline(configuration: configuration)
             let encoded = try pipeline.renderEncodedData(on: asset)
             let result = ProcessedImageData(
                 data: encoded.data,
                 uti: encoded.uti,
                 configuration: configuration
             )
-            return (asset.id, result)
+            return .ready(assetID: asset.id, data: result)
         } catch {
             AppLogger.processing.error("Preview encode failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            return nil
+            return .failed(assetID: asset.id)
         }
     }
 }

@@ -40,7 +40,7 @@ struct ProcessingPipeline {
     /// Write the processed image to a temporary file and return its URL.
     /// When `preEncoded` is provided, the expensive encode step is skipped.
     func renderTemporaryURL(on asset: ImageAsset, preEncoded: (data: Data, uti: UTType)? = nil) throws -> URL {
-        let encoded = try preEncoded ?? processAndEncode(from: asset.originalURL)
+        let encoded = try preEncoded ?? processAndEncode(asset)
         let ext = ImageIOCapabilities.shared.preferredFilenameExtension(for: encoded.uti)
         let base = asset.originalURL.deletingPathExtension().lastPathComponent
         let tempFilename = base + "_tmp_" + String(UUID().uuidString.prefix(8)) + "." + ext
@@ -51,17 +51,18 @@ struct ProcessingPipeline {
 
     /// Process and return encoded data with the chosen UTType.
     func renderEncodedData(on asset: ImageAsset) throws -> (data: Data, uti: UTType) {
-        return try processAndEncode(from: asset.originalURL)
+        return try processAndEncode(asset)
     }
 
     /// Determine the UTType that encoding will use, without rendering the image.
     func outputUTType(for asset: ImageAsset) -> UTType {
-        let chosenFormat = finalFormat ?? ImageIOCapabilities.shared.formatForURL(asset.originalURL)
+        let chosenFormat = finalFormat ?? asset.originalFormat
         return ProcessedImageEncoder.decideUTTypeForExport(originalURL: asset.originalURL, requestedFormat: chosenFormat)
     }
 
     // MARK: - DRY helper
-    private func processAndEncode(from originalURL: URL) throws -> (data: Data, uti: UTType) {
+    private func processAndEncode(_ asset: ImageAsset) throws -> (data: Data, uti: UTType) {
+        let originalURL = asset.originalURL
         guard let token = SandboxAccessToken(url: originalURL) else {
             throw ImageOperationError.permissionDenied
         }
@@ -71,7 +72,7 @@ struct ProcessingPipeline {
         for operation in operations {
             image = try operation.transformed(image)
         }
-        let chosenFormat = finalFormat ?? ImageIOCapabilities.shared.formatForURL(originalURL)
+        let chosenFormat = finalFormat ?? asset.originalFormat
         let quality = compressionPercent.map { max(min($0, 1.0), 0.01) }
         let encoded = try ProcessedImageEncoder.encodeToData(ciImage: image,
                                                      originalURL: originalURL,

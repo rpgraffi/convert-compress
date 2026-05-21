@@ -10,16 +10,11 @@ struct FormatControl: View {
     @State private var keyEventMonitor: LocalEventMonitor?
     
     private var pinnedFormats: [ImageFormat] {
-        [ImageFormat(utType: .png), ImageFormat(utType: .jpeg), ImageFormat(utType: .heic), ImageFormat(utType: .webP)]
-            .filter { ImageIOCapabilities.shared.supportsWriting(utType: $0.utType) }
+        vm.pinnedWritableFormats
     }
     
     private var otherFormats: [ImageFormat] {
-        let pinnedIds = Set(pinnedFormats.map { $0.id })
-        return ImageIOCapabilities.shared
-            .writableFormats()
-            .filter { !pinnedIds.contains($0.id) }
-            .sorted { $0.displayName < $1.displayName }
+        vm.otherWritableFormats
     }
     
     private var selectedLabel: String {

@@ -9,7 +9,7 @@ struct ControlsBar: View {
             FormatControl()
             ResizeControl()
             
-            if shouldShowCompression {
+            if vm.shouldShowCompressionControl {
                 QualityControl()
                     .transition(.opacity.combined(with: .scale))
             }
@@ -17,7 +17,7 @@ struct ControlsBar: View {
             FlipControl()
             RemoveBackgroundControl()
             
-            if shouldShowMetadata {
+            if vm.shouldShowMetadataControl {
                 MetadataControl()
                     .transition(.opacity.combined(with: .scale))
             }
@@ -27,25 +27,10 @@ struct ControlsBar: View {
         .animation(Theme.Animations.spring(), value: vm.overwriteOriginals)
         .animation(Theme.Animations.spring(), value: vm.removeMetadata)
         .animation(Theme.Animations.spring(), value: vm.allowedSquareSizes)
-        .animation(Theme.Animations.spring(), value: shouldShowCompression)
-        .animation(Theme.Animations.spring(), value: shouldShowMetadata)
+        .animation(Theme.Animations.spring(), value: vm.shouldShowCompressionControl)
+        .animation(Theme.Animations.spring(), value: vm.shouldShowMetadataControl)
         .padding(.bottom, 4)
         .padding(.horizontal, 8)
     }
-    
-    private var shouldShowCompression: Bool {
-        if let f = vm.selectedFormat {
-            return ImageIOCapabilities.shared.capabilities(for: f).supportsQuality
-        }
-        return true
-    }
-    
-    private var shouldShowMetadata: Bool {
-        if let f = vm.selectedFormat {
-            return ImageIOCapabilities.shared.capabilities(for: f).supportsMetadata
-        }
-        return true
-    }
-    
 }
 

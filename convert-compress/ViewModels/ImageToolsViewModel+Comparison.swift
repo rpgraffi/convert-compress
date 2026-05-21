@@ -143,7 +143,7 @@ extension ImageToolsViewModel {
             
             await MainActor.run {
                 if let cacheEntry {
-                    processedCache[assetID] = cacheEntry
+                    processedCache.storeReady(cacheEntry, forKey: assetID)
                 }
                 comparisonPreview = ComparisonPreviewState(
                     originalImage: original,

@@ -59,10 +59,17 @@ final class ImageToolsViewModel: ObservableObject {
     
     // MARK: - Processed Image Cache
     
+    struct PreviewProcessingBatch {
+        let id = UUID()
+        let assetIDs: Set<UUID>
+        let configuration: ProcessingConfiguration
+    }
+
     /// Cached processed results from estimation. Reused by clipboard,
     /// comparison, and export to avoid redundant processing.
     @Published var processedCache = ProcessingCache()
     var processingTask: Task<Void, Never>? = nil
+    var processingBatch: PreviewProcessingBatch? = nil
     let processingDebouncer = Debouncer()
     
     /// IDs of assets currently visible in the grid, updated by ImagesGridView.

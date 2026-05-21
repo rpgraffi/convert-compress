@@ -4819,6 +4819,9 @@
         }
       }
     },
+    "Error" : {
+
+    },
     "Fit to window" : {
       "comment" : "A button that zooms an image to fit exactly within its container.",
       "extractionState" : "manual",

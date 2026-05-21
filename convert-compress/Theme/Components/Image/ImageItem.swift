@@ -15,13 +15,13 @@ struct ImageItem: View {
     }
     
     var body: some View {
-        let changeInfo = ImageChangeInfo(asset: asset, vm: vm)
-        
+        let displayInfo = vm.displayInfo(for: asset)
+
         ZStack {
             thumbnailLayer
             fileNameOverlay
             hoverControlsOverlay
-            infoOverlay(changeInfo: changeInfo)
+            infoOverlay(displayInfo: displayInfo)
         }
         .contentShape(Rectangle())
         .onHover(perform: handleHover)
@@ -81,10 +81,10 @@ struct ImageItem: View {
         }
     }
     
-    private func infoOverlay(changeInfo: ImageChangeInfo) -> some View {
+    private func infoOverlay(displayInfo: ImageAssetDisplayInfo) -> some View {
         ZStack(alignment: .bottomLeading) {
             Color.clear
-            InfoOverlay(changeInfo: changeInfo)
+            InfoOverlay(displayInfo: displayInfo)
         }
     }
     

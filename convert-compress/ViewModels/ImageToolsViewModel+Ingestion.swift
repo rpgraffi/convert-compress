@@ -77,7 +77,7 @@ extension ImageToolsViewModel {
         let fileName = asset.originalURL.lastPathComponent
         AppLogger.ingestion.debug("Thumbnail load begin: \(fileName, privacy: .public)")
         
-        let output = await ThumbnailGenerator.load(for: asset.originalURL, scale: scale)
+        let output = await ImageAssetMetadataLoader.load(for: asset.originalURL, scale: scale)
         
         AppLogger.ingestion.debug("""
             Thumbnail load done: \(fileName, privacy: .public) \
@@ -90,7 +90,7 @@ extension ImageToolsViewModel {
         incrementIngestionProgress()
     }
 
-    private func applyThumbnailUpdate(for asset: ImageAsset, output: ThumbnailGenerator.Output) {
+    private func applyThumbnailUpdate(for asset: ImageAsset, output: ImageAssetMetadataLoader.Output) {
         guard let index = images.firstIndex(where: { $0.id == asset.id }) else {
             AppLogger.ingestion.warning("""
                 Thumbnail update skipped; asset missing: \
@@ -102,6 +102,7 @@ extension ImageToolsViewModel {
         images[index].thumbnail = output.thumbnail
         images[index].originalPixelSize = output.pixelSize
         images[index].originalFileSizeBytes = output.fileSizeBytes
+        images[index].originalFormat = output.originalFormat
         
         AppLogger.ingestion.debug("Thumbnail applied: \(asset.originalURL.lastPathComponent, privacy: .public)")
     }

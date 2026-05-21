@@ -79,7 +79,7 @@ struct ComparisonView: View {
             }
             .overlay(alignment: .bottom) {
                 if showUI {
-                    ComparisonBottom(asset: asset)
+                    ComparisonBottom(displayInfo: vm.displayInfo(for: asset))
                         .transition(
                             .move(edge: .bottom).combined(with: .opacity)
                         )
