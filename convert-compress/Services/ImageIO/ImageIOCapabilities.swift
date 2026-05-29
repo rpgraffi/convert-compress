@@ -2,7 +2,6 @@ import Foundation
 import UniformTypeIdentifiers
 import ImageIO
 import CoreGraphics
-import SDWebImageWebPCoder
 
 final class ImageIOCapabilities {
     static let shared = ImageIOCapabilities()
@@ -26,7 +25,7 @@ final class ImageIOCapabilities {
         // ImageIO may not advertise WebP as a destination type on all systems
         self.writableTypes.insert(UTType.webP.identifier)
 
-        // Ensure AVIF appears as readable + writable via SDWebImageAVIFCoder
+        // Ensure AVIF appears as readable + writable via the custom AVIF encoder.
         self.readableTypes.insert(UTType.avif.identifier)
         self.writableTypes.insert(UTType.avif.identifier)
 
@@ -67,11 +66,11 @@ final class ImageIOCapabilities {
         }
         // Ensure some common types appear first in a stable, human-friendly order
         let priority: [String: Int] = [
-            UTType.jpeg.identifier: 0,
-            UTType.png.identifier: 1,
-            UTType.heic.identifier: 2,
-            UTType.webP.identifier: 3,
-            UTType.avif.identifier: 4,
+            UTType.avif.identifier: 0,
+            UTType.jpeg.identifier: 1,
+            UTType.png.identifier: 2,
+            UTType.heic.identifier: 3,
+            UTType.webP.identifier: 4,
             UTType.tiff.identifier: 5,
             UTType.bmp.identifier: 6,
             UTType.gif.identifier: 7
