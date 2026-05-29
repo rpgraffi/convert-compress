@@ -62,6 +62,8 @@ struct ProcessingPipeline {
 
     // MARK: - DRY helper
     private func processAndEncode(_ asset: ImageAsset) throws -> (data: Data, uti: UTType) {
+        try Task.checkCancellation()
+
         let originalURL = asset.originalURL
         guard let token = SandboxAccessToken(url: originalURL) else {
             throw ImageOperationError.permissionDenied
@@ -70,8 +72,12 @@ struct ProcessingPipeline {
 
         var image = try loadCIImage(from: originalURL, operations: operations)
         for operation in operations {
+            try Task.checkCancellation()
             image = try operation.transformed(image)
         }
+
+        try Task.checkCancellation()
+
         let chosenFormat = finalFormat ?? asset.originalFormat
         let quality = compressionPercent.map { max(min($0, 1.0), 0.01) }
         let encoded = try ProcessedImageEncoder.encodeToData(ciImage: image,
@@ -79,6 +85,8 @@ struct ProcessingPipeline {
                                                      format: chosenFormat,
                                                      compressionQuality: quality,
                                                      stripMetadata: removeMetadata)
+        try Task.checkCancellation()
+
         return encoded
     }
 }

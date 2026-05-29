@@ -7,6 +7,7 @@ final class ImageToolsModules {
     let encodedOutput: EncodedOutputModule
     let comparison: ComparisonSessionModule
     let export: ExportSessionModule
+    let session: ImageToolsSessionModule
     let presets: PresetLibraryModule
 
     init() {
@@ -23,42 +24,21 @@ final class ImageToolsModules {
             assets: assets,
             encodedOutputCache: encodedOutput.cache
         )
+        let session = ImageToolsSessionModule(
+            settings: settings,
+            assets: assets,
+            encodedOutput: encodedOutput,
+            comparison: comparison,
+            export: export
+        )
         let presets = PresetLibraryModule(settings: settings)
-
-        settings.sourceSizeForRestrictedFormat = { [weak assets] in
-            assets?.firstSourceSizeForRestrictions()
-        }
-        settings.onConfigurationChanged = { [weak encodedOutput, weak comparison] _ in
-            encodedOutput?.scheduleProcessing()
-            comparison?.scheduleComparisonPreviewRefresh()
-        }
-
-        assets.shouldClearSourceDirectoryOnClear = { [weak export] in
-            export?.exportDirectory == nil
-        }
-        assets.onImagesChanged = { [weak comparison] in
-            comparison?.refreshComparisonPreviewIfNeeded()
-        }
-        assets.onAssetRemoved = { [weak encodedOutput, weak comparison] assetID in
-            encodedOutput?.removeValue(forKey: assetID)
-            comparison?.dismissIfSelected(assetIDs: [assetID])
-        }
-        assets.onAllAssetsCleared = { [weak encodedOutput, weak comparison] in
-            encodedOutput?.removeAll()
-            comparison?.dismissComparison()
-        }
-        assets.onExportedAssetsCleared = { [weak encodedOutput, weak comparison] exportedIDs in
-            for id in exportedIDs {
-                encodedOutput?.removeValue(forKey: id)
-            }
-            comparison?.dismissIfSelected(assetIDs: exportedIDs)
-        }
 
         self.settings = settings
         self.assets = assets
         self.encodedOutput = encodedOutput
         self.comparison = comparison
         self.export = export
+        self.session = session
         self.presets = presets
     }
 }
@@ -72,6 +52,7 @@ extension View {
             .environment(modules.encodedOutput)
             .environment(modules.comparison)
             .environment(modules.export)
+            .environment(modules.session)
             .environment(modules.presets)
     }
 }

@@ -14,11 +14,8 @@ final class AssetCollectionModule {
     var sourceDirectory: URL?
     var ingestionProgress = ProgressState()
 
-    @ObservationIgnored var shouldClearSourceDirectoryOnClear: (() -> Bool)?
     @ObservationIgnored var onImagesChanged: (() -> Void)?
-    @ObservationIgnored var onAssetRemoved: ((UUID) -> Void)?
-    @ObservationIgnored var onAllAssetsCleared: (() -> Void)?
-    @ObservationIgnored var onExportedAssetsCleared: ((Set<UUID>) -> Void)?
+    @ObservationIgnored private var ingestionTasks: [UUID: Task<Void, Never>] = [:]
 
     var ingestFraction: Double {
         ingestionProgress.fraction
@@ -35,18 +32,16 @@ final class AssetCollectionModule {
     }
 
     func addURLs(_ urls: [URL]) {
-        Task(priority: .medium) { [weak self] in
-            await self?.ingest(urls: urls)
+        let taskID = UUID()
+        ingestionTasks[taskID] = Task(priority: .medium) { [weak self] in
+            await self?.runIngestionTask(id: taskID, urls: urls)
         }
     }
 
     func addProvidersStreaming(_ providers: [NSItemProvider], batchSize: Int = 64) {
-        Task(priority: .medium) { [weak self] in
-            guard let self else { return }
-            let stream = IngestionCoordinator.streamURLs(from: providers, batchSize: batchSize)
-            for await urls in stream {
-                await self.ingest(urls: urls)
-            }
+        let taskID = UUID()
+        ingestionTasks[taskID] = Task(priority: .medium) { [weak self] in
+            await self?.runProviderIngestionTask(id: taskID, providers: providers, batchSize: batchSize)
         }
     }
 
@@ -55,13 +50,16 @@ final class AssetCollectionModule {
         addURLs(urls)
     }
 
-    func remove(_ asset: ImageAsset) {
-        withAnimation(.spring(response: 0.45, dampingFraction: 0.9, blendDuration: 0.2)) {
-            if let index = images.firstIndex(of: asset) {
-                images.remove(at: index)
-            }
+    @discardableResult
+    func remove(_ asset: ImageAsset) -> Bool {
+        guard let index = images.firstIndex(of: asset) else {
+            return false
         }
-        onAssetRemoved?(asset.id)
+
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.9, blendDuration: 0.2)) {
+            images.remove(at: index)
+        }
+        return true
     }
 
     func replaceImages(_ updatedImages: [ImageAsset]) {
@@ -70,23 +68,33 @@ final class AssetCollectionModule {
         }
     }
 
-    func clearAll() {
+    func clearAll(clearSourceDirectory: Bool = true) {
+        cancelIngestion()
+
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
             images.removeAll()
         }
 
-        if shouldClearSourceDirectoryOnClear?() ?? true {
+        if clearSourceDirectory {
             sourceDirectory = nil
         }
-        onAllAssetsCleared?()
     }
 
-    func clearExported() {
+    @discardableResult
+    func clearExported() -> Set<UUID> {
         let exportedIDs = Set(images.filter(\.isEdited).map(\.id))
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.3)) {
             images.removeAll { $0.isEdited }
         }
-        onExportedAssetsCleared?(exportedIDs)
+        return exportedIDs
+    }
+
+    func cancelIngestion() {
+        for task in ingestionTasks.values {
+            task.cancel()
+        }
+        ingestionTasks.removeAll()
+        ingestionProgress.reset()
     }
 
     func firstSourceSizeForRestrictions() -> CGSize? {
@@ -104,7 +112,29 @@ final class AssetCollectionModule {
         return CGSize(width: maxWidth, height: maxHeight)
     }
 
+    private func runIngestionTask(id: UUID, urls: [URL]) async {
+        defer {
+            ingestionTasks[id] = nil
+        }
+
+        await ingest(urls: urls)
+    }
+
+    private func runProviderIngestionTask(id: UUID, providers: [NSItemProvider], batchSize: Int) async {
+        defer {
+            ingestionTasks[id] = nil
+        }
+
+        let stream = IngestionCoordinator.streamURLs(from: providers, batchSize: batchSize)
+        for await urls in stream {
+            guard !Task.isCancelled else { return }
+            await ingest(urls: urls)
+        }
+    }
+
     private func ingest(urls: [URL]) async {
+        guard !Task.isCancelled else { return }
+
         let existingURLs = Set(images.map(\.originalURL))
         guard let prepared = IngestionPlanner().prepare(urls: urls, existingURLs: existingURLs) else {
             return
@@ -119,6 +149,8 @@ final class AssetCollectionModule {
         AppLogger.ingestion.debug("Appended assets. Total images: \(self.images.count, privacy: .public)")
 
         await loadThumbnails(for: prepared.assets)
+
+        guard !Task.isCancelled else { return }
         AppLogger.ingestion.debug("Ingest complete for batch of \(prepared.assets.count, privacy: .public) URLs")
     }
 
@@ -128,6 +160,8 @@ final class AssetCollectionModule {
 
         await withTaskGroup(of: Void.self) { group in
             for asset in assets {
+                guard !Task.isCancelled else { break }
+
                 group.addTask(priority: .medium) { [weak self] in
                     await self?.loadThumbnail(for: asset, scale: scale, semaphore: semaphore)
                 }
@@ -139,10 +173,13 @@ final class AssetCollectionModule {
         await semaphore.acquire()
         defer { Task { await semaphore.release() } }
 
+        guard !Task.isCancelled else { return }
+
         let fileName = asset.originalURL.lastPathComponent
         AppLogger.ingestion.debug("Thumbnail load begin: \(fileName, privacy: .public)")
 
         let output = await ImageAssetMetadataLoader.load(for: asset.originalURL, scale: scale)
+        guard !Task.isCancelled else { return }
 
         AppLogger.ingestion.debug("""
             Thumbnail load done: \(fileName, privacy: .public) \

@@ -4,9 +4,9 @@ import AppKit
 // MARK: Main View
 struct ImageItem: View {
     let asset: ImageAsset
-    @Environment(AssetCollectionModule.self) private var assets
     @Environment(EncodedOutputModule.self) private var encodedOutput
     @Environment(ComparisonSessionModule.self) private var comparison
+    @Environment(ImageToolsSessionModule.self) private var session
     let heroNamespace: Namespace.ID
     
     @State private var isHovering: Bool = false
@@ -111,7 +111,7 @@ struct ImageItem: View {
 
     private func installKeyMonitor() {
         removeKeyMonitor()
-        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [assets, comparison, asset] event in
+        keyEventMonitor = LocalEventMonitor(mask: .keyDown) { [comparison, session, asset] event in
             // Spacebar
             if event.keyCode == 49 {
                 comparison.presentComparison(for: asset)
@@ -119,7 +119,7 @@ struct ImageItem: View {
             }
             // X key
             if event.keyCode == 7 { 
-                assets.remove(asset)
+                session.remove(asset)
                 return nil
             }
             return event

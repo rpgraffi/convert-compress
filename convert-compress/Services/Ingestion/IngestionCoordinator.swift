@@ -46,7 +46,7 @@ enum IngestionCoordinator {
                 return
             }
             
-            Task.detached(priority: .userInitiated) {
+            let producerTask = Task.detached(priority: .userInitiated) {
                 var buffer: [URL] = []
                 
                 func flushBuffer(force: Bool = false) {
@@ -60,20 +60,37 @@ enum IngestionCoordinator {
                 
                 await withTaskGroup(of: [URL].self) { group in
                     for provider in providers {
+                        guard !Task.isCancelled else { break }
+
                         group.addTask {
-                            await processProvider(provider)
+                            guard !Task.isCancelled else { return [] }
+                            return await processProvider(provider)
                         }
                     }
                     
                     for await urls in group {
+                        guard !Task.isCancelled else {
+                            group.cancelAll()
+                            return
+                        }
+
                         guard !urls.isEmpty else { continue }
                         buffer.append(contentsOf: urls)
                         flushBuffer()
                     }
                 }
-                
+
+                guard !Task.isCancelled else {
+                    continuation.finish()
+                    return
+                }
+
                 flushBuffer(force: true)
                 continuation.finish()
+            }
+
+            continuation.onTermination = { _ in
+                producerTask.cancel()
             }
         }
     }
