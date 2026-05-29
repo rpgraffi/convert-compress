@@ -229,7 +229,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B7438E622E7DA6F3003E7442 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
-				B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif.swift" */,
+				B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B77ECCBB2E45573200C28347;
@@ -667,7 +667,7 @@
 				minimumVersion = 0.14.6;
 			};
 		};
-		B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif.swift" */ = {
+		B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/awxkee/avif.swift";
 			requirement = {
@@ -685,7 +685,7 @@
 		};
 		B7A11A032F6A000000000003 /* avif */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif.swift" */;
+			package = B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */;
 			productName = avif;
 		};
 /* End XCSwiftPackageProductDependency section */
