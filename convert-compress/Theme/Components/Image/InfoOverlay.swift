@@ -3,7 +3,45 @@ import SwiftUI
 struct InfoOverlay: View {
     let displayInfo: ImageAssetDisplayInfo
 
-    private static let pendingOutputSizeFrameDuration = 0.30
+    private static let pendingOutputSizeFrameDuration = 0.10
+    private static let pendingBrailleNoiseFrames = [
+        "⠞⠃⣴⠏⢀⡼⠋⣰⡟",
+        "⠟⢁⣾⠏⢀⠞⠃⣴⡟",
+        "⠛⢁⣾⠃⣠⠞⠁⣼⠏",
+        "⠋⢠⡾⠃⣠⠟⢁⣾⠏",
+        "⠋⢠⡿⢁⣴⠋⢀⡾⠃",
+        "⠁⣰⠟⢁⣴⠋⢠⡿⢃",
+        "⠁⣰⠟⢠⡶⠁⢠⠿⢁",
+        "⠀⡼⠟⣠⡾⠁⣰⠟⢡",
+        "⢀⡼⠋⣰⡞⠀⣰⠟⢠",
+        "⢀⡼⠋⣴⡟⢀⡼⠋⣰",
+        "⣠⠞⠁⣴⠏⢀⡼⠋⣰",
+        "⣠⠞⢁⣾⠏⣠⡜⠁⣴",
+        "⣤⠊⢁⣾⠃⣠⠞⠁⣼",
+        "⣴⠊⢀⡿⢃⣤⠎⢀⣾",
+        "⣴⠀⢠⡿⢃⣴⠂⢀⡾",
+        "⡶⠀⣠⠟⢁⣴⠂⢀⡾",
+        "⡶⠀⣠⠟⢡⣶⠀⢠⠟",
+        "⡖⠀⡰⠛⣡⡶⠀⣠⠟",
+        "⡞⢀⡐⠋⣱⡶⠀⡠⠛",
+        "⠟⢀⡀⠋⣱⡾⢀⡀⠋",
+        "⠟⣀⠄⠉⣴⠟⢀⡀⠉",
+        "⠏⣠⠀⠉⣴⠟⣀⡄⠉",
+        "⢏⣠⠀⠁⡴⠟⣠⡄⠉",
+        "⢋⣤⠀⠁⡼⠟⣠⡄⠁",
+        "⢋⣤⠊⠀⠼⢟⣤⠄⠁",
+        "⢋⣴⠊⠀⠼⢋⣤⠎⠀",
+        "⢣⣴⠋⠀⠜⢋⣴⠎⠀",
+        "⢡⣶⠃⠀⠚⢋⣴⠏⠀",
+        "⢡⣾⠃⡀⠚⢁⣶⠏⢀",
+        "⢠⡾⢁⡠⠛⢁⣾⠇⣀",
+        "⢰⡿⢁⡠⠋⢠⣾⢃⣠",
+        "⣰⡿⢁⡴⠋⢠⡿⢃⣠",
+        "⣰⠟⣀⡴⠁⢰⠿⢁⣴",
+        "⡼⠟⣠⡞⠁⢰⠟⢁⡴",
+        "⡼⠋⣠⡞⠁⡰⠟⣠⡾",
+        "⡾⠋⣴⡟⠀⡼⠋⣠⡾"
+    ]
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 6) {
@@ -44,9 +82,10 @@ struct InfoOverlay: View {
         if let originalSize = displayInfo.originalFileSizeBytes {
             let originalSizeText = FileSizeFormat.string(forByteCount: originalSize)
 
-            if displayInfo.outputStatus == .pending {
+            switch displayInfo.outputStatus {
+            case nil, .pending:
                 TimelineView(.periodic(from: .now, by: Self.pendingOutputSizeFrameDuration)) { context in
-                    fileSizeBadgeContent(
+                    pendingFileSizeBadgeContent(
                         originalSizeText: originalSizeText,
                         outputSizeText: Self.pendingOutputSizeText(
                             length: originalSizeText.count,
@@ -54,10 +93,15 @@ struct InfoOverlay: View {
                         )
                     )
                 }
-            } else {
+            case .ready(let byteCount):
                 fileSizeBadgeContent(
                     originalSizeText: originalSizeText,
-                    outputSizeText: outputSizeText
+                    outputSizeText: FileSizeFormat.string(forByteCount: byteCount)
+                )
+            case .failed:
+                fileSizeBadgeContent(
+                    originalSizeText: originalSizeText,
+                    outputSizeText: String(localized: "Error")
                 )
             }
         }
@@ -71,39 +115,45 @@ struct InfoOverlay: View {
         )
     }
 
+    @ViewBuilder
+    private func pendingFileSizeBadgeContent(originalSizeText: String, outputSizeText: String) -> some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            Text(originalSizeText)
+                .foregroundStyle(.secondary)
+            Text(originalSizeText)
+                .hidden()
+                .overlay(alignment: .trailing) {
+                    Text(outputSizeText)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+                .clipped()
+        }
+        .font(Theme.Fonts.captionMono)
+        .monospaced(true)
+        .padding(6)
+        .background(OverlayBackground(cornerRadius: 6))
+    }
+
     private static func pendingOutputSizeText(length: Int, at date: Date) -> String {
         guard length > 0 else {
             return ""
         }
 
-        let frameCount = length * 2
         let frameIndex = Int(date.timeIntervalSinceReferenceDate / pendingOutputSizeFrameDuration)
-            % frameCount
+            % pendingBrailleNoiseFrames.count
 
-        if frameIndex <= length {
-            let dashCount = length - frameIndex
-            return String(repeating: " ", count: frameIndex)
-                + String(repeating: "-", count: dashCount)
-        }
-
-        let dashCount = frameIndex - length
-        return String(repeating: "-", count: dashCount)
-            + String(repeating: " ", count: length - dashCount)
+        return Self.withCharacterCount(pendingBrailleNoiseFrames[frameIndex], length)
     }
 
-    private var outputSizeText: String {
-        guard let outputStatus = displayInfo.outputStatus else {
-            return "--- KB"
+    private static func withCharacterCount(_ text: String, _ length: Int) -> String {
+        if text.count > length {
+            return String(text.prefix(length))
         }
-
-        switch outputStatus {
-        case .pending:
-            return "--- KB"
-        case .ready(let byteCount):
-            return FileSizeFormat.string(forByteCount: byteCount)
-        case .failed:
-            return String(localized: "Error")
+        if text.count < length {
+            return text + String(repeating: " ", count: length - text.count)
         }
+        return text
     }
 
     private func formatResolution(_ size: CGSize, padTo reference: CGSize? = nil) -> String {
