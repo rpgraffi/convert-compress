@@ -56,9 +56,19 @@ final class EncodedOutputCache: ObservableObject {
         }
 
         do {
-            let encoded = try await Task.detached(priority: .utility) {
+            try Task.checkCancellation()
+
+            let renderTask = Task.detached(priority: .utility) {
                 try ProcessingPipeline(configuration: configuration).renderEncodedData(on: asset)
-            }.value
+            }
+            let encoded = try await withTaskCancellationHandler {
+                try await renderTask.value
+            } onCancel: {
+                renderTask.cancel()
+            }
+
+            try Task.checkCancellation()
+
             let data = ProcessedImageData(
                 data: encoded.data,
                 uti: encoded.uti,

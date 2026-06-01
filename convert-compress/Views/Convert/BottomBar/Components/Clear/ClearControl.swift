@@ -3,6 +3,7 @@ import SwiftUI
 struct ClearControl: View {
     @Environment(AssetCollectionModule.self) private var assets
     @Environment(ExportSessionModule.self) private var export
+    @Environment(ImageToolsSessionModule.self) private var session
 
     private var mode: ClearControlMode {
         ClearControlMode(assets: assets, export: export)
@@ -10,7 +11,7 @@ struct ClearControl: View {
 
     var body: some View {
         PillButton(role: .destructive) {
-            mode.perform(assets: assets, export: export)
+            mode.perform(session: session)
         } label: {
             Text(mode.label)
             .contentTransition(.interpolate)
@@ -64,14 +65,14 @@ private enum ClearControlMode: Equatable {
     }
 
     @MainActor
-    func perform(assets: AssetCollectionModule, export: ExportSessionModule) {
+    func perform(session: ImageToolsSessionModule) {
         switch self {
         case .stopExport:
-            export.cancelExport()
+            session.stopExport()
         case .clearExported:
-            assets.clearExported()
+            session.clearExported()
         case .clearAll:
-            assets.clearAll()
+            session.clearAll()
         }
     }
 }

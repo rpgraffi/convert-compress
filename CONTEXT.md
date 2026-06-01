@@ -1,0 +1,5 @@
+# Project Context
+
+## Image Tools Session
+
+The Image Tools Session is the active conversion workspace: loaded image assets, current pipeline settings, preview and comparison work, and export work. Session lifecycle operations keep those modules consistent when the user clears assets, removes an asset, stops export, or changes processing settings.

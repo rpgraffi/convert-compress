@@ -99,6 +99,8 @@ final class EncodedOutputModule {
     }
 
     func removeAll() {
+        processingDebouncer.cancel()
+        cancelPreviewProcessing()
         encodedOutputCache.removeAll()
     }
 

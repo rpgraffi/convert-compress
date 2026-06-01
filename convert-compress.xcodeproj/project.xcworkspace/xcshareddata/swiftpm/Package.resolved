@@ -1,31 +1,40 @@
 {
-  "originHash" : "edacfc43369527f7c1d472f7ec12ea6a13c4225814b059e0fd3103c426287dee",
+  "originHash" : "338dd383e7afe5beb70c918c8afb6c1abfa96252a19b3e289e4f24d9a643004e",
   "pins" : [
     {
-      "identity" : "libaom-xcode",
+      "identity" : "avif.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libaom-Xcode.git",
+      "location" : "https://github.com/awxkee/avif.swift",
       "state" : {
-        "revision" : "b00c20d10f13608c7579aad1f849e0f815d4d3a8",
-        "version" : "3.0.0"
+        "revision" : "fa187469e86f31797eed5cfc528cc263835cba74",
+        "version" : "2.2.0"
       }
     },
     {
-      "identity" : "libavif-xcode",
+      "identity" : "libaom.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libavif-Xcode.git",
+      "location" : "https://github.com/awxkee/libaom.swift.git",
       "state" : {
-        "revision" : "0dc978b08b9bf8b7d1b505f1cb15218e8f637a6c",
-        "version" : "1.0.0"
+        "revision" : "83e08f0eb34bf6ef95a82d15f4cfbbc2d70deeb2",
+        "version" : "1.1.2"
       }
     },
     {
-      "identity" : "libvmaf-xcode",
+      "identity" : "libdav1d.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libvmaf-Xcode.git",
+      "location" : "https://github.com/awxkee/libdav1d.swift.git",
       "state" : {
-        "revision" : "41db5dc11d05c02d1aca7de0b572a068f528c37c",
-        "version" : "2.3.1"
+        "revision" : "3fb3f25bd7e38203a4954673105143a302c0bfda",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "libsvtav1enc.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/awxkee/libsvtav1enc.swift",
+      "state" : {
+        "revision" : "551a675778aa0dda6d23653ef3d0fc37a8d33c08",
+        "version" : "1.1.0"
       }
     },
     {
@@ -38,21 +47,21 @@
       }
     },
     {
+      "identity" : "nuke",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kean/Nuke.git",
+      "state" : {
+        "revision" : "63a8fcbd6621340a2410bc3e9575ac97058615f4",
+        "version" : "13.0.6"
+      }
+    },
+    {
       "identity" : "sdwebimage",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage.git",
       "state" : {
         "revision" : "b62cb63bf4ed1f04c961a56c9c6c9d5ab8524ec6",
         "version" : "5.21.1"
-      }
-    },
-    {
-      "identity" : "sdwebimageavifcoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageAVIFCoder",
-      "state" : {
-        "revision" : "b6455e16f2752d43e05d58ffbe38aac56e7c1149",
-        "version" : "0.12.0"
       }
     },
     {

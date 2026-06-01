@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B7438E642E7DA6F3003E7442 /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = B7438E632E7DA6F3003E7442 /* SDWebImageWebPCoder */; };
-		B7D9FFF92F696EF00049799A /* SDWebImageAVIFCoder in Frameworks */ = {isa = PBXBuildFile; productRef = B7D9FFF82F696EF00049799A /* SDWebImageAVIFCoder */; };
+		B7A11A012F6A000000000001 /* avif in Frameworks */ = {isa = PBXBuildFile; productRef = B7A11A032F6A000000000003 /* avif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B7D9FFF92F696EF00049799A /* SDWebImageAVIFCoder in Frameworks */,
+				B7A11A012F6A000000000001 /* avif in Frameworks */,
 				B7438E642E7DA6F3003E7442 /* SDWebImageWebPCoder in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -125,7 +125,7 @@
 			name = "convert-compress";
 			packageProductDependencies = (
 				B7438E632E7DA6F3003E7442 /* SDWebImageWebPCoder */,
-				B7D9FFF82F696EF00049799A /* SDWebImageAVIFCoder */,
+				B7A11A032F6A000000000003 /* avif */,
 			);
 			productName = "image-tools";
 			productReference = B7B69C582E83FC5700BE3883 /* convert-compress.app */;
@@ -229,7 +229,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B7438E622E7DA6F3003E7442 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
-				B7D9FFF72F696EF00049799A /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */,
+				B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B77ECCBB2E45573200C28347;
@@ -667,12 +667,12 @@
 				minimumVersion = 0.14.6;
 			};
 		};
-		B7D9FFF72F696EF00049799A /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */ = {
+		B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageAVIFCoder";
+			repositoryURL = "https://github.com/awxkee/avif.swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.12.0;
+				minimumVersion = 2.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -683,10 +683,10 @@
 			package = B7438E622E7DA6F3003E7442 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */;
 			productName = SDWebImageWebPCoder;
 		};
-		B7D9FFF82F696EF00049799A /* SDWebImageAVIFCoder */ = {
+		B7A11A032F6A000000000003 /* avif */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B7D9FFF72F696EF00049799A /* XCRemoteSwiftPackageReference "SDWebImageAVIFCoder" */;
-			productName = SDWebImageAVIFCoder;
+			package = B7A11A022F6A000000000002 /* XCRemoteSwiftPackageReference "avif" */;
+			productName = avif;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

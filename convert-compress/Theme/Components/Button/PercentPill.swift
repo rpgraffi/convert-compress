@@ -1,5 +1,4 @@
 import SwiftUI
-import AppKit
 
 /// Reusable percent slider pill with inline editing, drag interaction, scroll, and optional haptics.
 struct PercentPill: View {
@@ -32,14 +31,21 @@ struct PercentPill: View {
                     
                     Spacer()
                     
-                    if isEditing {
-                        InlinePercentEditor(
-                            isEditing: $isEditing,
-                            text: $percentString,
-                            onCommit: commitPercent
-                        )
-                    } else {
-                        Text("\(Int(progress * 100))%")
+                    HStack(spacing: 4) {
+                        if isEditing {
+                            InlineNumberField(
+                                text: $percentString,
+                                onCommit: commitPercent
+                            )
+                            .frame(minWidth: 28, maxWidth: 44)
+                        } else {
+                            Text("\(percent(for: progress))")
+                                .font(Theme.Fonts.button)
+                                .monospacedDigit()
+                                .fixedSize(horizontal: true, vertical: false)
+                        }
+                        
+                        Text("%")
                             .font(Theme.Fonts.button)
                             .monospacedDigit()
                     }
@@ -51,10 +57,11 @@ struct PercentPill: View {
             .horizontalScrollStep(
                 isEnabled: !isEditing
             ) { steps in
-                updateValue((value01 + Double(steps) * dragStep).clamped(to: 0...1))
+                let target = value01 + Double(steps) * dragStep
+                updateValue(snapped(target))
             }
             .gesture(dragGesture(width: geo.size.width))
-            .onAppear { percentString = "\(Int(progress * 100))" }
+            .onAppear { percentString = "\(percent(for: progress))" }
         }
     }
     
@@ -62,21 +69,33 @@ struct PercentPill: View {
         DragGesture(minimumDistance: 2).onChanged { value in
             guard !isEditing else { return }
             let x = value.location.x.clamped(to: 0...width)
-            let stepped = (x / width / dragStep).rounded() * dragStep
-            updateValue(stepped.clamped(to: 0...1))
+            updateValue(snapped(x / width))
         }
     }
     
     private func startEditing(progress: Double) {
         guard !isEditing else { return }
         isEditing = true
-        percentString = "\(Int(progress * 100))"
+        percentString = "\(percent(for: progress))"
     }
     
     private func commitPercent() {
-        let percent = (Int(percentString) ?? Int(value01 * 100)).clamped(to: 0...100)
-        percentString = "\(percent)"
-        updateValue(Double(percent) / 100)
+        let value = (Int(percentString) ?? percent(for: value01)).clamped(to: 0...100)
+        percentString = "\(value)"
+        updateValue(Double(value) / 100)
+        isEditing = false
+    }
+    
+    /// Rounds a 0...1 progress to a whole-percent integer, avoiding the floating-point
+    /// truncation that made values land one step low (e.g. `Int(0.35 * 100) == 34`).
+    private func percent(for progress: Double) -> Int {
+        Int((progress * 100).rounded())
+    }
+    
+    /// Snaps a 0...1 value to the nearest `dragStep` increment, clamped to 0...1.
+    /// Keeps repeated scroll increments locked to the step grid instead of drifting.
+    private func snapped(_ value: Double) -> Double {
+        ((value / dragStep).rounded() * dragStep).clamped(to: 0...1)
     }
     
     private func updateValue(_ newValue: Double) {
@@ -93,7 +112,7 @@ struct PercentPill: View {
         }
         
         if showsTenPercentHaptics {
-            let tick = Int((progress * 100).rounded())
+            let tick = percent(for: progress)
             if tick % 10 == 0 && tick > 0 && tick < 100 && lastTenPercentTick != tick {
                 Haptics.alignment()
                 lastTenPercentTick = tick

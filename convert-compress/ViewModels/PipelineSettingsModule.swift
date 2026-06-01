@@ -238,6 +238,7 @@ final class PipelineSettingsModule {
 
     private var pinnedFormatCandidates: [ImageFormat] {
         [
+            ImageFormat(utType: .avif),
             ImageFormat(utType: .png),
             ImageFormat(utType: .jpeg),
             ImageFormat(utType: .heic),

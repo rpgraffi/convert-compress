@@ -71,6 +71,7 @@ final class ExportSessionModule {
 
     func cancelExport() {
         exportTask?.cancel()
+        exportProgress.reset()
     }
 
     private func loadPersistedState() {
@@ -127,6 +128,11 @@ final class ExportSessionModule {
     }
 
     private func finishExport(with result: ExportResult) {
+        if result.status == .cancelled, assets.images.isEmpty {
+            exportProgress.reset()
+            return
+        }
+
         assets.replaceImages(result.updatedImages)
         exportProgress.reset()
     }

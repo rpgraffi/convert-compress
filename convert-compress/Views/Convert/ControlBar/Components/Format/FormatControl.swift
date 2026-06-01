@@ -23,6 +23,7 @@ struct FormatControl: View {
     
     private func shortcutFor(format: ImageFormat) -> Character? {
         switch format.utType {
+        case .avif: return "a"
         case .png: return "p"
         case .jpeg: return "j"
         case .heic: return "h"
@@ -170,9 +171,16 @@ struct FormatControlView_Previews: PreviewProvider {
             v.selectedFormat = ImageFormat(utType: .webP)
             return v
         }()
+        let settingsAVIF: PipelineSettingsModule = {
+            let v = PipelineSettingsModule()
+            v.selectedFormat = ImageFormat(utType: .avif)
+            return v
+        }()
         return VStack(alignment: .leading, spacing: 16) {
             FormatControl()
                 .environment(settingsDefault)
+            FormatControl()
+                .environment(settingsAVIF)
             FormatControl()
                 .environment(settingsPNG)
             FormatControl()

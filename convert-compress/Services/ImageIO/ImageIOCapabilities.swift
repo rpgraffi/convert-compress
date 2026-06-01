@@ -2,7 +2,6 @@ import Foundation
 import UniformTypeIdentifiers
 import ImageIO
 import CoreGraphics
-import SDWebImageWebPCoder
 
 final class ImageIOCapabilities {
     static let shared = ImageIOCapabilities()
@@ -26,7 +25,7 @@ final class ImageIOCapabilities {
         // ImageIO may not advertise WebP as a destination type on all systems
         self.writableTypes.insert(UTType.webP.identifier)
 
-        // Ensure AVIF appears as readable + writable via SDWebImageAVIFCoder
+        // Ensure AVIF appears as readable + writable via the custom AVIF encoder.
         self.readableTypes.insert(UTType.avif.identifier)
         self.writableTypes.insert(UTType.avif.identifier)
 
@@ -49,38 +48,11 @@ final class ImageIOCapabilities {
     }
 
     // MARK: - Dynamic format lists
-    func readableFormats() -> [ImageFormat] {
-        allImageFormats().filter { supportsReading(utType: $0.utType) }
-    }
 
     func writableFormats() -> [ImageFormat] {
-        allImageFormats().filter { supportsWriting(utType: $0.utType) }
-    }
-
-    func allImageFormats() -> [ImageFormat] {
-        let union = readableTypes.union(writableTypes)
-        var results: [ImageFormat] = []
-        for id in union {
-            if let t = UTType(id), t.conforms(to: .image) {
-                results.append(ImageFormat(utType: t))
-            }
-        }
-        // Ensure some common types appear first in a stable, human-friendly order
-        let priority: [String: Int] = [
-            UTType.jpeg.identifier: 0,
-            UTType.png.identifier: 1,
-            UTType.heic.identifier: 2,
-            UTType.webP.identifier: 3,
-            UTType.avif.identifier: 4,
-            UTType.tiff.identifier: 5,
-            UTType.bmp.identifier: 6,
-            UTType.gif.identifier: 7
-        ]
-        return results.sorted { a, b in
-            let ai = priority[a.utType.identifier] ?? Int.max
-            let bi = priority[b.utType.identifier] ?? Int.max
-            if ai != bi { return ai < bi }
-            return a.displayName.localizedCaseInsensitiveCompare(b.displayName) == .orderedAscending
+        writableTypes.compactMap { id in
+            guard let utType = UTType(id), utType.conforms(to: .image) else { return nil }
+            return ImageFormat(utType: utType)
         }
     }
 
@@ -110,18 +82,29 @@ final class ImageIOCapabilities {
 
     // MARK: - Privacy-sensitive metadata detection
     
-    /// Determines if a format supports privacy-sensitive metadata like EXIF data
-    /// This is used to show/hide the metadata removal control appropriately
+    /// Determines if a format can preserve privacy-sensitive metadata through our ImageIO export path.
+    /// This is used to show/hide the metadata removal control appropriately.
     private func supportsPrivacySensitiveMetadata(utType: UTType) -> Bool {
         // Only check writable formats since we can't remove metadata from formats we can't write
         guard supportsWriting(utType: utType) else { return false }
+
+        // These formats can store metadata, but our custom encoders currently rebuild
+        // them from pixels only, so exported files are already stripped.
+        if utType == UTType.webP || utType == .avif {
+            return false
+        }
         
-        // Common formats that support EXIF and other privacy-sensitive metadata
+        // Common ImageIO-backed formats that support EXIF, XMP, GPS, or related privacy metadata.
         let privacyMetadataFormats: Set<String> = [
-            UTType.jpeg.identifier,     // JPEG - full EXIF support
-            UTType.tiff.identifier,     // TIFF - full EXIF support  
-            UTType.heic.identifier,     // HEIC - full EXIF support
-            UTType.heif.identifier,     // HEIF - full EXIF support
+            UTType.jpeg.identifier,
+            UTType.png.identifier,
+            UTType.tiff.identifier,
+            UTType.heic.identifier,
+            UTType.heif.identifier,
+            "public.heics",
+            "public.heifs",
+            "public.jpeg-2000",
+            "public.jpeg-xl"
         ]
         
         if privacyMetadataFormats.contains(utType.identifier) {
