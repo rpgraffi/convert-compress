@@ -1,5 +1,4 @@
 import SwiftUI
-import AppKit
 
 /// Single numeric pixel field with inline dimension toggle ("width" / "height" / "long side").
 /// Supports dragging, scrolling, and text input to change values.
@@ -17,7 +16,6 @@ struct ResizeSliderControl: View {
     @State private var hapticTracker = HapticStopTracker()
     @State private var isDragging: Bool = false
     @State private var isEditing: Bool = false
-    @FocusState private var fieldFocused: Bool
     
     private var activeText: String {
         switch activeDimension {
@@ -62,8 +60,6 @@ struct ResizeSliderControl: View {
             .font(Theme.Fonts.button)
             .onTapGesture {
                 isEditing = true
-                fieldFocused = true
-                KeyWindowEditing.selectAllText()
             }
             .horizontalScrollStep(
                 sensitivity: 7.0,
@@ -272,30 +268,15 @@ struct ResizeSliderControl: View {
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.trailing, 10)
         }
-        .onChange(of: fieldFocused) { _, isFocused in
-            if !isFocused && isEditing {
-                isEditing = false
-            }
-        }
     }
     
     @ViewBuilder
     private func editableTextField() -> some View {
-        TextField("", text: activeTextBinding())
-            .textFieldStyle(.plain)
-            .multilineTextAlignment(.trailing)
-            .focused($fieldFocused)
-            .frame(minWidth: 30, maxWidth: 60)
-            .monospacedDigit()
-            .font(Theme.Fonts.button)
-            .foregroundStyle(.primary)
-            .onAppear {
-                fieldFocused = true
-                KeyWindowEditing.selectAllText()
-            }
-            .onSubmit {
-                isEditing = false
-            }
+        InlineNumberField(
+            text: activeTextBinding(),
+            onCommit: { isEditing = false }
+        )
+        .frame(minWidth: 30, maxWidth: 60)
     }
     
     private func labelText() -> String {
