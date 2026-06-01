@@ -195,13 +195,20 @@ struct RenamePopover: View {
     @ViewBuilder
     private var previewList: some View {
         if assets.images.isEmpty {
-            Text(String(localized: "Preview renamed image names"))
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
+            let hasSamplePreview = export.renameTemplate.isEmpty == false
+
+            previewRow(
+                hasSamplePreview ? export.samplePreviewFilename() : String(localized: "Preview renamed image names"),
+                font: hasSamplePreview ? .system(size: 14, design: .monospaced) : .system(size: 12),
+                foregroundStyle: hasSamplePreview ? .primary : .secondary,
+                alignment: hasSamplePreview ? .leading : .center
+            )
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .frame(height: rowHeight * 2)
         } else {
             let visibleRows = min(max(assets.images.count, 1), 4)
+            let previewHeight = max(rowHeight * 2, CGFloat(visibleRows) * rowHeight + 16)
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
@@ -216,10 +223,26 @@ struct RenamePopover: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
+                .frame(minHeight: previewHeight, alignment: .center)
             }
-            .frame(height: CGFloat(visibleRows) * rowHeight + 16)
+            .frame(height: previewHeight)
             .mask(previewMask(isScrollable: assets.images.count > 4))
         }
+    }
+
+    private func previewRow(
+        _ text: String,
+        font: Font,
+        foregroundStyle: Color,
+        alignment: Alignment
+    ) -> some View {
+        Text(text)
+            .font(font)
+            .foregroundStyle(foregroundStyle)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            .frame(maxWidth: .infinity, alignment: alignment)
+            .frame(height: rowHeight)
     }
 
     private func previewMask(isScrollable: Bool) -> some View {

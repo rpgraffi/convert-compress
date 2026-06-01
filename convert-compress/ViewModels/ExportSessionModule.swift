@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Observation
+import UniformTypeIdentifiers
 
 @MainActor
 @Observable
@@ -93,6 +94,24 @@ final class ExportSessionModule {
 
     func previewFilename(for asset: ImageAsset, index: Int) -> String {
         plannedDestinationURL(for: asset, index: index).lastPathComponent
+    }
+
+    func samplePreviewFilename() -> String {
+        let configuration = settings.currentConfiguration
+        let sampleSide = samplePreviewSide(for: configuration)
+        var sampleAsset = ImageAsset(url: URL(fileURLWithPath: "/tmp/ImageName.jpg"))
+        sampleAsset.originalPixelSize = CGSize(width: sampleSide, height: sampleSide)
+        sampleAsset.originalFormat = ImageFormat(utType: UTType.jpeg)
+
+        let request = ExportDestinationRequest(
+            asset: sampleAsset,
+            index: 0,
+            totalCount: max(assets.images.count, 1),
+            configuration: configuration,
+            outputUTType: (configuration.selectedFormat ?? sampleAsset.originalFormat)?.utType ?? UTType.jpeg
+        )
+
+        return exportDestinationResolver().destinationURL(for: request).lastPathComponent
     }
 
     func applyPipelineAsync() {
@@ -211,6 +230,22 @@ final class ExportSessionModule {
                 configuration: configuration
             )
         )
+    }
+
+    private func samplePreviewSide(for configuration: ProcessingConfiguration) -> CGFloat {
+        let candidates = [
+            configuration.resizeWidth,
+            configuration.resizeHeight,
+            configuration.resizeLongEdge
+        ]
+
+        for candidate in candidates {
+            if let value = Int(candidate), value > 0 {
+                return CGFloat(value)
+            }
+        }
+
+        return 1024
     }
 
     private func exportWorkflowDependencies() -> ExportWorkflowDependencies {
