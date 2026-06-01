@@ -110,7 +110,7 @@ struct ResizeSliderControl: View {
             activeDimension = .height
             widthText = ""
             longEdgeText = ""
-        } else {
+        } else if !widthText.isEmpty || !heightText.isEmpty || !longEdgeText.isEmpty {
             activeDimension = .width
             heightText = ""
             longEdgeText = ""
