@@ -48,38 +48,11 @@ final class ImageIOCapabilities {
     }
 
     // MARK: - Dynamic format lists
-    func readableFormats() -> [ImageFormat] {
-        allImageFormats().filter { supportsReading(utType: $0.utType) }
-    }
 
     func writableFormats() -> [ImageFormat] {
-        allImageFormats().filter { supportsWriting(utType: $0.utType) }
-    }
-
-    func allImageFormats() -> [ImageFormat] {
-        let union = readableTypes.union(writableTypes)
-        var results: [ImageFormat] = []
-        for id in union {
-            if let t = UTType(id), t.conforms(to: .image) {
-                results.append(ImageFormat(utType: t))
-            }
-        }
-        // Ensure some common types appear first in a stable, human-friendly order
-        let priority: [String: Int] = [
-            UTType.avif.identifier: 0,
-            UTType.jpeg.identifier: 1,
-            UTType.png.identifier: 2,
-            UTType.heic.identifier: 3,
-            UTType.webP.identifier: 4,
-            UTType.tiff.identifier: 5,
-            UTType.bmp.identifier: 6,
-            UTType.gif.identifier: 7
-        ]
-        return results.sorted { a, b in
-            let ai = priority[a.utType.identifier] ?? Int.max
-            let bi = priority[b.utType.identifier] ?? Int.max
-            if ai != bi { return ai < bi }
-            return a.displayName.localizedCaseInsensitiveCompare(b.displayName) == .orderedAscending
+        writableTypes.compactMap { id in
+            guard let utType = UTType(id), utType.conforms(to: .image) else { return nil }
+            return ImageFormat(utType: utType)
         }
     }
 

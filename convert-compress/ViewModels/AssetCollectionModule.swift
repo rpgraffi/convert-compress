@@ -56,7 +56,7 @@ final class AssetCollectionModule {
             return false
         }
 
-        withAnimation(.spring(response: 0.45, dampingFraction: 0.9, blendDuration: 0.2)) {
+        _ = withAnimation(.spring(response: 0.45, dampingFraction: 0.9, blendDuration: 0.2)) {
             images.remove(at: index)
         }
         return true
@@ -213,3 +213,4 @@ final class AssetCollectionModule {
         ingestionProgress.increment()
     }
 }
+
