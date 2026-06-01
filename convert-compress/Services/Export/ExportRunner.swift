@@ -28,15 +28,15 @@ struct ExportRunner {
         var wasCancelled = false
 
         await withTaskGroup(of: ExportRunnerTaskResult.self) { group in
-            var iterator = targets.makeIterator()
+            var iterator = exportTargets(from: targets).makeIterator()
             let limit = min(max(1, maxConcurrent), targets.count)
 
             func addNextTask(
-                from iterator: inout IndexingIterator<[ImageAsset]>,
+                from iterator: inout IndexingIterator<[ExportRunnerTarget]>,
                 to group: inout TaskGroup<ExportRunnerTaskResult>
             ) {
                 guard !Task.isCancelled else { return }
-                guard let asset = iterator.next() else { return }
+                guard let target = iterator.next() else { return }
                 group.addTask(priority: .utility) {
                     guard !Task.isCancelled else {
                         return .cancelled
@@ -44,16 +44,19 @@ struct ExportRunner {
 
                     do {
                         let encoded = try await encodedOutputCache.resolve(
-                            asset: asset,
+                            asset: target.asset,
                             configuration: configuration
                         ) {
                             !Task.isCancelled
                         }
-                        let updated = try write(asset: asset, encoded: encoded.encodedOutput)
-                        return .success(original: asset, updated: updated)
+                        let updated = try write(
+                            target: target,
+                            encoded: encoded.encodedOutput
+                        )
+                        return .success(original: target.asset, updated: updated)
                     } catch {
-                        AppLogger.export.error("Export failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
-                        return .failure(ExportAssetFailure(asset: asset, error: error))
+                        AppLogger.export.error("Export failed for \(target.asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                        return .failure(ExportAssetFailure(asset: target.asset, error: error))
                     }
                 }
             }
@@ -100,8 +103,25 @@ struct ExportRunner {
         )
     }
 
-    private func write(asset: ImageAsset, encoded: (data: Data, uti: UTType)) throws -> ImageAsset {
-        let destinationURL = destinationResolver.destinationURL(for: asset, uti: encoded.uti)
+    private func exportTargets(from assets: [ImageAsset]) -> [ExportRunnerTarget] {
+        assets.enumerated().map { index, asset in
+            ExportRunnerTarget(asset: asset, index: index, totalCount: assets.count)
+        }
+    }
+
+    private func write(
+        target: ExportRunnerTarget,
+        encoded: (data: Data, uti: UTType)
+    ) throws -> ImageAsset {
+        let destinationURL = destinationResolver.destinationURL(
+            for: ExportDestinationRequest(
+                asset: target.asset,
+                index: target.index,
+                totalCount: target.totalCount,
+                configuration: configuration,
+                outputUTType: encoded.uti
+            )
+        )
         let destinationDirectory = destinationURL.deletingLastPathComponent()
 
         guard writeAccess.allowsWriting(to: destinationDirectory) else {
@@ -127,7 +147,7 @@ struct ExportRunner {
             try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
         }
 
-        var updated = asset
+        var updated = target.asset
         updated.workingURL = destinationURL
         updated.isEdited = true
         return updated
@@ -145,4 +165,10 @@ private enum ExportRunnerTaskResult {
     case success(original: ImageAsset, updated: ImageAsset)
     case failure(ExportAssetFailure)
     case cancelled
+}
+
+private struct ExportRunnerTarget {
+    let asset: ImageAsset
+    let index: Int
+    let totalCount: Int
 }

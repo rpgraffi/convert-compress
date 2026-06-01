@@ -6,6 +6,7 @@ import Observation
 @Observable
 final class ExportSessionModule {
     private typealias Keys = StorageKeys.Pipeline
+    private typealias RenameKeys = StorageKeys.ExportRename
 
     var exportDirectory: URL? = nil {
         didSet {
@@ -14,6 +15,17 @@ final class ExportSessionModule {
             } else {
                 UserDefaults.standard.removeObject(forKey: Keys.exportDirectory)
             }
+        }
+    }
+    var isRenameEnabled = false
+    var renameTemplate = "" {
+        didSet {
+            UserDefaults.standard.set(renameTemplate, forKey: RenameKeys.template)
+        }
+    }
+    var renameDateFormatPreset: RenameDateFormatPreset = .dayMonthYearDots {
+        didSet {
+            UserDefaults.standard.set(renameDateFormatPreset.rawValue, forKey: RenameKeys.dateFormatPreset)
         }
     }
     var exportProgress = ProgressState()
@@ -63,6 +75,26 @@ final class ExportSessionModule {
         exportProgress.fraction
     }
 
+    var renameSettings: ExportRenameSettings {
+        ExportRenameSettings(
+            isEnabled: isRenameEnabled,
+            template: renameTemplate,
+            dateFormatPreset: renameDateFormatPreset
+        )
+    }
+
+    var hasDuplicateRenameDestinations: Bool {
+        duplicateRenameDestinations().isEmpty == false
+    }
+
+    func setRenameTemplate(_ value: String) {
+        renameTemplate = FilenameSanitizer.sanitizeTemplateInput(value)
+    }
+
+    func previewFilename(for asset: ImageAsset, index: Int) -> String {
+        plannedDestinationURL(for: asset, index: index).lastPathComponent
+    }
+
     func applyPipelineAsync() {
         PaywallCoordinator.shared.requestAccess { [weak self] in
             self?.executeExport()
@@ -77,6 +109,13 @@ final class ExportSessionModule {
     private func loadPersistedState() {
         if let exportPath = UserDefaults.standard.string(forKey: Keys.exportDirectory) {
             exportDirectory = URL(fileURLWithPath: exportPath)
+        }
+        if let template = UserDefaults.standard.string(forKey: RenameKeys.template) {
+            renameTemplate = FilenameSanitizer.sanitizeTemplateInput(template)
+        }
+        if let rawPreset = UserDefaults.standard.string(forKey: RenameKeys.dateFormatPreset),
+           let preset = RenameDateFormatPreset(rawValue: rawPreset) {
+            renameDateFormatPreset = preset
         }
     }
 
@@ -141,7 +180,36 @@ final class ExportSessionModule {
         let keepStructure = UserDefaults.standard.bool(forKey: StorageKeys.Preferences.keepFolderStructure)
         return ExportDestinationResolver(
             exportDirectory: exportDirectory,
-            folderStructureRoot: keepStructure ? assets.sourceDirectory : nil
+            folderStructureRoot: keepStructure ? assets.sourceDirectory : nil,
+            renameSettings: renameSettings
+        )
+    }
+
+    private func duplicateRenameDestinations() -> [URL] {
+        guard isRenameEnabled, assets.images.count > 1 else { return [] }
+
+        var seen: Set<URL> = []
+        var duplicates: Set<URL> = []
+        for (index, asset) in assets.images.enumerated() {
+            let url = plannedDestinationURL(for: asset, index: index).standardizedFileURL
+            if seen.contains(url) {
+                duplicates.insert(url)
+            } else {
+                seen.insert(url)
+            }
+        }
+        return Array(duplicates)
+    }
+
+    private func plannedDestinationURL(for asset: ImageAsset, index: Int) -> URL {
+        let configuration = settings.currentConfiguration
+        return exportDestinationResolver().destinationURL(
+            for: .planned(
+                asset: asset,
+                index: index,
+                totalCount: assets.images.count,
+                configuration: configuration
+            )
         )
     }
 

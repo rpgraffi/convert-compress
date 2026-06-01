@@ -115,16 +115,15 @@ struct ExportWorkflow {
     }
 
     private func destinationConflicts() -> [URL] {
-        let planned = targets.map { destinationURL(for: $0) }
+        let planned = plannedDestinationURLs()
         let uniquePlanned = Array(Set(planned))
         let fileManager = FileManager.default
         return uniquePlanned.filter { fileManager.fileExists(atPath: $0.path) }
     }
 
     private func uniqueWriteScopeDirectories() -> [URL] {
-        let destinations = targets.map {
-            destinationURL(for: $0).deletingLastPathComponent().standardizedFileURL
-        }
+        let destinations = plannedDestinationURLs()
+            .map { $0.deletingLastPathComponent().standardizedFileURL }
         var seen: Set<URL> = []
         var result: [URL] = []
         for directory in destinations {
@@ -154,11 +153,16 @@ struct ExportWorkflow {
         return candidate
     }
 
-    private func destinationURL(for asset: ImageAsset) -> URL {
-        let outputUTType = ProcessedImageEncoder.decideUTTypeForExport(
-            originalURL: asset.originalURL,
-            requestedFormat: configuration.selectedFormat ?? asset.originalFormat
-        )
-        return destinationResolver.destinationURL(for: asset, uti: outputUTType)
+    private func plannedDestinationURLs() -> [URL] {
+        targets.enumerated().map { index, asset in
+            destinationResolver.destinationURL(
+                for: .planned(
+                    asset: asset,
+                    index: index,
+                    totalCount: targets.count,
+                    configuration: configuration
+                )
+            )
+        }
     }
 }
