@@ -25,7 +25,8 @@ struct AVIFEncoder: CustomImageEncoder {
         )
 
         do {
-            return try avif.AVIFEncoder.encode(image: image, with: options)
+            let data = try avif.AVIFEncoder.encode(image: image, with: options)
+            return try ImageMetadataEditor.apply(.appAuthorship, to: data, utType: utType)
         } catch {
             throw ImageOperationError.exportFailed
         }
