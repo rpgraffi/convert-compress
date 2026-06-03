@@ -4,6 +4,40 @@ import XCTest
 @testable import convert_compress
 
 final class ExportRenameTests: XCTestCase {
+    @MainActor
+    func testRenameModuleCoordinatesTemplateInsertionAndPresentation() {
+        clearRenameDefaults()
+        defer { clearRenameDefaults() }
+        let modules = ImageToolsModules()
+        let rename = modules.rename
+
+        rename.setEnabled(true)
+        let nextOffset = rename.insert(RenameToken.originalName.text, atUTF16Offset: 0)
+        rename.setTemplate("bad/name:\n")
+        rename.setEnabled(false)
+
+        XCTAssertEqual(nextOffset, 2)
+        XCTAssertEqual(rename.template, "bad_name__")
+        XCTAssertFalse(rename.isEnabled)
+        XCTAssertFalse(rename.isPopoverPresented)
+    }
+
+    @MainActor
+    func testRenameModulePlansPreviewAndDuplicateDestinations() {
+        clearRenameDefaults()
+        defer { clearRenameDefaults() }
+        let modules = ImageToolsModules()
+        modules.rename.setEnabled(true)
+        modules.rename.setTemplate("same")
+        modules.assets.images = [
+            ImageAsset(url: URL(fileURLWithPath: "/tmp/first.png")),
+            ImageAsset(url: URL(fileURLWithPath: "/tmp/second.png"))
+        ]
+
+        XCTAssertEqual(modules.rename.previewFilename(for: modules.assets.images[0], index: 0), "same.png")
+        XCTAssertTrue(modules.rename.hasDuplicateDestinations)
+    }
+
     func testTokenParserRecognizesKnownTokensOnly() {
         let matches = RenameTokenParser.matches(in: "$&-$today-$created-$modified-$nn-$NNN-$w-$h-$q-$unknown")
 
@@ -137,6 +171,11 @@ final class ExportRenameTests: XCTestCase {
         components.month = month
         components.day = day
         return components.date!
+    }
+
+    private func clearRenameDefaults() {
+        UserDefaults.standard.removeObject(forKey: StorageKeys.ExportRename.template)
+        UserDefaults.standard.removeObject(forKey: StorageKeys.ExportRename.dateFormatPreset)
     }
 }
 

@@ -2,8 +2,7 @@ import SwiftUI
 
 struct RenamePopover: View {
     @Environment(AssetCollectionModule.self) private var assets
-    @Environment(ExportSessionModule.self) private var export
-    @Binding var isPresented: Bool
+    @Environment(ExportRenameModule.self) private var rename
     @State private var cursorOffset = 0
     @State private var requestedCursorOffset: Int?
     @State private var isFieldFocused = false
@@ -14,14 +13,14 @@ struct RenamePopover: View {
     private let joinedChipCornerRadius: CGFloat = 4
 
     var body: some View {
-        @Bindable var export = export
+        @Bindable var rename = rename
 
         VStack(spacing: 0) {
             VStack(spacing: 8) {
                 templateField
                     .padding(.horizontal, 10)
                     .padding(.top, 10)
-                shortcuts(selection: $export.renameDateFormatPreset)
+                shortcuts(selection: $rename.dateFormatPreset)
             }
             .padding(.bottom, 10)
 
@@ -39,8 +38,8 @@ struct RenamePopover: View {
         HStack(spacing: 8) {
             RenameTemplateField(
                 text: Binding(
-                    get: { export.renameTemplate },
-                    set: { export.setRenameTemplate($0) }
+                    get: { rename.template },
+                    set: { rename.setTemplate($0) }
                 ),
                 cursorOffset: $cursorOffset,
                 requestedCursorOffset: $requestedCursorOffset,
@@ -49,7 +48,7 @@ struct RenamePopover: View {
             )
             .frame(height: 28)
 
-            if export.hasDuplicateRenameDestinations {
+            if rename.hasDuplicateDestinations {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
                     .help(String(localized: "This template creates duplicate destination filenames. Export will still continue."))
@@ -195,10 +194,10 @@ struct RenamePopover: View {
     @ViewBuilder
     private var previewList: some View {
         if assets.images.isEmpty {
-            let hasSamplePreview = export.renameTemplate.isEmpty == false
+            let hasSamplePreview = rename.template.isEmpty == false
 
             previewRow(
-                hasSamplePreview ? export.samplePreviewFilename() : String(localized: "Preview renamed image names"),
+                hasSamplePreview ? rename.samplePreviewFilename() : String(localized: "Preview renamed image names"),
                 font: hasSamplePreview ? .system(size: 14, design: .monospaced) : .system(size: 12),
                 foregroundStyle: hasSamplePreview ? .primary : .secondary,
                 alignment: hasSamplePreview ? .leading : .center
@@ -213,7 +212,7 @@ struct RenamePopover: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(assets.images.enumerated()), id: \.element.id) { index, asset in
-                        Text(export.previewFilename(for: asset, index: index))
+                        Text(rename.previewFilename(for: asset, index: index))
                             .font(.system(size: 14, design: .monospaced))
                             .lineLimit(1)
                             .truncationMode(.middle)
@@ -264,19 +263,7 @@ struct RenamePopover: View {
     }
 
     private func insert(_ tokenText: String) {
-        let current = export.renameTemplate
-        let currentLength = (current as NSString).length
-        let safeOffset = min(max(cursorOffset, 0), currentLength)
-        let insertionIndex = String.Index(utf16Offset: safeOffset, in: current)
-        var updated = current
-        updated.insert(contentsOf: tokenText, at: insertionIndex)
-
-        let sanitized = FilenameSanitizer.sanitizeTemplateInput(updated)
-        export.setRenameTemplate(sanitized)
-
-        let insertedLength = (tokenText as NSString).length
-        let nextOffset = min(safeOffset + insertedLength, (sanitized as NSString).length)
-        requestedCursorOffset = nextOffset
+        requestedCursorOffset = rename.insert(tokenText, atUTF16Offset: cursorOffset)
         focusTemplateField()
     }
 

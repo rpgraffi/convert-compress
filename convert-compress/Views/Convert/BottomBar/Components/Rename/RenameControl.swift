@@ -1,22 +1,25 @@
 import SwiftUI
 
 struct RenameControl: View {
-    @Environment(ExportSessionModule.self) private var export
-    @State private var isPopoverShown = false
+    @Environment(ExportRenameModule.self) private var rename
 
     var body: some View {
-        @Bindable var export = export
-
         CircleIconToggle(
-            isOn: $export.isRenameEnabled,
+            isOn: Binding(
+                get: { rename.isEnabled },
+                set: { rename.setEnabled($0) }
+            ),
             icon: Image(systemName: "textformat")
         )
-        .help(String(localized: export.isRenameEnabled ? "Disable renaming" : "Rename exported files"))
-        .popover(isPresented: $isPopoverShown, arrowEdge: .bottom) {
-            RenamePopover(isPresented: $isPopoverShown)
-        }
-        .onChange(of: export.isRenameEnabled) { _, isEnabled in
-            isPopoverShown = isEnabled
+        .help(String(localized: rename.isEnabled ? "Disable renaming" : "Rename exported files"))
+        .popover(
+            isPresented: Binding(
+                get: { rename.isPopoverPresented },
+                set: { rename.setPopoverPresented($0) }
+            ),
+            arrowEdge: .bottom
+        ) {
+            RenamePopover()
         }
     }
 }
