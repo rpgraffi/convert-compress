@@ -5,7 +5,7 @@ import XCTest
 
 final class AVIFEncoderTests: XCTestCase {
     func testDefaultEncodingSettingsFavorInteractiveSpeedAndColorFidelity() {
-        XCTAssertEqual(AVIFEncoder.encoderSpeed, 10)
+        XCTAssertEqual(AVIFEncoder.encoderSpeed, 6)
         XCTAssertTrue(AVIFEncoder.usesFullRangeColor)
     }
 
@@ -33,6 +33,24 @@ final class AVIFEncoderTests: XCTestCase {
 
         XCTAssertGreaterThan(data.count, 0)
         XCTAssertEqual(String(data: data[4..<8], encoding: .ascii), "ftyp")
+
+        let decodedBytes = String(decoding: data, as: UTF8.self)
+        XCTAssertFalse(decodedBytes.contains("awxkee/avif.swift"))
+        XCTAssertFalse(decodedBytes.contains("avif.swift"))
+        XCTAssertTrue(decodedBytes.contains("Convert &amp; Compress"))
+    }
+
+    func testAppAuthorshipMetadataReplacesPackageXMPFieldsInPlace() throws {
+        let originalData = Data(("prefix" + packageXMPPacket + "suffix").utf8)
+
+        let updatedData = try ImageMetadataEditor.apply(.appAuthorship, to: originalData, utType: .avif)
+        let updatedPacket = String(decoding: updatedData, as: UTF8.self)
+
+        XCTAssertEqual(updatedData.count, originalData.count)
+        XCTAssertFalse(updatedPacket.contains("awxkee/avif.swift"))
+        XCTAssertFalse(updatedPacket.contains("avif.swift"))
+        XCTAssertFalse(updatedPacket.contains("<dc:publisher>"))
+        XCTAssertTrue(updatedPacket.contains("Convert &amp; Compress"))
     }
 
     private func makeCGImage(rgbaBytes: [UInt8], width: Int, height: Int, colorSpace: CGColorSpace) throws -> CGImage {
@@ -55,5 +73,26 @@ final class AVIFEncoderTests: XCTestCase {
             shouldInterpolate: false,
             intent: .defaultIntent
         ))
+    }
+
+    private var packageXMPPacket: String {
+        "<?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?>"
+            + "<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMP Core 5.5.0'>"
+            + "<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>"
+            + "<rdf:Description rdf:about='' xmlns:dc='http://purl.org/dc/elements/1.1/'>"
+            + "<dc:title>Generated image by avif.swift</dc:title>"
+            + "<dc:creator>avif.swift</dc:creator>"
+            + "<dc:description>A image was created by avif.swift (https://github.com/awxkee/avif.swift)</dc:description>"
+            + "<dc:date>2026:06:03 10:56:00</dc:date>"
+            + "<dc:publisher>https://github.com/awxkee/avif.swift</dc:publisher>"
+            + "<dc:format>AVIF</dc:format>"
+            + "</rdf:Description>"
+            + "<rdf:Description rdf:about='' xmlns:xmp='http://ns.adobe.com/xap/1.0/'>"
+            + "<xmp:CreatorTool>avif.swift (https://github.com/awxkee/avif.swift)</xmp:CreatorTool>"
+            + "<xmp:ModifyDate>2026:06:03 10:56:00</xmp:ModifyDate>"
+            + "</rdf:Description>"
+            + "</rdf:RDF>"
+            + "</x:xmpmeta>"
+            + "<?xpacket end='w'?>"
     }
 }

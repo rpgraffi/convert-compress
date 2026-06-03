@@ -3862,6 +3862,363 @@
         }
       }
     },
+    "Created" : {
+      "comment" : "A button that inserts the created date token into the rename template.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ الإنشاء"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oprettet"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creado"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luotu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成日"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생성됨"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opprettet"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aangemaakt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utworzono"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Criado"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Criado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создано"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skapad"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oluşturuldu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建日期"
+          }
+        }
+      }
+    },
+    "Date" : {
+      "comment" : "A label displayed in a popover that lets the user change the date format of a rename template.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التاريخ"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dato"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päivämäärä"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "날짜"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarih"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期"
+          }
+        }
+      }
+    },
+    "Date Format" : {
+      "comment" : "A label for a menu that lets the user choose a date format for a rename template.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تنسيق التاريخ"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datoformat"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datumsformat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de fecha"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päivämäärän muoto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format de date"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付フォーマット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "날짜 형식"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datoformat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datumformaat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format daty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de data"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de data"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Формат даты"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datumformat"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarih biçimi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期格式"
+          }
+        }
+      }
+    },
     "Delete preset" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6246,6 +6603,126 @@
       "comment" : "Error message when an image processing operation fails.",
       "isCommentAutoGenerated" : true
     },
+    "Index ↑" : {
+      "comment" : "A label displayed in a button that renames a file name by its index.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المؤشر ↑"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indeks ↑"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index ↑"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index ↑"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Índice ↑"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indeksi ↑"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index ↑"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indice ↑"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インデックス ↑"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인덱스 ↑"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indeks ↑"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index ↑"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indeks ↑"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Índice ↑"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Índice ↑"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Индекс ↑"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index ↑"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dizin ↑"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "索引 ↑"
+          }
+        }
+      }
+    },
     "KB" : {
       "comment" : "\"KB\" short for Kilo Byte",
       "extractionState" : "manual",
@@ -6725,124 +7202,53 @@
         }
       }
     },
+    "Localized" : {
+      "comment" : "Label for the \"Localized\" date format preset.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "محلي" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Lokalt" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lokalisiert" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Localized" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Localizado" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Paikallinen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Localisé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Localizzato" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ローカライズ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "로컬라이즈" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Lokalisert" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Gelokaliseerd" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zlokalizowany" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Localizado" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Localizado" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Локализовано" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Lokaliserad" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yerelleştirilmiş" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本地化" } }
+      }
+    },
     "Long Edge" : {
       "comment" : "A resize mode option that resizes images based on their longest side dimension.",
       "extractionState" : "manual",
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الضلع الأطول"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Længste side"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lange Seite"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Long Edge"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lado largo"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pisin sivu"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Côté long"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lato lungo"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "長辺"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "긴 변"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lengste side"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Langste zijde"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dłuższy bok"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lado longo"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lado longo"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Дл. сторона"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Längsta sida"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uzun kenar"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "长边"
-          }
-        }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الضلع الأطول" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Længste side" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lange Seite" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Long Edge" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Lado largo" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Pisin sivu" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Côté long" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Lato lungo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "長辺" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "긴 변" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Lengste side" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Langste zijde" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dłuższy bok" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Lado longo" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Lado longo" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Дл. сторона" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Längsta sida" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Uzun kenar" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "长边" } }
       }
     },
     "Made in Europe" : {
@@ -7201,6 +7607,30 @@
             "value" : "将删除元数据"
           }
         }
+      }
+    },
+    "Modified" : {
+      "comment" : "A button that inserts the modified date token into the rename template.",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تاريخ التعديل" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Ændret" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geändert" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Modified" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Modificado" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Muokattu" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifié" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modificato" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "変更日" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "수정됨" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Endret" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Gewijzigd" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zmodyfikowano" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Modificado" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Modificado" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Изменено" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Ändrad" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Değiştirildi" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "修改日期" } }
       }
     },
     "More" : {
@@ -8994,6 +9424,31 @@
         }
       }
     },
+    "Preview renamed image names" : {
+      "comment" : "A label displayed when there are no images to preview.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "معاينة أسماء الصور المعاد تسميتها" }},
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Forhåndsvis omdøbte billednavne" }},
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorschau umbenannter Bildnamen" }},
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Preview renamed image names" }},
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Vista previa de los nombres de imágenes renombradas" }},
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Esikatsele uudelleennimetyt kuvat" }},
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aperçu des noms d’images renommées" }},
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Anteprima nomi immagini rinominate" }},
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リネームされた画像名をプレビュー" }},
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이름이 바뀐 이미지 미리보기" }},
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Forhåndsvis omdøpte bildebilde" }},
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Voorvertoning hernoemde afbeeldingsnamen" }},
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Podgląd nowych nazw obrazów" }},
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Pré-visualizar nomes das imagens renomeadas" }},
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Visualizar nomes das imagens renomeadas" }},
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Просмотр новых имён изображений" }},
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Förhandsgranska bytta bildnamn" }},
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Yeniden adlandırılan görsel adlarını önizle" }},
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预览重命名后的图片名" }}
+      }
+    },
     "Privacy" : {
       "comment" : "A link to the privacy policy.",
       "extractionState" : "manual",
@@ -10775,123 +11230,53 @@
         }
       }
     },
+    "Rename images" : {
+      "comment" : "Placeholder text for the rename template field.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إعادة تسمية الصور" }},
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Omdøb billeder" }},
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bilder umbenennen" }},
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename images" }},
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Renombrar imágenes" }},
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Nimeä kuvat uudelleen" }},
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Renommer les images" }},
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rinomina immagini" }},
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "画像の名前を変更" }},
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이미지 이름 바꾸기" }},
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Gi nytt navn til bilder" }},
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Afbeeldingen hernoemen" }},
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zmień nazwy obrazów" }},
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Renomear imagens" }},
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Renomear imagens" }},
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Переименовать изображения" }},
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Byt namn på bilder" }},
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Görselleri yeniden adlandır" }},
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重命名图片" }}
+      }
+    },
     "Replace" : {
       "extractionState" : "manual",
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "استبدل"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erstat"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ersetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Replace"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reemplazar"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Korvaa"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remplacer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sostituisci"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "置き換え"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "대체"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erstatt"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vervang"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zastąp"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Substitui"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Substituir"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Заменить"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ersätt"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Değiştir"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "替换"
-          }
-        }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استبدل" }},
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Erstat" }},
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ersetzen" }},
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Replace" }},
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reemplazar" }},
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Korvaa" }},
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Remplacer" }},
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sostituisci" }},
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "置き換え" }},
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "대체" }},
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Erstatt" }},
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Vervang" }},
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zastąp" }},
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Substitui" }},
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Substituir" }},
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Заменить" }},
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Ersätt" }},
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Değiştir" }},
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "替换" }}
       }
     },
     "Replace existing files?" : {
@@ -13405,6 +13790,14 @@
       "comment" : "Error description for when an image fails to load.",
       "isCommentAutoGenerated" : true
     },
+    "This template creates duplicate destination filenames. Export will still continue." : {
+      "comment" : "A warning message that appears when a rename template creates duplicate filenames.",
+      "isCommentAutoGenerated" : true
+    },
+    "Today" : {
+      "comment" : "A button that inserts the current date in the rename template.",
+      "isCommentAutoGenerated" : true
+    },
     "Toggle metadata removal" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13644,124 +14037,54 @@
         }
       }
     },
+    "Untitled" : {
+      "comment" : "Default name for an image without a specified name.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بدون عنوان" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Uden titel" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Unbenannt" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Untitled" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sin título" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Nimetön" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sans titre" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Senza titolo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "無題" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "제목 없음" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Uten tittel" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Naamloos" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Bez tytułu" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Sem título" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Sem título" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Без имени" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Namnlös" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Başlıksız" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无标题" } }
+      }
+    },
     "W" : {
       "comment" : "Short for \"Width\" in context of pixel in image",
       "extractionState" : "manual",
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "B"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "B"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "宽"
-          }
-        }
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ع" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "B" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "B" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "W" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "A" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "L" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "L" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "L" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "幅" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "너비" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "B" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "B" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "SZ" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "L" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "L" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ш" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "B" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "G" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "宽" } }
       }
     },
     "Website" : {
