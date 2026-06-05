@@ -1511,7 +1511,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autoriser Convertir & Compresser à enregistrer des fichiers dans %@ ?"
+            "value" : "Autoriser Convertir et compresser à enregistrer des fichiers dans %@ ?"
           }
         },
         "it" : {
@@ -3555,7 +3555,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Convertir & Compresser a besoin d’une autorisation pour enregistrer des fichiers dans %@. Choisissez « Autoriser » lorsque la demande apparaît."
+            "value" : "Convertir et compresser a besoin d’une autorisation pour enregistrer des fichiers dans %@. Choisissez « Autoriser » lorsque la demande apparaît."
           }
         },
         "it" : {
