@@ -20,6 +20,7 @@ final class ExportSessionModule {
 
     @ObservationIgnored private let settings: PipelineSettingsModule
     @ObservationIgnored private let assets: AssetCollectionModule
+    @ObservationIgnored private let rename: ExportRenameModule
     @ObservationIgnored private let encodedOutputCache: EncodedOutputCache
     @ObservationIgnored private let alertView: ExportAlertView
     @ObservationIgnored private var exportTask: Task<Void, Never>?
@@ -27,13 +28,23 @@ final class ExportSessionModule {
     init(
         settings: PipelineSettingsModule,
         assets: AssetCollectionModule,
+        rename: ExportRenameModule,
         encodedOutputCache: EncodedOutputCache,
         alertView: ExportAlertView = ExportAlertView()
     ) {
         self.settings = settings
         self.assets = assets
+        self.rename = rename
         self.encodedOutputCache = encodedOutputCache
         self.alertView = alertView
+        self.rename.configureDestinationResolver { [weak self] in
+            self?.exportDestinationResolver()
+                ?? ExportDestinationResolver(
+                    exportDirectory: nil,
+                    folderStructureRoot: nil,
+                    renameSettings: .disabled
+                )
+        }
         loadPersistedState()
     }
 
@@ -141,7 +152,8 @@ final class ExportSessionModule {
         let keepStructure = UserDefaults.standard.bool(forKey: StorageKeys.Preferences.keepFolderStructure)
         return ExportDestinationResolver(
             exportDirectory: exportDirectory,
-            folderStructureRoot: keepStructure ? assets.sourceDirectory : nil
+            folderStructureRoot: keepStructure ? assets.sourceDirectory : nil,
+            renameSettings: rename.exportSettings
         )
     }
 

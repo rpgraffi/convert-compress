@@ -34,6 +34,13 @@ enum StorageKeys {
         static let removeMetadata     = "convert-compress.remove_metadata.v1"
     }
 
+    // MARK: - Export Rename (local)
+
+    enum ExportRename {
+        static let template         = "\(AppConstants.bundleIdentifier).export_rename.template.v1"
+        static let dateFormatPreset = "\(AppConstants.bundleIdentifier).export_rename.date_format_preset.v1"
+    }
+
     // MARK: - Usage Tracking (local)
 
     enum Usage {

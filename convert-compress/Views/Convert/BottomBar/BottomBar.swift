@@ -16,6 +16,7 @@ struct BottomBar: View {
             SaveControl()
             
             HStack(spacing: 8) {
+                RenameControl()
                 ExportDirectoryControl(
                     directory: $export.exportDirectory,
                     sourceDirectory: assets.sourceDirectory,

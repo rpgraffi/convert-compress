@@ -4,6 +4,7 @@ import SwiftUI
 final class ImageToolsModules {
     let settings: PipelineSettingsModule
     let assets: AssetCollectionModule
+    let rename: ExportRenameModule
     let encodedOutput: EncodedOutputModule
     let comparison: ComparisonSessionModule
     let export: ExportSessionModule
@@ -13,6 +14,7 @@ final class ImageToolsModules {
     init() {
         let settings = PipelineSettingsModule()
         let assets = AssetCollectionModule()
+        let rename = ExportRenameModule(settings: settings, assets: assets)
         let encodedOutput = EncodedOutputModule(settings: settings, assets: assets)
         let comparison = ComparisonSessionModule(
             settings: settings,
@@ -22,6 +24,7 @@ final class ImageToolsModules {
         let export = ExportSessionModule(
             settings: settings,
             assets: assets,
+            rename: rename,
             encodedOutputCache: encodedOutput.cache
         )
         let session = ImageToolsSessionModule(
@@ -35,6 +38,7 @@ final class ImageToolsModules {
 
         self.settings = settings
         self.assets = assets
+        self.rename = rename
         self.encodedOutput = encodedOutput
         self.comparison = comparison
         self.export = export
@@ -49,6 +53,7 @@ extension View {
         self
             .environment(modules.settings)
             .environment(modules.assets)
+            .environment(modules.rename)
             .environment(modules.encodedOutput)
             .environment(modules.comparison)
             .environment(modules.export)

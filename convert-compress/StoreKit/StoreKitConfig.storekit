@@ -20,9 +20,14 @@
       "internalID" : "6752908811",
       "localizations" : [
         {
-          "description" : "Desbloquea todas las funciones",
-          "displayName" : "Acceso de por vida",
-          "locale" : "es_ES"
+          "description" : "解鎖所有功能",
+          "displayName" : "終身存取",
+          "locale" : "zh_Hant"
+        },
+        {
+          "description" : "Разблокируйте все функции с пожизненным доступом",
+          "displayName" : "Пожизненный доступ",
+          "locale" : "ru"
         },
         {
           "description" : "افتح جميع الميزات مع وصول مدى الحياة",
@@ -30,14 +35,39 @@
           "locale" : "ar"
         },
         {
-          "description" : "Unlock all features with lifetime access",
-          "displayName" : "Lifetime Access ",
-          "locale" : "en_US"
+          "description" : "Desbloqueie todos os recursos com acesso vitalício",
+          "displayName" : "Acesso vitalício",
+          "locale" : "pt_PT"
         },
         {
-          "description" : "Разблокируйте все функции с пожизненным доступом",
-          "displayName" : "Пожизненный доступ",
-          "locale" : "ru"
+          "description" : "解锁所有功能",
+          "displayName" : "终身访问",
+          "locale" : "zh_Hans"
+        },
+        {
+          "description" : "全機能を利用可能",
+          "displayName" : "ライフタイムアクセス",
+          "locale" : "ja"
+        },
+        {
+          "description" : "Desbloqueie todos os recursos para sempre",
+          "displayName" : "Acesso vitalício",
+          "locale" : "pt_BR"
+        },
+        {
+          "description" : "Lås upp alla funktioner med livstidsåtkomst",
+          "displayName" : "Livstidsåtkomst",
+          "locale" : "sv"
+        },
+        {
+          "description" : "Desbloquea todas las funciones",
+          "displayName" : "Acceso de por vida",
+          "locale" : "es_ES"
+        },
+        {
+          "description" : "Odblokuj wszystkie funkcje na zawsze",
+          "displayName" : "Dożywotni dostęp",
+          "locale" : "pl"
         },
         {
           "description" : "Ontgrendel alle functies met levenslange toegang",
@@ -50,19 +80,24 @@
           "locale" : "fr"
         },
         {
+          "description" : "Lås op for alle funktioner med livstidsadgang",
+          "displayName" : "Livstidsadgang",
+          "locale" : "da"
+        },
+        {
           "description" : "Avaa kaikki ominaisuudet elinikäisellä käyttöoikeudella",
           "displayName" : "Elinikäinen käyttöoikeus",
           "locale" : "fi"
         },
         {
-          "description" : "Desbloqueie todos os recursos com acesso vitalício",
-          "displayName" : "Acesso vitalício",
-          "locale" : "pt_PT"
+          "description" : "Unlock all features with lifetime access",
+          "displayName" : "Lifetime Access ",
+          "locale" : "en_US"
         },
         {
-          "description" : "Lås upp alla funktioner med livstidsåtkomst",
-          "displayName" : "Livstidsåtkomst",
-          "locale" : "sv"
+          "description" : "Schalte alle Funktionen frei, für immer",
+          "displayName" : "Lebenslanger Zugriff",
+          "locale" : "de"
         },
         {
           "description" : "Sblocca tutte le funzionalità con accesso a vita",
@@ -75,44 +110,9 @@
           "locale" : "ko"
         },
         {
-          "description" : "Lås op for alle funktioner med livstidsadgang",
-          "displayName" : "Livstidsadgang",
-          "locale" : "da"
-        },
-        {
-          "description" : "全機能を利用可能",
-          "displayName" : "ライフタイムアクセス",
-          "locale" : "ja"
-        },
-        {
-          "description" : "Odblokuj wszystkie funkcje na zawsze",
-          "displayName" : "Dożywotni dostęp",
-          "locale" : "pl"
-        },
-        {
           "description" : "Tüm özelliklerin kilidini ömür boyu erişimle açın",
           "displayName" : "Ömür boyu erişim",
           "locale" : "tr"
-        },
-        {
-          "description" : "Schalte alle Funktionen frei, für immer",
-          "displayName" : "Lebenslanger Zugriff",
-          "locale" : "de"
-        },
-        {
-          "description" : "解鎖所有功能",
-          "displayName" : "終身存取",
-          "locale" : "zh_Hant"
-        },
-        {
-          "description" : "Desbloqueie todos os recursos para sempre",
-          "displayName" : "Acesso vitalício",
-          "locale" : "pt_BR"
-        },
-        {
-          "description" : "解锁所有功能",
-          "displayName" : "终身访问",
-          "locale" : "zh_Hans"
         }
       ],
       "productID" : "lifetime_regular",
@@ -120,44 +120,14 @@
       "type" : "NonConsumable"
     },
     {
-      "displayPrice" : "9.99",
+      "displayPrice" : "12.99",
       "familyShareable" : true,
       "internalID" : "6752862236",
       "localizations" : [
         {
-          "description" : "Desbloquea todas las funciones",
-          "displayName" : "De por vida • Reducido",
-          "locale" : "es_ES"
-        },
-        {
-          "description" : "افتح جميع الميزات مع وصول مدى الحياة",
-          "displayName" : "مدى الحياة • مخفض",
-          "locale" : "ar"
-        },
-        {
-          "description" : "Unlock all features with lifetime access",
-          "displayName" : "Lifetime • Reduced",
-          "locale" : "en_US"
-        },
-        {
-          "description" : "Разблокируйте все функции с пожизненным доступом",
-          "displayName" : "Навсегда • Со скидкой",
-          "locale" : "ru"
-        },
-        {
-          "description" : "Ontgrendel alle functies met levenslange toegang",
-          "displayName" : "Levenslang • Gereduceerd",
-          "locale" : "nl"
-        },
-        {
-          "description" : "Débloquez toutes les fonctions",
-          "displayName" : "À vie • Réduit",
-          "locale" : "fr"
-        },
-        {
-          "description" : "Avaa kaikki ominaisuudet elinikäisellä käyttöoikeudella",
-          "displayName" : "Elinikäinen • Alennettu",
-          "locale" : "fi"
+          "description" : "解鎖所有功能",
+          "displayName" : "終身 • 優惠",
+          "locale" : "zh_Hant"
         },
         {
           "description" : "Desbloqueie todos os recursos com acesso vitalício",
@@ -165,9 +135,74 @@
           "locale" : "pt_PT"
         },
         {
+          "description" : "افتح جميع الميزات مع وصول مدى الحياة",
+          "displayName" : "مدى الحياة • مخفض",
+          "locale" : "ar"
+        },
+        {
+          "description" : "Разблокируйте все функции с пожизненным доступом",
+          "displayName" : "Навсегда • Со скидкой",
+          "locale" : "ru"
+        },
+        {
+          "description" : "解锁所有功能",
+          "displayName" : "终身 • 优惠",
+          "locale" : "zh_Hans"
+        },
+        {
+          "description" : "Odblokuj wszystkie funkcje na zawsze",
+          "displayName" : "Dożywotnio • Zniżka",
+          "locale" : "pl"
+        },
+        {
+          "description" : "Desbloqueie todos os recursos para sempre",
+          "displayName" : "Vitalício • Promocional",
+          "locale" : "pt_BR"
+        },
+        {
           "description" : "Lås upp alla funktioner med livstidsåtkomst",
           "displayName" : "Livstid • Reducerat",
           "locale" : "sv"
+        },
+        {
+          "description" : "Desbloquea todas las funciones",
+          "displayName" : "De por vida • Reducido",
+          "locale" : "es_ES"
+        },
+        {
+          "description" : "Débloquez toutes les fonctions",
+          "displayName" : "À vie • Réduit",
+          "locale" : "fr"
+        },
+        {
+          "description" : "Ontgrendel alle functies met levenslange toegang",
+          "displayName" : "Levenslang • Gereduceerd",
+          "locale" : "nl"
+        },
+        {
+          "description" : "全機能を利用可能",
+          "displayName" : "ライフタイム • 割引",
+          "locale" : "ja"
+        },
+        {
+          "description" : "Lås op for alle funktioner med livstidsadgang",
+          "displayName" : "Livstid • Reduceret",
+          "locale" : "da"
+        },
+        {
+          "description" : "Avaa kaikki ominaisuudet elinikäisellä käyttöoikeudella",
+          "displayName" : "Elinikäinen • Alennettu",
+          "locale" : "fi"
+        },
+        {
+          "description" : "Unlock all features with lifetime access",
+          "displayName" : "Lifetime • Reduced",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Schalte alle Funktionen frei, für immer",
+          "displayName" : "Lebenslang • Reduziert",
+          "locale" : "de"
         },
         {
           "description" : "Sblocca tutte le funzionalità con accesso a vita",
@@ -180,44 +215,9 @@
           "locale" : "ko"
         },
         {
-          "description" : "Lås op for alle funktioner med livstidsadgang",
-          "displayName" : "Livstid • Reduceret",
-          "locale" : "da"
-        },
-        {
-          "description" : "Odblokuj wszystkie funkcje na zawsze",
-          "displayName" : "Dożywotnio • Zniżka",
-          "locale" : "pl"
-        },
-        {
-          "description" : "全機能を利用可能",
-          "displayName" : "ライフタイム • 割引",
-          "locale" : "ja"
-        },
-        {
           "description" : "Tüm özelliklerin kilidini ömür boyu erişimle açın",
           "displayName" : "Ömür Boyu • İndirimli",
           "locale" : "tr"
-        },
-        {
-          "description" : "Schalte alle Funktionen frei, für immer",
-          "displayName" : "Lebenslang • Reduziert",
-          "locale" : "de"
-        },
-        {
-          "description" : "解鎖所有功能",
-          "displayName" : "終身 • 優惠",
-          "locale" : "zh_Hant"
-        },
-        {
-          "description" : "Desbloqueie todos os recursos para sempre",
-          "displayName" : "Vitalício • Promocional",
-          "locale" : "pt_BR"
-        },
-        {
-          "description" : "解锁所有功能",
-          "displayName" : "终身 • 优惠",
-          "locale" : "zh_Hans"
         }
       ],
       "productID" : "lifetime",
@@ -233,7 +233,7 @@
     "_developerTeamID" : "9AU33YWN79",
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 786813061.07286501,
+    "_lastSynchronizedDate" : 802171746.58466101,
     "_locale" : "en_US",
     "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
@@ -246,7 +246,7 @@
 
   ],
   "version" : {
-    "major" : 4,
+    "major" : 5,
     "minor" : 0
   }
 }
