@@ -145,6 +145,14 @@ final class EncodedOutputModule {
 
         await withTaskGroup(of: Void.self) { group in
             for asset in assetsToProcess {
+                let assetID = asset.id
+                let shouldCommit: @MainActor () -> Bool = { [weak self] in
+                    guard let self else { return false }
+                    return self.processingBatch?.id == batch.id
+                        && self.settings.currentConfiguration == batch.configuration
+                        && self.assets.images.contains(where: { $0.id == assetID })
+                }
+
                 group.addTask(priority: .utility) {
                     guard !Task.isCancelled else { return }
 
@@ -158,12 +166,7 @@ final class EncodedOutputModule {
                         _ = try await encodedOutputCache.resolve(
                             asset: asset,
                             configuration: batch.configuration
-                        ) { [weak self] in
-                            guard let self else { return false }
-                            return self.processingBatch?.id == batch.id
-                                && self.settings.currentConfiguration == batch.configuration
-                                && self.assets.images.contains(where: { $0.id == asset.id })
-                        }
+                        ) { shouldCommit() }
                     } catch {
                         AppLogger.processing.error("Preview encode failed for \(asset.originalURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
                     }

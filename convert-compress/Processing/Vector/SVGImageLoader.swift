@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import ImageIO
 import UniformTypeIdentifiers
 
 struct SVGImageLoader: VectorImageLoader {
@@ -16,6 +17,20 @@ struct SVGImageLoader: VectorImageLoader {
         let data = try Data(contentsOf: url)
         let content = String(data: data, encoding: .utf8) ?? ""
         return resolveIntrinsicSize(svgContent: content, nsImage: NSImage(contentsOf: url))
+    }
+
+    static func embeddedPatternRasterImage(from url: URL) throws -> NSImage? {
+        guard canHandle(url) else { return nil }
+
+        let data = try Data(contentsOf: url)
+        guard let content = String(data: data, encoding: .utf8),
+              let imageData = embeddedRasterPatternData(in: content),
+              let source = CGImageSourceCreateWithData(imageData as CFData, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            return nil
+        }
+
+        return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
     }
 
     // MARK: - SVG XML Parsing
@@ -67,6 +82,20 @@ struct SVGImageLoader: VectorImageLoader {
         return defaultSize
     }
 
+    private static func embeddedRasterPatternData(in svgContent: String) -> Data? {
+        let objectBoundingPattern = #"<pattern\b[^>]*patternContentUnits\s*=\s*["']objectBoundingBox["']"#
+        let rectPatternFill = #"<rect\b[^>]*fill\s*=\s*["']url\("#
+        let imageDataURL = #"(?:xlink:href|href)\s*=\s*["']data:image/[^;]+;base64,([^"']+)["']"#
+
+        guard hasMatch(objectBoundingPattern, in: svgContent),
+              hasMatch(rectPatternFill, in: svgContent),
+              let base64 = firstCapture(imageDataURL, in: svgContent),
+              let data = Data(base64Encoded: base64, options: .ignoreUnknownCharacters) else {
+            return nil
+        }
+        return data
+    }
+
     private static func numericAttribute(_ name: String, in tag: String) -> CGFloat? {
         let pattern = "\(name)\\s*=\\s*[\"']([^\"']+)[\"']"
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
@@ -88,5 +117,18 @@ struct SVGImageLoader: VectorImageLoader {
             .compactMap { Double($0.trimmingCharacters(in: .whitespaces)) }
         guard parts.count == 4 else { return nil }
         return CGRect(x: parts[0], y: parts[1], width: parts[2], height: parts[3])
+    }
+
+    private static func hasMatch(_ pattern: String, in content: String) -> Bool {
+        firstCapture("(\(pattern))", in: content) != nil
+    }
+
+    private static func firstCapture(_ pattern: String, in content: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: content, range: NSRange(content.startIndex..., in: content)),
+              let range = Range(match.range(at: 1), in: content) else {
+            return nil
+        }
+        return String(content[range])
     }
 }

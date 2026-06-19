@@ -1,0 +1,9 @@
+{
+  "id" : "345d56ac-253d-4e65-81b5-d2d20e9b9b6b",
+  "targets" : [
+    {
+      "id" : "06C12D09-DC19-42A2-ABB1-1D780DC30A1F",
+      "name" : "image-tools"
+    }
+  ]
+}
