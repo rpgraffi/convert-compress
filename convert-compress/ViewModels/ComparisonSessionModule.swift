@@ -128,10 +128,10 @@ final class ComparisonSessionModule {
         let cropRegion = await MainActor.run { calculateCropRegion(for: asset) }
 
         let original = await Task.detached(priority: .medium) {
-            NSImage(contentsOf: asset.originalURL)
+            Self.loadOriginalPreviewImage(for: asset)
         }.value
 
-        let originalSize = original?.size
+        let originalSize = asset.originalPixelSize ?? original?.size
 
         guard await isStillSelected(assetID) else { return }
 
@@ -148,17 +148,19 @@ final class ComparisonSessionModule {
         }
 
         let configuration = settings.currentConfiguration
+        let encodedOutput = encodedOutput
+        let shouldCommit: @MainActor () -> Bool = { [weak self] in
+            guard let self else { return false }
+            return self.comparisonSelection?.assetID == assetID
+                && self.settings.currentConfiguration == configuration
+        }
 
         do {
             let (processed, processedPixelSize) = try await Task.detached(priority: .medium) {
-                let data = try await self.encodedOutput.resolve(
+                let data = try await encodedOutput.resolve(
                     asset: asset,
                     configuration: configuration
-                ) { [weak self] in
-                    guard let self else { return false }
-                    return self.comparisonSelection?.assetID == assetID
-                        && self.settings.currentConfiguration == configuration
-                }
+                ) { shouldCommit() }
 
                 let image = NSImage(data: data.data)
                 let pixelSize = ImageMetadata.pixelSize(for: data.data)
@@ -197,6 +199,16 @@ final class ComparisonSessionModule {
 
     private func isStillSelected(_ assetID: UUID) async -> Bool {
         await MainActor.run { comparisonSelection?.assetID == assetID }
+    }
+
+    private nonisolated static func loadOriginalPreviewImage(for asset: ImageAsset) -> NSImage? {
+        if VectorImageSupport.isVectorImage(asset.originalURL),
+           let originalSize = asset.originalPixelSize {
+            let maxPixelSize = Int(max(originalSize.width, originalSize.height).rounded())
+            return try? VectorImageSupport.loadThumbnail(for: asset.originalURL, maxPixelSize: maxPixelSize).thumbnail
+        }
+
+        return NSImage(contentsOf: asset.originalURL)
     }
 
     private func isStillShowingComparison(

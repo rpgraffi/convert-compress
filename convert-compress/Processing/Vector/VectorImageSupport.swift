@@ -48,7 +48,7 @@ enum VectorImageSupport {
 
     /// Loads a vector image and returns a CIImage rasterized at `targetSize` pixels.
     static func loadAsCIImage(from url: URL, targetSize: CGSize) throws -> CIImage {
-        let nsImage = try loadNSImage(from: url)
+        let nsImage = try loadNSImageForRasterization(from: url)
         AppLogger.processing.debug("Loading vector as CIImage: \(url.lastPathComponent, privacy: .public) at \(Int(targetSize.width))×\(Int(targetSize.height))")
         return CIImage(cgImage: try rasterize(nsImage: nsImage, at: targetSize))
     }
@@ -56,7 +56,6 @@ enum VectorImageSupport {
     /// Loads a vector image as a thumbnail at the given max pixel size.
     /// Returns the rasterized thumbnail and the image's intrinsic pixel dimensions.
     static func loadThumbnail(for url: URL, maxPixelSize: Int) throws -> (thumbnail: NSImage, pixelSize: CGSize) {
-        let nsImage = try loadNSImage(from: url)
         let intrinsic = try intrinsicSize(for: url)
 
         let scale = min(1.0, CGFloat(maxPixelSize) / max(intrinsic.width, intrinsic.height))
@@ -65,6 +64,7 @@ enum VectorImageSupport {
             height: (intrinsic.height * scale).rounded()
         )
 
+        let nsImage = try loadNSImageForRasterization(from: url)
         let cgImage = try rasterize(nsImage: nsImage, at: thumbSize)
         let displayScale = NSScreen.main?.backingScaleFactor ?? 2.0
         let pointSize = NSSize(width: CGFloat(cgImage.width) / displayScale, height: CGFloat(cgImage.height) / displayScale)
@@ -83,6 +83,14 @@ enum VectorImageSupport {
             throw VectorImageError.rasterizationFailed
         }
         return nsImage
+    }
+
+    private static func loadNSImageForRasterization(from url: URL) throws -> NSImage {
+        if let embeddedRaster = try SVGImageLoader.embeddedPatternRasterImage(from: url) {
+            AppLogger.processing.debug("Loaded SVG embedded raster pattern directly: \(url.lastPathComponent, privacy: .public)")
+            return embeddedRaster
+        }
+        return try loadNSImage(from: url)
     }
 
     private static func rasterize(nsImage: NSImage, at size: CGSize) throws -> CGImage {

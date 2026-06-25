@@ -59,8 +59,10 @@ struct ExportDirectoryControl: View {
     }
     
     private var currentLabel: String {
-        if let dir = directory { return dir.lastPathComponent }
-        if hasActiveImages, let sourceDirectory { return sourceDirectory.lastPathComponent }
+        if let dir = directory { return FileManager.default.displayName(atPath: dir.path) }
+        if hasActiveImages, let sourceDirectory {
+            return FileManager.default.displayName(atPath: sourceDirectory.path)
+        }
         return String(localized: "Destination")
     }
     
