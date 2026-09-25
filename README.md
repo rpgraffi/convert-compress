@@ -13,7 +13,7 @@ The app is built with SwiftUI and a Core Image based processing pipeline. It sup
 ## Features
 
 - Batch convert images with drag-and-drop, paste, and folder workflows.
-- Convert across 50+ input formats and 20+ output formats, including JPEG, PNG, HEIC, WebP, AVIF, TIFF, SVG, RAW, ICNS, ICO, and PDF.
+- Convert across 50+ input formats and 20+ output formats, including JPEG, PNG, HEIC, WebP, AVIF (export on macOS 26+), TIFF, SVG, RAW, ICNS, ICO, and PDF.
 - Resize or crop images, including format-aware size constraints for icon formats.
 - Adjust compression quality where supported by the target format.
 - Preserve or remove privacy-sensitive metadata.
