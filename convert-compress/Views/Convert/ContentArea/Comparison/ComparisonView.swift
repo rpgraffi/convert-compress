@@ -184,7 +184,11 @@ struct ComparisonView: View {
     }
     
     private func originalImageLayer(imageFrame: CGRect) -> some View {
-        GeometryReader { geo in
+        // Full size for the hero animation. Once the processed image shows, keep the
+        // original left of the slider, so it can't shine through transparent pixels.
+        let showsProcessed = showUI && preview.processedImage != nil
+
+        return GeometryReader { geo in
             Group {
                 if let image = preview.originalImage ?? asset.thumbnail {
                     Image(nsImage: image)
@@ -195,6 +199,11 @@ struct ComparisonView: View {
                         .offset(x: zoomPanState.offset.x, y: zoomPanState.offset.y)
                         .position(x: geo.size.width / 2, y: geo.size.height / 2)
                         .drawingGroup(opaque: false, colorMode: .nonLinear)
+                        .mask(alignment: .leading) {
+                            Rectangle()
+                                .frame(width: showsProcessed ? sliderPosition * geo.size.width : geo.size.width)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
                 } else {
                     Color.clear
                 }
