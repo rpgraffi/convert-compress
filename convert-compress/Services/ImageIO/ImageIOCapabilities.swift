@@ -25,10 +25,6 @@ final class ImageIOCapabilities {
         // ImageIO may not advertise WebP as a destination type on all systems
         self.writableTypes.insert(UTType.webP.identifier)
 
-        // Ensure AVIF appears as readable + writable via the custom AVIF encoder.
-        self.readableTypes.insert(UTType.avif.identifier)
-        self.writableTypes.insert(UTType.avif.identifier)
-
         for utType in VectorImageSupport.allSupportedUTTypes {
             self.readableTypes.insert(utType.identifier)
         }
@@ -65,7 +61,7 @@ final class ImageIOCapabilities {
         let isReadable = supportsReading(utType: utType)
         let isWritable = supportsWriting(utType: utType)
         let supportsQuality = (utType == .jpeg) || (utType == UTType.heic) || (utType == UTType.webP) || (utType == .avif)
-        let supportsLossless = (utType == .png) || (utType == .tiff) || (utType == .bmp) || (utType == .gif) || (utType == UTType.webP) || (utType == .avif)
+        let supportsLossless = (utType == .png) || (utType == .tiff) || (utType == .bmp) || (utType == .gif) || (utType == UTType.webP)
         let supportsMetadata = supportsPrivacySensitiveMetadata(utType: utType)
         let supportsAlpha = supportsAlphaChannel(utType: utType)
         let resizeRestricted = sizeRestrictions(forUTType: utType) != nil
@@ -88,9 +84,9 @@ final class ImageIOCapabilities {
         // Only check writable formats since we can't remove metadata from formats we can't write
         guard supportsWriting(utType: utType) else { return false }
 
-        // These formats can store metadata, but our custom encoders currently rebuild
-        // them from pixels only, so exported files are already stripped.
-        if utType == UTType.webP || utType == .avif {
+        // WebP can store metadata, but our custom encoder rebuilds it from pixels only,
+        // so exported files are already stripped.
+        if utType == UTType.webP {
             return false
         }
         
@@ -103,6 +99,7 @@ final class ImageIOCapabilities {
             UTType.heif.identifier,
             "public.heics",
             "public.heifs",
+            UTType.avif.identifier,
             "public.jpeg-2000",
             "public.jpeg-xl"
         ]

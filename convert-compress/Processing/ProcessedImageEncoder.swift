@@ -22,6 +22,19 @@ struct ProcessedImageEncoder {
         decideActualUTType(originalURL: originalURL, requestedFormat: requestedFormat)
     }
 
+    /// Keep the source RGB profile (e.g. Adobe RGB, Display P3), so exports look the same.
+    /// Falls back to sRGB for gray, CMYK, HDR and vector sources.
+    private static func outputColorSpace(for ciImage: CIImage, originalURL: URL) -> CGColorSpace? {
+        if let space = ciImage.colorSpace,
+           space.model == .rgb,
+           space.supportsOutput,
+           !CGColorSpaceUsesITUR_2100TF(space),
+           !VectorImageSupport.isVectorImage(originalURL) {
+            return space
+        }
+        return CGColorSpace(name: CGColorSpace.sRGB)
+    }
+
     private static func buildDestinationProperties(originalURL: URL, actualUTI: UTType, compressionQuality: Double?, stripMetadata: Bool) -> [CFString: Any] {
         var props: [CFString: Any] = [:]
         if !stripMetadata {
@@ -38,13 +51,17 @@ struct ProcessedImageEncoder {
         if actualUTI == .jpeg || actualUTI == UTType.heic {
             props[kCGImageDestinationLossyCompressionQuality] = compressionQuality ?? 0.9
         }
+        if actualUTI == .avif {
+            // Apple's AVIF writer fails at exactly 1.0.
+            props[kCGImageDestinationLossyCompressionQuality] = min(compressionQuality ?? 0.9, 0.999)
+        }
         return props
     }
 
     static func encodeToData(ciImage: CIImage, originalURL: URL, format: ImageFormat?, compressionQuality: Double?, stripMetadata: Bool = false) throws -> (data: Data, uti: UTType) {
         let actualUTI = decideActualUTType(originalURL: originalURL, requestedFormat: format)
         let ciContext = ProcessedImageEncoder.sharedCIContext
-        guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else {
+        guard let colorSpace = outputColorSpace(for: ciImage, originalURL: originalURL) else {
             throw ImageOperationError.exportFailed
         }
         guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent, format: .RGBA8, colorSpace: colorSpace) else {

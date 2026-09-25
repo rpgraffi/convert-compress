@@ -2,8 +2,7 @@ import UniformTypeIdentifiers
 
 struct CustomImageEncoderRegistry {
     private static let encoders: [CustomImageEncoder] = [
-        WebPEncoder(),
-        AVIFEncoder()
+        WebPEncoder()
     ]
 
     static func encoder(for utType: UTType) -> CustomImageEncoder? {
