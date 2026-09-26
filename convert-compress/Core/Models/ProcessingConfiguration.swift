@@ -11,6 +11,8 @@ struct ProcessingConfiguration: Codable, Equatable {
     let flipV: Bool
     let removeMetadata: Bool
     let removeBackground: Bool
+    /// nil = quality mode. Optional so older presets still decode.
+    var maxFileSizeKB: Int? = nil
 
     var resizeSpecification: ResizeSpecification {
         ResizeSpecification(

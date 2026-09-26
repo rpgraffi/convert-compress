@@ -18,7 +18,7 @@ struct ResizeControl: View {
                     UnrestrictedResizeControl()
                 }
             }
-            .frame(minWidth: Layout.pillMinWidth, maxWidth: Theme.Metrics.controlMaxWidth)
+            .flexibleWidth(min: Layout.pillMinWidth, max: Theme.Metrics.controlMaxWidth)
             .help(String(localized: "Change image size"))
             
             
@@ -33,10 +33,6 @@ struct ResizeControl: View {
             }
         }
         .frame(height: Theme.Metrics.controlHeight)
-        .frame(
-            minWidth: ControlLayout.resizeControlMinWidth(includesModeToggle: showsModeToggle),
-            maxWidth: ControlLayout.resizeControlMaxWidth(includesModeToggle: showsModeToggle)
-        )
         .animation(Theme.Animations.spring(), value: settings.resizeMode)
     }
     

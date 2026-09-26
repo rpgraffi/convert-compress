@@ -7,11 +7,13 @@ struct ProcessingPipeline {
     var removeMetadata: Bool = false
     var finalFormat: ImageFormat? = nil
     var compressionPercent: Double? = nil
+    var maxFileSizeKB: Int? = nil
 
     init(configuration: ProcessingConfiguration) {
         removeMetadata = configuration.removeMetadata
         finalFormat = configuration.selectedFormat
         compressionPercent = configuration.compressionPercent
+        maxFileSizeKB = configuration.maxFileSizeKB
 
         if RestrictedFormatSizing.isRestricted(configuration.selectedFormat) {
             if let format = configuration.selectedFormat {
@@ -79,12 +81,18 @@ struct ProcessingPipeline {
         try Task.checkCancellation()
 
         let chosenFormat = finalFormat ?? asset.originalFormat
-        let quality = compressionPercent.map { max(min($0, 1.0), 0.01) }
-        let encoded = try ProcessedImageEncoder.encodeToData(ciImage: image,
+        let encoded: (data: Data, uti: UTType)
+        if let maxFileSizeKB, ImageIOCapabilities.shared.capabilities(forUTType: outputUTType(for: asset)).supportsQuality {
+            let rendered = try ProcessedImageEncoder.render(ciImage: image, originalURL: originalURL, format: chosenFormat, stripMetadata: removeMetadata)
+            encoded = (try MaxFileSize.fit(maxByteCount: maxFileSizeKB * 1024, encode: rendered.encode), rendered.uti)
+        } else {
+            let quality = compressionPercent.map { max(min($0, 1.0), 0.01) }
+            encoded = try ProcessedImageEncoder.encodeToData(ciImage: image,
                                                      originalURL: originalURL,
                                                      format: chosenFormat,
                                                      compressionQuality: quality,
                                                      stripMetadata: removeMetadata)
+        }
         try Task.checkCancellation()
 
         return encoded

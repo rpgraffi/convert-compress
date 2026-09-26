@@ -32,6 +32,8 @@ enum StorageKeys {
         static let flipV              = "convert-compress.flip_v.v1"
         static let removeBackground   = "convert-compress.remove_background.v1"
         static let removeMetadata     = "convert-compress.remove_metadata.v1"
+        static let usesMaxFileSize    = newKey("pipeline.uses_max_file_size.v1")
+        static let maxFileSizeKB      = newKey("pipeline.max_file_size_kb.v1")
     }
 
     // MARK: - Export Rename (local)

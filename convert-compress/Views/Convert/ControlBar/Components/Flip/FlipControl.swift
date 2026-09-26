@@ -27,8 +27,7 @@ struct FlipControl: View {
         }
         .buttonStyle(.plain)
         .contentShape(Circle())
-        .frame(height: controlHeight)
-        .aspectRatio(1, contentMode: .fit)
+        .frame(width: controlHeight, height: controlHeight)
         .onChange(of: settings.flipV) { _, newValue in
             guard newValue else { return }
             withAnimation(.none) { vFlipRotation = 0 }

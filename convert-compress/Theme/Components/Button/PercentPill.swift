@@ -12,60 +12,56 @@ struct PercentPill: View {
     @State private var percentString = "100"
     @State private var didHapticAtFull = false
     @State private var lastTenPercentTick: Int?
+    @State private var width: CGFloat = 1
 
     var body: some View {
-        GeometryReader { geo in
-            let progress = value01.clamped(to: 0...1)
-            
-            ZStack(alignment: .leading) {
-                PillBackground(
-                    containerSize: geo.size,
-                    cornerRadius: Theme.Metrics.pillCornerRadius(forHeight: geo.size.height),
-                    progress: progress
-                )
-                
-                HStack {
-                    Text(label)
+        let progress = value01.clamped(to: 0...1)
+
+        HStack {
+            Text(label)
+                .font(Theme.Fonts.button)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: true, vertical: false)
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 4) {
+                if isEditing {
+                    InlineNumberField(
+                        text: $percentString,
+                        onCommit: commitPercent
+                    )
+                    .frame(minWidth: 28, maxWidth: 44)
+                } else {
+                    Text("\(percent(for: progress))")
                         .font(Theme.Fonts.button)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 4) {
-                        if isEditing {
-                            InlineNumberField(
-                                text: $percentString,
-                                onCommit: commitPercent
-                            )
-                            .frame(minWidth: 28, maxWidth: 44)
-                        } else {
-                            Text("\(percent(for: progress))")
-                                .font(Theme.Fonts.button)
-                                .monospacedDigit()
-                                .fixedSize(horizontal: true, vertical: false)
-                        }
-                        
-                        Text("%")
-                            .font(Theme.Fonts.button)
-                            .monospacedDigit()
-                    }
+                        .monospacedDigit()
+                        .fixedSize(horizontal: true, vertical: false)
                 }
-                .padding(.horizontal, 12)
+
+                Text("%")
+                    .font(Theme.Fonts.button)
+                    .monospacedDigit()
+                    .fixedSize(horizontal: true, vertical: false)
             }
-            .contentShape(Rectangle())
-            .onTapGesture { startEditing(progress: progress) }
-            .horizontalScrollStep(
-                isEnabled: !isEditing
-            ) { steps in
-                let target = value01 + Double(steps) * dragStep
-                updateValue(snapped(target))
-            }
-            .gesture(dragGesture(width: geo.size.width))
-            .onAppear { percentString = "\(percent(for: progress))" }
         }
+        .padding(.horizontal, 12)
+        .frame(height: Theme.Metrics.controlHeight)
+        .background(PillBackground(progress: progress))
+        .contentShape(Rectangle())
+        .onTapGesture { startEditing(progress: progress) }
+        .horizontalScrollStep(
+            isEnabled: !isEditing
+        ) { steps in
+            let target = value01 + Double(steps) * dragStep
+            updateValue(snapped(target))
+        }
+        .gesture(dragGesture)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = max($0, 1) }
+        .onAppear { percentString = "\(percent(for: progress))" }
     }
     
-    private func dragGesture(width: CGFloat) -> some Gesture {
+    private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 2).onChanged { value in
             guard !isEditing else { return }
             let x = value.location.x.clamped(to: 0...width)
