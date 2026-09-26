@@ -9,26 +9,19 @@ struct UnrestrictedResizeControl: View {
         @Bindable var settings = settings
 
         ZStack {
-            GeometryReader { geo in
-                let size = geo.size
-                Group {
-                    if settings.resizeMode == .resize {
-                        ResizeSliderControl(
-                            widthText: $settings.resizeWidth,
-                            heightText: $settings.resizeHeight,
-                            longEdgeText: $settings.resizeLongEdge,
-                            baseSize: basePixelSizeForCurrentSelection(),
-                            containerSize: size,
-                            squareLocked: false
-                        )
-                        .transition(.opacity)
-                    } else {
-                        ResizeCropControl()
-                            .transition(.opacity)
-                    }
-                }
+            if settings.resizeMode == .resize {
+                ResizeSliderControl(
+                    widthText: $settings.resizeWidth,
+                    heightText: $settings.resizeHeight,
+                    longEdgeText: $settings.resizeLongEdge,
+                    baseSize: basePixelSizeForCurrentSelection(),
+                    squareLocked: false
+                )
+                .transition(.opacity)
+            } else {
+                ResizeCropControl()
+                    .transition(.opacity)
             }
-            .frame(minWidth: ResizeControl.Layout.pillMinWidth)
         }
     }
     

@@ -53,8 +53,7 @@ struct CircleIconToggle: View {
         }
         .buttonStyle(.plain)
         .contentShape(Circle())
-        .frame(height: height)
-        .aspectRatio(1, contentMode: .fit)
+        .frame(width: height, height: height)
         .animation(Theme.Animations.pillFill(), value: isOn)
     }
 }

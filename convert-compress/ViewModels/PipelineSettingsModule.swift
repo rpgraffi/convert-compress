@@ -51,6 +51,18 @@ final class PipelineSettingsModule {
             notifyConfigurationChanged()
         }
     }
+    var usesMaxFileSize: Bool = false {
+        didSet {
+            UserDefaults.standard.set(usesMaxFileSize, forKey: Keys.usesMaxFileSize)
+            notifyConfigurationChanged()
+        }
+    }
+    var maxFileSizeKB: Int = 500 {
+        didSet {
+            UserDefaults.standard.set(maxFileSizeKB, forKey: Keys.maxFileSizeKB)
+            notifyConfigurationChanged()
+        }
+    }
     var flipV: Bool = false {
         didSet {
             UserDefaults.standard.set(flipV, forKey: Keys.flipV)
@@ -94,7 +106,8 @@ final class PipelineSettingsModule {
             compressionPercent: caps?.supportsQuality == false ? 0 : compressionPercent,
             flipV: flipV,
             removeMetadata: caps?.supportsMetadata == false ? false : removeMetadata,
-            removeBackground: removeBackground
+            removeBackground: removeBackground,
+            maxFileSizeKB: usesMaxFileSize && caps?.supportsQuality != false ? maxFileSizeKB : nil
         )
     }
 
@@ -140,6 +153,8 @@ final class PipelineSettingsModule {
             resizeLongEdge = configuration.resizeLongEdge
             selectedFormat = configuration.selectedFormat
             compressionPercent = configuration.compressionPercent
+            usesMaxFileSize = configuration.maxFileSizeKB != nil
+            maxFileSizeKB = configuration.maxFileSizeKB ?? maxFileSizeKB
             flipV = configuration.flipV
             removeMetadata = configuration.removeMetadata
             removeBackground = configuration.removeBackground
@@ -177,6 +192,12 @@ final class PipelineSettingsModule {
 
             if defaults.object(forKey: Keys.compressionPercent) != nil {
                 compressionPercent = defaults.double(forKey: Keys.compressionPercent)
+            }
+            if defaults.object(forKey: Keys.usesMaxFileSize) != nil {
+                usesMaxFileSize = defaults.bool(forKey: Keys.usesMaxFileSize)
+            }
+            if defaults.object(forKey: Keys.maxFileSizeKB) != nil {
+                maxFileSizeKB = defaults.integer(forKey: Keys.maxFileSizeKB)
             }
             if defaults.object(forKey: Keys.flipV) != nil {
                 flipV = defaults.bool(forKey: Keys.flipV)

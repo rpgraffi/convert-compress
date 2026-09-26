@@ -59,28 +59,35 @@ struct ProcessedImageEncoder {
     }
 
     static func encodeToData(ciImage: CIImage, originalURL: URL, format: ImageFormat?, compressionQuality: Double?, stripMetadata: Bool = false) throws -> (data: Data, uti: UTType) {
-        let actualUTI = decideActualUTType(originalURL: originalURL, requestedFormat: format)
-        let ciContext = ProcessedImageEncoder.sharedCIContext
-        guard let colorSpace = outputColorSpace(for: ciImage, originalURL: originalURL) else {
-            throw ImageOperationError.exportFailed
-        }
-        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent, format: .RGBA8, colorSpace: colorSpace) else {
-            throw ImageOperationError.exportFailed
-        }
+        let rendered = try render(ciImage: ciImage, originalURL: originalURL, format: format, stripMetadata: stripMetadata)
+        return (try rendered.encode(compressionQuality), rendered.uti)
+    }
 
+    /// Renders once, so `encode` can try several qualities cheaply.
+    static func render(ciImage: CIImage, originalURL: URL, format: ImageFormat?, stripMetadata: Bool = false) throws -> (uti: UTType, encode: (Double?) throws -> Data) {
+        let actualUTI = decideActualUTType(originalURL: originalURL, requestedFormat: format)
+        guard let colorSpace = outputColorSpace(for: ciImage, originalURL: originalURL),
+              let cgImage = sharedCIContext.createCGImage(ciImage, from: ciImage.extent, format: .RGBA8, colorSpace: colorSpace) else {
+            throw ImageOperationError.exportFailed
+        }
+        return (actualUTI, { quality in
+            try encode(cgImage, originalURL: originalURL, actualUTI: actualUTI, compressionQuality: quality, stripMetadata: stripMetadata)
+        })
+    }
+
+    private static func encode(_ cgImage: CGImage, originalURL: URL, actualUTI: UTType, compressionQuality: Double?, stripMetadata: Bool) throws -> Data {
         if let encoder = CustomImageEncoderRegistry.encoder(for: actualUTI) {
-            let size = CGSize(width: ciImage.extent.width, height: ciImage.extent.height)
+            let size = CGSize(width: cgImage.width, height: cgImage.height)
             if stripMetadata && !encoder.supportsMetadataStripping {
                 AppLogger.export.warning("Metadata stripping is not supported by custom encoder for \(actualUTI.identifier, privacy: .public)")
             }
-            let data = try encoder.encode(
+            return try encoder.encode(
                 cgImage: cgImage,
                 pixelSize: size,
                 utType: actualUTI,
                 compressionQuality: compressionQuality,
                 stripMetadata: stripMetadata && encoder.supportsMetadataStripping
             )
-            return (data, actualUTI)
         }
 
         let props = buildDestinationProperties(originalURL: originalURL, actualUTI: actualUTI, compressionQuality: compressionQuality, stripMetadata: stripMetadata)
@@ -90,7 +97,6 @@ struct ProcessedImageEncoder {
         }
         CGImageDestinationAddImage(destination, cgImage, props as CFDictionary)
         guard CGImageDestinationFinalize(destination) else { throw ImageOperationError.exportFailed }
-        let data = cfData as Data
-        return (data, actualUTI)
+        return cfData as Data
     }
 }

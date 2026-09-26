@@ -7,7 +7,6 @@ struct ResizeSliderControl: View {
     @Binding var heightText: String
     @Binding var longEdgeText: String
     let baseSize: CGSize?
-    let containerSize: CGSize
     let squareLocked: Bool
     
     private enum ActiveDimension { case width, height, longEdge }
@@ -16,6 +15,7 @@ struct ResizeSliderControl: View {
     @State private var hapticTracker = HapticStopTracker()
     @State private var isDragging: Bool = false
     @State private var isEditing: Bool = false
+    @State private var width: CGFloat = 1
     
     private var activeText: String {
         switch activeDimension {
@@ -43,41 +43,36 @@ struct ResizeSliderControl: View {
     }
     
     var body: some View {
-        let corner = Theme.Metrics.pillCornerRadius(forHeight: containerSize.height)
         let stops = allowedStopsForActiveDimension()
         let progress = valueToProgress(stops: stops)
         
         HStack(spacing: 0) {
-            ZStack {
-                PillBackground(
-                    containerSize: containerSize,
-                    cornerRadius: corner,
-                    progress: progress
+            contentRow()
+                .allowsHitTesting(!isDragging)
+                .frame(height: Theme.Metrics.controlHeight)
+                .background(PillBackground(progress: progress))
+                .font(Theme.Fonts.button)
+                .onTapGesture {
+                    isEditing = true
+                }
+                .horizontalScrollStep(
+                    sensitivity: 7.0,
+                    isEnabled: !isEditing
+                ) { steps in
+                    handleScrollGesture(steps: steps, stops: stops)
+                }
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 2)
+                        .onChanged { value in
+                            handleDragGesture(value: value, stops: stops)
+                        }
+                        .onEnded { _ in
+                            isDragging = false
+                        }
                 )
-                contentRow()
-                    .allowsHitTesting(!isDragging)
-            }
-            .font(Theme.Fonts.button)
-            .onTapGesture {
-                isEditing = true
-            }
-            .horizontalScrollStep(
-                sensitivity: 7.0,
-                isEnabled: !isEditing
-            ) { steps in
-                handleScrollGesture(steps: steps, stops: stops)
-            }
-            .highPriorityGesture(
-                DragGesture(minimumDistance: 2)
-                    .onChanged { value in
-                        handleDragGesture(value: value, stops: stops)
-                    }
-                    .onEnded { _ in
-                        isDragging = false
-                    }
-            )
-            .animation(Theme.Animations.pillFill(), value: progress)
+                .animation(Theme.Animations.pillFill(), value: progress)
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = max($0, 1) }
         .onAppear {
             initializeActiveDimension()
         }
@@ -139,7 +134,6 @@ struct ResizeSliderControl: View {
     }
     
     private func calculateStopIndex(from xPosition: CGFloat, totalStops: Int) -> Int {
-        let width = max(containerSize.width, 1)
         let clampedX = min(max(0, xPosition), width)
         let progress = Double(clampedX / width)
         let rawIndex = Int((progress * Double(max(totalStops - 1, 1))).rounded())

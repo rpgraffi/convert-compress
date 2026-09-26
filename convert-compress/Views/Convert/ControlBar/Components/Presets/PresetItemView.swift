@@ -72,7 +72,10 @@ struct PresetItemView<TrailingButtons: View>: View {
                 .frame(minWidth: 70, alignment: .leading)
             
             // Quality
-            if configuration.compressionPercent > 0 {
+            if let maxFileSizeKB = configuration.maxFileSizeKB {
+                Text(verbatim: "≤ \(MaxFileSize.label(maxFileSizeKB))")
+                    .frame(minWidth: 30, alignment: .leading)
+            } else if configuration.compressionPercent > 0 {
                 HStack(spacing: 0) {
                     Text(String(format: "%.0f", configuration.compressionPercent * 100))
                     Text("%")

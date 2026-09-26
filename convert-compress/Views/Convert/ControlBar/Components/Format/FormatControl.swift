@@ -62,6 +62,8 @@ struct FormatControl: View {
             .fixedSize(horizontal: true, vertical: false)
         }
         .menuStyle(.borderlessButton)
+        // Menu reports a tiny min width and would squeeze its label.
+        .fixedSize(horizontal: true, vertical: false)
         .help(settings.selectedFormat?.fullName ?? "")
         .frame(height: controlHeight)
         .padding(.horizontal, 8)

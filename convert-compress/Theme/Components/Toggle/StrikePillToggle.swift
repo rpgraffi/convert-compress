@@ -27,7 +27,7 @@ struct StrikePillToggle<LabelContent: View>: View {
         BasePillToggle(isOn: $isOn, highlightedFill: highlightedFill, normalFill: normalFill) { isOn in
             let baseLabel = label()
                 .font(Theme.Fonts.button)
-                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .foregroundStyle(isOn ? Color.white : .primary)
 
             baseLabel

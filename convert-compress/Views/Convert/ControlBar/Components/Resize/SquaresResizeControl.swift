@@ -8,17 +8,14 @@ struct SquaresResizeControl: View {
     let allowedSizes: [Int] // sorted ascending
     @State private var menuHandler: MenuHandler?
     @State private var hapticTracker = HapticStopTracker()
+    @State private var width: CGFloat = 1
     
     var body: some View {
-        GeometryReader { geo in
-            let size = geo.size
-            let corner = Theme.Metrics.pillCornerRadius(forHeight: size.height)
-            discretePercentPill(containerSize: size, corner: corner, sizes: allowedSizes)
-                .onTapGesture {
-                    showSizesMenuAtMouseLocation(sizes: allowedSizes)
-                }
-        }
-        .frame(minWidth: ResizeControl.Layout.pillMinWidth)
+        discretePercentPill(sizes: allowedSizes)
+            .onTapGesture {
+                showSizesMenuAtMouseLocation(sizes: allowedSizes)
+            }
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = max($0, 1) }
     }
     
     private func sizesMenu(_ sizes: [Int]) -> some View {
@@ -35,28 +32,24 @@ struct SquaresResizeControl: View {
         settings.resizeHeight = String(side)
     }
     
-    private func discretePercentPill(containerSize: CGSize, corner: CGFloat, sizes: [Int]) -> some View {
+    private func discretePercentPill(sizes: [Int]) -> some View {
         let progress = valueToProgress(sizes: sizes)
-        return ZStack(alignment: .leading) {
-            PillBackground(
-                containerSize: containerSize,
-                cornerRadius: corner,
-                progress: progress,
-                // For fixed-size controls we always want the pill filled; never fade out at max
-                fadeStart: 2.0
-            )
-            HStack(spacing: 8) {
-                Text(String(localized: "Resize"))
-                    .font(Theme.Fonts.button)
-                    .foregroundStyle(.secondary)
-                Spacer(minLength: 0)
-                Text(currentSizeLabel(sizes: sizes))
-                    .font(Theme.Fonts.button)
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-            }
-            .padding(.horizontal, 12)
+        return HStack(spacing: 8) {
+            Text(String(localized: "Resize"))
+                .font(Theme.Fonts.button)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: true, vertical: false)
+            Spacer(minLength: 0)
+            Text(currentSizeLabel(sizes: sizes))
+                .font(Theme.Fonts.button)
+                .foregroundStyle(.primary)
+                .monospacedDigit()
+                .fixedSize(horizontal: true, vertical: false)
         }
+        .padding(.horizontal, 12)
+        .frame(height: Theme.Metrics.controlHeight)
+        // For fixed-size controls we always want the pill filled; never fade out at max
+        .background(PillBackground(progress: progress, fadeStart: 2.0))
         .contentShape(Rectangle())
         .horizontalScrollStep(sensitivity: 10.0) { steps in
             let currentIdx = sizes.firstIndex(of: Int(settings.resizeWidth) ?? 0) ?? 0
@@ -67,7 +60,6 @@ struct SquaresResizeControl: View {
         .gesture(
             DragGesture(minimumDistance: 2)
                 .onChanged { value in
-                    let width = max(containerSize.width, 1)
                     let x = min(max(0, value.location.x), width)
                     let p = Double(x / width)
                     let count = max(sizes.count, 1)
